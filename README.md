@@ -4,6 +4,8 @@
 
 Spartan Hangout is a web application for San José State University students to find and organize **small group activities**, such as study sessions, pickup games, coffee meetups and gaming nights, and to connect with other Spartans who share their interests.
 
+It is a **responsive, mobile-first full-stack web app**, not a native mobile app. It's designed for phones first, following the UI mockups, with layouts made for tablets and desktop browsers too.
+
 CMPE 131 – Software Engineering, Group 5:
 Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 
@@ -17,11 +19,13 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 | Architecture & planning documentation (this repository's `docs/`) | **Drafted, awaiting team review** |
 | [Milestone 0 – Foundation](docs/roadmap.md#m0--project-foundation) | **Committed to `main`** (roadmap tasks stay "In review" until a teammate reviews them). Workspaces, Express skeleton with `GET /api/v1/health`, Prisma setup, React app shell with the four tabs, Docker Compose, CI |
 | [Milestone 1 – Registration & email verification](docs/roadmap.md#m1--registration--email-verification) | **Committed to `main`.** Register with an `@sjsu.edu` email (FR01–FR02), verification link with 24-hour expiry and resend (FR03), account activation (FR04) |
-| [Milestone 2 – Login, sessions & lockout](docs/roadmap.md#m2--login-sessions--lockout) | **Implemented, awaiting review.** Log in and out (FR09), sessions that end after 30 idle minutes (FR10), 15-minute lockout after 5 failed attempts (FR11); every screen except registration and login requires logging in |
-| Other product features | **Not started.** Profiles are next |
-| Next step | [Milestone 3 – Profiles & relationship policy](docs/roadmap.md#m3--profiles--relationship-policy) |
+| [Milestone 2 – Login, sessions & lockout](docs/roadmap.md#m2--login-sessions--lockout) | **Committed to `main`.** Log in and out (FR09), 30-minute idle sessions (FR10), lockout after 5 failed attempts (FR11) |
+| Responsive layout | **Implemented, awaiting review.** Phone layout from the mockups; tablet icon rail and desktop sidebar ([Q25](docs/open-questions.md#q25-target-devices)) |
+| [Milestone 3 – Profiles & relationship policy](docs/roadmap.md#m3--profiles--relationship-policy) | **Implemented, awaiting review.** View your own profile with your private email (FR12), edit name, interests and free times (FR05–FR06), view other students' profiles with shared interests highlighted and no email (FR13). Block and connection tables exist for later milestones |
+| Other product features | **Not started.** Activities are next |
+| Next step | [Milestone 4 – Activities: create, view, edit, lifecycle](docs/roadmap.md#m4--activities-create-view-edit-lifecycle) |
 
-The setup commands and scripts below work today. Of the "Main features", only registration, email verification, and login/logout exist so far; the rest is **planned**.
+The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout and profiles exist so far; the rest is **planned**.
 
 ---
 
@@ -148,7 +152,17 @@ Run `npm run db:migrate` again whenever you pull new migrations. Open <http://lo
 | `npm run format` / `format:check` | Prettier write / check |
 | `npm test` | Vitest in every workspace; API tests use `DATABASE_URL_TEST` (needs `docker compose up -d`) |
 | `npm run codegen` | Build `@sh/shared` and generate the Prisma client. Runs automatically before `dev`, `build`, `typecheck` and `test` |
+| `npm run check-node` | Stop with a clear message unless this terminal uses the Node version in `.nvmrc`. Runs automatically before `dev`, `build`, `typecheck` and `test` |
 | `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle (Prisma) |
+
+### Troubleshooting
+
+| Symptom | Cause and fix |
+|---|---|
+| "✖ Spartan Hangout needs Node 24" | The terminal is on an older Node. Run `nvm install && nvm use`, or make 24 your default with `nvm alias default 24`. (On Node 20 the API's `argon2` module crashes without any error message.) `npm install` also refuses to run on the wrong version (`.npmrc` has `engine-strict=true`) |
+| Page says "We couldn't reach Spartan Hangout", and the browser console shows `502 (Bad Gateway)` for `/api/v1/...` | The web app is running but the API isn't. Look at the `api` lines in the `npm run dev` output for the error, fix it, and restart `npm run dev` |
+| API logs a database connection error | PostgreSQL isn't running. Start it with `docker compose up -d` (on WSL, turn on Docker Desktop's WSL integration), then `npm run db:migrate` |
+| "Port 5173 (or 3000) is already in use" | Another dev server is still running. Stop it (Ctrl+C in its terminal) before starting a new one |
 
 ## Documentation
 

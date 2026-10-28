@@ -13,6 +13,7 @@ The required frontend stack is React, TypeScript, React Router and TanStack Quer
 - **React Router** (data-router API) for routes, nested layouts (`AppShell` with header and bottom nav) and an auth guard.
 - Code is **organized by feature** under `src/features/<feature>/`. Each feature has its pages, components and an `api.ts` of TanStack Query hooks. Truly shared UI lives in `src/components/` and helpers in `src/lib/`.
 - **Styling:** CSS Modules (built into Vite) plus global CSS custom properties for the design tokens in the mockups (SJSU blue `#0055A2`, gold `#E5A823`, and so on). No CSS framework.
+- **Responsive, mobile-first:** one web app for phones, tablets and desktops (open question Q25). Phone styles come first, and media queries at 768px and 1024px add the tablet rail and desktop sidebar layouts (architecture §12.3). There is no separate native app.
 - **Forms:** controlled inputs with `useState`, validated with the shared Zod schemas (ADR-0007) through a tiny `zodForm` helper. No form library.
 - **Dates:** the built-in `Intl.DateTimeFormat` with `timeZone: 'America/Los_Angeles'` (ADR-0011).
 

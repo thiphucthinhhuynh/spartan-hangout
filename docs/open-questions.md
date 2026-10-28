@@ -32,7 +32,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q22 | [Organizer updates after an activity starts](#q22-organizer-updates-after-an-activity-starts) | Unclear requirement | Open |
 | Q23 | [Hosting and email provider](#q23-hosting-and-email-provider) | Architecture | Open |
 | Q24 | [Frontend component testing](#q24-frontend-component-testing) | Architecture | Open |
-| Q25 | [Target devices](#q25-target-devices) | Architecture / UX | Open |
+| Q25 | [Target devices](#q25-target-devices) | Architecture / UX | Decided 2026-10-27 |
 | Q26 | [Password hashing algorithm](#q26-password-hashing-algorithm) | Architecture | Decided 2026-10-27 |
 | Q27 | [Background polling and the 30-minute idle timeout](#q27-background-polling-and-the-30-minute-idle-timeout) | Architecture | Open (needed by M7) |
 
@@ -197,7 +197,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 ### Q25. Target devices
 
 - **Source:** The mockups are phone-sized only. The proposal calls it an "app", and the stack is a web app.
-- **Working assumption:** a responsive web app designed mobile-first, which stays usable on desktop by centering the layout at phone-to-tablet width. No native app.
+- **Decision (2026-10-27):** Spartan Hangout is a **responsive, mobile-first full-stack web app**, not a native mobile app. Phones keep the mockup layout, and tablets and desktops get layouts designed for them rather than a stretched phone UI. Breakpoints and layout rules are in [architecture §12.3](architecture.md#123-styling-and-responsive-layout).
 
 ### Q26. Password hashing algorithm
 

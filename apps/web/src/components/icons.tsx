@@ -93,3 +93,22 @@ export const ShieldCheckIcon = (props: IconProps) => (
     <path d="m9 12 2 2 4-4" />
   </Icon>
 );
+
+export const LockIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="3" y="11" width="18" height="11" rx="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </Icon>
+);
+
+export const PencilIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+  </Icon>
+);
+
+export const ArrowLeftIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </Icon>
+);

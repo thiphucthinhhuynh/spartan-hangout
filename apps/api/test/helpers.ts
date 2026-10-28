@@ -1,3 +1,4 @@
+import request from 'supertest';
 import type { EmailMessage, Mailer } from '../src/common/email.js';
 import type { Clock } from '../src/common/time.js';
 import { hashPassword } from '../src/common/password.js';
@@ -52,15 +53,29 @@ export async function createUser({
   password = 'goSpartans1',
   displayName = 'Sammy Spartan',
   status = 'ACTIVE' as 'ACTIVE' | 'PENDING_VERIFICATION',
+  interests = ['STUDY'] as ('STUDY' | 'SPORTS' | 'FOOD' | 'SOCIAL' | 'GAMING')[],
 } = {}) {
   return db.user.create({
     data: {
       email,
       passwordHash: await hashPassword(password),
       displayName,
-      interests: ['STUDY'],
+      interests,
       status,
       availability: { create: [{ dayOfWeek: 3, startMinute: 960, endMinute: 1080 }] },
     },
   });
+}
+
+/** A Supertest agent logged in as the given student (cookie kept between requests). */
+export async function loggedInAgent(
+  app: Parameters<typeof request.agent>[0],
+  email = 'sammy.spartan@sjsu.edu',
+  password = 'goSpartans1',
+) {
+  const agent = request.agent(app);
+  const res = await agent.post('/api/v1/auth/login').send({ email, password });
+  if (res.status !== 200)
+    throw new Error(`Test login failed: ${res.status} ${JSON.stringify(res.body)}`);
+  return agent;
 }

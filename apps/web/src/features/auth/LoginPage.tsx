@@ -62,7 +62,7 @@ export function LoginPage() {
 
       <div className={styles.intro}>
         <h1 className={styles.title}>
-          Your campus. <span className={styles.accent}>Your people.</span>
+          Your campus. <span className={`${styles.accent} ${styles.line}`}>Your people.</span>
         </h1>
         <p className={styles.lead}>
           Discover activities, find your crew, and make more of your time at SJSU.

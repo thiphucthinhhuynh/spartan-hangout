@@ -11,33 +11,45 @@ const tabs: { to: string; label: string; Icon: ComponentType<SVGProps<SVGSVGElem
   { to: '/profile', label: 'Profile', Icon: UserIcon },
 ];
 
-/** Header + page content + bottom tab bar, as in the mockups. */
+/**
+ * Responsive app frame (architecture §12.3). Phones: header + content + bottom tab bar, as in the
+ * mockups. Tablets: left icon rail. Desktop: full left sidebar. Same links at every size.
+ */
 export function AppShell() {
   return (
     <div className={styles.shell}>
-      <header className={styles.header}>
-        <Logo />
-      </header>
+      <a href="#main" className={styles.skipLink}>
+        Skip to content
+      </a>
 
-      <main className={styles.main}>
+      <div className={styles.sidebar}>
+        {/* The sidebar's background spans the whole page; its contents stay in view. */}
+        <div className={styles.sidebarSticky}>
+          <header className={styles.header}>
+            <Logo collapsible />
+          </header>
+
+          <nav className={styles.nav} aria-label="Main">
+            {tabs.map(({ to, label, Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === '/'}
+                className={({ isActive }) =>
+                  [styles.tab, isActive && styles.active].filter(Boolean).join(' ')
+                }
+              >
+                <Icon />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
-
-      <nav className={styles.nav} aria-label="Main">
-        {tabs.map(({ to, label, Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              [styles.tab, isActive && styles.active].filter(Boolean).join(' ')
-            }
-          >
-            <Icon />
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
     </div>
   );
 }

@@ -15,6 +15,11 @@
   color: var(--color-primary);
 }
 
+/* Keeps "Your people." on its own line at every width, as in the mockup. */
+.line {
+  display: block;
+}
+
 .lead {
   font-size: 1.0625rem;
   color: var(--color-muted);
@@ -108,8 +113,8 @@
   right: -16px;
   width: 220px;
   height: 220px;
-  color: var(--color-accent);
-  opacity: 0.35;
+  color: #fff;
+  opacity: 0.12;
 }
 
 .heroPill {
@@ -142,4 +147,11 @@
   flex: 1;
   height: 1px;
   background: var(--color-border);
+}
+
+/* Desktop shows the brand panel from AuthLayout instead of this banner. */
+@media (min-width: 1024px) {
+  .hero {
+    display: none;
+  }
 }

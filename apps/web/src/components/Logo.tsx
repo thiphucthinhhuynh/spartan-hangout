@@ -1,9 +1,14 @@
 import styles from './Logo.module.css';
 
+interface LogoProps {
+  /** Show only the helmet mark on tablet-width navigation rails. */
+  collapsible?: boolean;
+}
+
 /** Helmet mark + "spartan hangout" wordmark from the mockups. */
-export function Logo() {
+export function Logo({ collapsible = false }: LogoProps) {
   return (
-    <span className={styles.logo}>
+    <span className={[styles.logo, collapsible && styles.collapsible].filter(Boolean).join(' ')}>
       <svg viewBox="0 0 32 32" width={40} height={40} aria-hidden="true">
         <rect width="32" height="32" rx="7" fill="var(--color-primary)" />
         <path

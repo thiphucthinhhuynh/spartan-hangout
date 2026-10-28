@@ -19,7 +19,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['packages/shared/**/*.ts', 'apps/api/**/*.ts', '*.js'],
+    files: ['packages/shared/**/*.ts', 'apps/api/**/*.ts', '*.js', 'scripts/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
   {

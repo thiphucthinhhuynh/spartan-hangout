@@ -162,7 +162,7 @@ apps/api/
 │   │   ├── validate.ts           # validate({ body, query, params }) middleware using Zod
 │   │   ├── auth.ts               # AuthUser type on req.user, requireAuth, requireAdmin
 │   │   ├── originCheck.ts        # CSRF: reject cross-site Origin on non-GET requests
-│   │   ├── relationships.ts      # isBlockedEitherWay(), areConnected(), blockedIdsFor()
+│   │   ├── relationships.ts      # isBlockedEitherWay(), areConnected(), blockedIdsFor(), orderedPair()
 │   │   ├── time.ts               # injectable clock; campus timezone helpers (M4)
 │   │   ├── crypto.ts             # random tokens + SHA-256 token hashing
 │   │   ├── password.ts           # argon2id hashing
@@ -500,8 +500,9 @@ apps/web/src/
     ├── plans/       api.ts  MyPlansPage
     ├── chat/        api.ts  ActivityChatPage
     ├── inbox/       api.ts  NotificationsPage  ConversationsPage  ConversationPage
-    ├── people/      api.ts  DiscoverStudentsPage  StudentProfilePage  ConnectionRequestsPage
-    ├── profile/     api.ts  MyProfilePage  EditProfilePage  AvailabilityEditor  DeleteAccountDialog
+    ├── people/      DiscoverStudentsPage  StudentProfilePage (M3, uses profile/api.ts)  ConnectionRequestsPage
+    ├── profile/     api.ts  MyProfilePage  EditProfilePage  AvailabilityEditor  InterestPicker
+    │                InterestTags  AvailabilityList  DeleteAccountDialog (M13)
     ├── moderation/  ReportDialog  BlockDialog
     └── admin/       api.ts  ReportsPage
 ```
@@ -532,7 +533,7 @@ Routes marked with an open question are **tentative**.
 
 An auth guard runs `GET /auth/me` (a TanStack Query query). If the user isn't logged in, it redirects to `/login?next=…`.
 
-### 12.3 Styling
+### 12.3 Styling and responsive layout
 
 Styles use CSS Modules (built into Vite) plus global CSS custom properties taken from the mockups. There is no CSS framework.
 
@@ -545,7 +546,22 @@ Styles use CSS Modules (built into Vite) plus global CSS custom properties taken
 | `--color-surface` | `#F5F7FA` |
 | radii | 12px inputs, 16px cards, pill chips |
 
-The layout is mobile-first because the mockups are phone screens. On wider screens it stays centered at phone-to-tablet width ([Q25](open-questions.md#q25-target-devices)).
+Spartan Hangout is a **responsive, mobile-first web app**, not a native app ([Q25](open-questions.md#q25-target-devices)). Base styles target phones, which is what the mockups show, and wider screens are added with `min-width` media queries.
+
+| Width | App screens (`AppShell`) | Sign-in screens (`AuthLayout`) |
+|---|---|---|
+| **< 768px** (phones) | Sticky top header, content, fixed bottom tab bar (mockups) | Single white column (mockup p.1) |
+| **768–1023px** (tablets) | Left icon rail (icon + small label), no bottom bar; content up to `--content-max-width` | Form in a centered card on the grey page background |
+| **≥ 1024px** (desktop) | Full left sidebar (logo + icon and label rows); content up to 1040px, centered | Split screen: blue brand panel left, form right |
+
+Rules for every new screen:
+
+- **Write phone styles first**, then add `@media (min-width: 768px)` / `(min-width: 1024px)` overrides. Custom properties can't be used in media queries, so the two breakpoints are written out (they're listed in `styles/tokens.css`).
+- **Use the extra width.** Lists of cards (activities, students) go from 1 column on phones to 2 on tablets and 3 on desktop with CSS grid. Long forms keep a readable width (about 560px).
+- **No horizontal scrolling** at any width from 320px up. Touch targets are at least 44px tall.
+- **Hover styles only under `@media (hover: hover)`**, so touch screens don't get stuck hover states.
+- **Same navigation everywhere:** one `<nav>` in `AppShell`, repositioned with CSS rather than duplicated. A "Skip to content" link helps keyboard users on desktop.
+- **Check every screen at phone, tablet and desktop widths** before a PR (roadmap definition of done).
 
 ### 12.4 Server state vs local state
 

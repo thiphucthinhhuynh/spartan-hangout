@@ -1,0 +1,173 @@
+/* Shared by My profile, Edit profile and Student profile. Phones first (architecture §12.3). */
+
+.layout {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.details {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.private {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.private svg {
+  flex-shrink: 0;
+}
+
+.muted {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.badge {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.sectionTitle {
+  margin-bottom: var(--space-3);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+}
+
+.tagShared {
+  border-color: var(--color-primary-soft);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.slot:last-child {
+  border-bottom: none;
+}
+
+.slotDay {
+  font-weight: 600;
+}
+
+.slotTime {
+  color: var(--color-muted);
+}
+
+/* Edit form */
+.formCard {
+  max-width: 720px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 640px;
+}
+
+.formActions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-2);
+}
+
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: #fdecea;
+  color: var(--color-danger);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Tablet and up: summary card beside the details */
+@media (min-width: 768px) {
+  .layout {
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .formActions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

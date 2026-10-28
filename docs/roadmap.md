@@ -17,7 +17,8 @@ This roadmap follows the [architecture](architecture.md). Each milestone deliver
 2. It follows the module and layer rules ([architecture §4–5](architecture.md#4-backend-modular-monolith)).
 3. Validation uses the shared Zod schemas, and errors use the standard envelope.
 4. Docs are updated if the API, data model or a decision changed, and traceability is updated.
-5. A teammate reviewed and approved the PR.
+5. UI changes work at phone, tablet and desktop widths with no horizontal scrolling ([architecture §12.3](architecture.md#123-styling-and-responsive-layout)).
+6. A teammate reviewed and approved the PR.
 
 ### Milestone overview
 
@@ -167,20 +168,20 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can view and edit their own profile and view other students' profiles. The shared block/connection policy exists.
 **Features included:** FR05–FR06, FR12–FR13 (the profile's Connect, Report and Block actions arrive in M9, M11 and M12).
 **Dependencies:** M2.
-**Expected files/modules:** Prisma migration (`block`, `connection`); `apps/api/src/common/relationships.ts`; `apps/api/src/modules/users/{users.routes,users.controller,users.service,users.mappers}.ts`; `packages/shared/src/schemas/profile.ts`, `dto/profile.ts`; `apps/web/src/features/profile/*`, `apps/web/src/features/people/StudentProfilePage.tsx`.
+**Expected files/modules:** Prisma migration (`block`, `connection`); `apps/api/src/common/relationships.ts`; `apps/api/src/modules/users/{users.routes,users.controller,users.service,users.mappers}.ts` (no repository: simple queries); `apps/api/test/users.test.ts`; `packages/shared/src/schemas/profile.ts`, `dto/profile.ts`; `apps/web/src/features/profile/{MyProfilePage,EditProfilePage,InterestTags,AvailabilityList,api}.tsx`; `apps/web/src/features/people/StudentProfilePage.tsx`; `apps/web/src/components/Avatar.tsx`; `apps/web/src/lib/format.ts`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 42 | Prisma migration: `block` and `connection` tables (stay empty until M12/M9) | 21 | Not started |
-| 43 | `common/relationships.ts`: `isBlockedEitherWay`, `blockedIdsFor`, `areConnected` | 42 | Not started |
-| 44 | Shared: `profileUpdateSchema`, `OwnProfileDto`, `PublicProfileDto` (no email field) | 22 | Not started |
-| 45 | `users.mappers`: own vs public profile; shared-interest marking | 44 | Not started |
-| 46 | `users.service`: get own profile; update (validate, replace slots in a transaction, `updated_at`); get public profile (404 when blocked; `connectionState`) | 43, 45 | Not started |
-| 47 | Routes: `GET /users/me`, `PATCH /users/me`, `GET /users/:id` | 46 | Not started |
-| 48 | Web: `MyProfilePage` (FR12): name, email, interests, availability, Edit and Log out | 47 | Not started |
-| 49 | Web: `EditProfilePage` reusing `AvailabilityEditor`, per-field errors, nothing saved on error (FR05–FR06) | 47, 29 | Not started |
-| 50 | Web: `StudentProfilePage` (FR13) with shared interests highlighted, no email | 47 | Not started |
-| 51 | Automated tests (key cases): public mapper never includes email; profile update validation | 47 | Not started |
+| 42 | Prisma migration: `block` and `connection` tables (stay empty until M12/M9) | 21 | In review (implemented, not merged) |
+| 43 | `common/relationships.ts`: `isBlockedEitherWay`, `blockedIdsFor`, `areConnected` | 42 | In review (implemented, not merged) |
+| 44 | Shared: `profileUpdateSchema`, `OwnProfileDto`, `PublicProfileDto` (no email field) | 22 | In review (implemented, not merged) |
+| 45 | `users.mappers`: own vs public profile; shared-interest marking | 44 | In review (implemented, not merged) |
+| 46 | `users.service`: get own profile; update (validate, replace slots in a transaction, `updated_at`); get public profile (404 when blocked; `connectionState`) | 43, 45 | In review (implemented, not merged) |
+| 47 | Routes: `GET /users/me`, `PATCH /users/me`, `GET /users/:id` | 46 | In review (implemented, not merged) |
+| 48 | Web: `MyProfilePage` (FR12): name, email, interests, availability, Edit and Log out | 47 | In review (implemented, not merged) |
+| 49 | Web: `EditProfilePage` reusing `AvailabilityEditor`, per-field errors, nothing saved on error (FR05–FR06) | 47, 29 | In review (implemented, not merged) |
+| 50 | Web: `StudentProfilePage` (FR13) with shared interests highlighted, no email | 47 | In review (implemented, not merged) |
+| 51 | Automated tests (key cases): public mapper never includes email; profile update validation | 47 | In review (implemented, not merged) |
 
 **Completion criteria:** own profile shows the email and other profiles never do. Edits validate with the registration rules, update in place and record `updated_at`. A blocked pair gets 404 (verifiable only by inserting a block row in a test until M12).
 
@@ -424,7 +425,7 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 | 138 | Implement the automated tests prioritized from the team's test-case document (Vitest/Supertest) | 137, 136 | Not started |
 | 139 | Run the manual test cases from the team's document; log and fix defects | 137, 136 | Not started |
 | 140 | Update traceability.md: confirm each FR is implemented and verified | 138, 139 | Not started |
-| 141 | Accessibility and responsive pass (labels, focus order, contrast, phone and desktop widths, Q25) | 136 | Not started |
+| 141 | Accessibility and responsive pass across all screens (labels, focus order, contrast; phone, tablet and desktop widths per architecture §12.3) | 136 | Not started |
 | 142 | Security review against the architecture §13 checklist | 136 | Not started |
 | 143 | Team decision Q23: hosting and email provider | 2 | Not started |
 | 144 | Production build: Express serves the built SPA; production env config; `prisma migrate deploy` on release | 143 | Not started |

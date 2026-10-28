@@ -1,7 +1,7 @@
 {
   "name": "spartan-hangout",
   "private": true,
-  "description": "Spartan Hangout — find and organize small group activities at SJSU (CMPE 131, Group 5)",
+  "description": "Spartan Hangout \u2014 find and organize small group activities at SJSU (CMPE 131, Group 5)",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -14,21 +14,22 @@
   ],
   "scripts": {
     "codegen": "npm run build -w @sh/shared && npm run db:generate -w @sh/api",
-    "predev": "npm run codegen",
+    "predev": "npm run check-node && npm run codegen",
     "dev": "concurrently -n shared,api,web -c magenta,blue,green \"npm:dev -w @sh/shared\" \"npm:dev -w @sh/api\" \"npm:dev -w @sh/web\"",
-    "prebuild": "npm run codegen",
+    "prebuild": "npm run check-node && npm run codegen",
     "build": "npm run build -w @sh/api && npm run build -w @sh/web",
-    "pretypecheck": "npm run codegen",
+    "pretypecheck": "npm run check-node && npm run codegen",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "pretest": "npm run codegen",
+    "pretest": "npm run check-node && npm run codegen",
     "test": "npm run test --workspaces --if-present",
     "db:generate": "npm run db:generate -w @sh/api",
     "db:migrate": "npm run db:migrate -w @sh/api",
     "db:reset": "npm run db:reset -w @sh/api",
-    "db:seed": "npm run db:seed -w @sh/api"
+    "db:seed": "npm run db:seed -w @sh/api",
+    "check-node": "node scripts/check-node.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

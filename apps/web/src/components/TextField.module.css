@@ -24,6 +24,11 @@
   border-color: var(--color-primary);
 }
 
+.control:has(.input:focus-visible) {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .invalid {
   border-color: var(--color-danger);
 }
@@ -38,6 +43,9 @@
   min-width: 0;
   border: none;
   background: transparent;
+}
+
+.input:focus-visible {
   outline: none;
 }
 

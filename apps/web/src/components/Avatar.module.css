@@ -1,0 +1,36 @@
+.avatar {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+}
+
+.md {
+  width: 48px;
+  height: 48px;
+  font-size: 1rem;
+}
+
+.lg {
+  width: 88px;
+  height: 88px;
+  font-size: 1.75rem;
+}
+
+.blue {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.gold {
+  background: var(--color-accent-soft);
+  color: var(--color-primary);
+}

@@ -4,9 +4,36 @@
   gap: var(--space-3);
 }
 
+.logo svg {
+  flex-shrink: 0;
+}
+
+/* In the app navigation the wordmark always fits on one line. */
+.collapsible .wordmark {
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .collapsible .wordmark {
+    font-size: 1.125rem;
+  }
+}
+
 .wordmark {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-primary);
+}
+
+/* Tablet rail: too narrow for the wordmark, so keep it for screen readers only. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .collapsible .wordmark {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }

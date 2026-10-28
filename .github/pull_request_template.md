@@ -13,6 +13,7 @@
 
 - [ ] CI passes (format, lint, typecheck, tests, build)
 - [ ] Follows the module and layer rules (docs/architecture.md §4–5)
+- [ ] UI changes checked at phone, tablet and desktop widths (docs/architecture.md §12.3)
 - [ ] Validation uses the shared Zod schemas; errors use the standard envelope
 - [ ] Docs updated if the API, data model or a decision changed (incl. docs/traceability.md)
 - [ ] Reviewed and approved by a teammate

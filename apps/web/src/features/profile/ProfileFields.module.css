@@ -87,3 +87,14 @@
 .remove:hover {
   background: var(--color-surface);
 }
+
+/* Very narrow phones: the day gets its own line above the two times. */
+@media (max-width: 399.98px) {
+  .slotRow {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  }
+
+  .slotRow > select {
+    grid-column: 1 / -1;
+  }
+}

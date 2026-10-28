@@ -58,6 +58,10 @@ model User {
   availability       AvailabilitySlot[]
   verificationTokens EmailVerificationToken[]
   sessions           Session[]
+  blocksMade         Block[]                  @relation("blocker")
+  blocksReceived     Block[]                  @relation("blocked")
+  connectionsAsA     Connection[]             @relation("connectionA")
+  connectionsAsB     Connection[]             @relation("connectionB")
 
   @@map("user")
 }
@@ -108,4 +112,37 @@ model Session {
 
   @@index([userId])
   @@map("session")
+}
+
+// ─── M3: relationships (read by common/relationships.ts) ────────────────────
+// Created now so every feature can check blocks and connections from the start.
+// Rows are added by blocking (M12) and connection requests (M9).
+// CHECK constraints in the migration SQL: no self-blocks; each connection pair stored once (a < b).
+
+/// FR54–FR57: `blocker` has blocked `blocked`.
+model Block {
+  blockerId String   @map("blocker_id") @db.Uuid
+  blockedId String   @map("blocked_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  blocker User @relation("blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
+  @@map("block")
+}
+
+/// FR46: two connected students, stored once with userAId < userBId.
+model Connection {
+  userAId   String   @map("user_a_id") @db.Uuid
+  userBId   String   @map("user_b_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  userA User @relation("connectionA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User @relation("connectionB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  @@id([userAId, userBId])
+  @@index([userBId])
+  @@map("connection")
 }

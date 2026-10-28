@@ -12,16 +12,16 @@ Abbreviations: **Unit-S** = shared Zod schema unit tests · **Unit-Svc** = servi
 | FR01 | Register only with `@sjsu.edu`; reject other domains and already-linked emails with a reason | auth | `POST /auth/register` | M1 | Unit-S, Int | Implemented (M1, in review) |
 | FR02 | Registration fields and rules (name 1–50, password rule, ≥ 1 interest, ≥ 1 valid slot); identify each invalid field | auth, shared | `POST /auth/register` | M1 | Unit-S, Int, Manual | Implemented (M1, in review) |
 | FR03 | Send verification link; inactive until used; 24-hour expiry; request a new link | auth | `POST /auth/register`, `POST /auth/verify-email`, `POST /auth/resend-verification` | M1 | Unit-Svc, Int | Implemented (M1, in review) |
-| FR04 | Create an active profile after verification; email not shown to others | auth, users | `POST /auth/verify-email`, `GET /users/:id` | M1 (M3 for the public view) | Int | Partly implemented (activation M1, login M2; public view in M3) |
-| FR05 | Edit display name, interests, availability; email not editable | users | `PATCH /users/me` | M3 | Int, Manual | Planned |
-| FR06 | Validate edits like registration; update in place; record last-updated; save nothing if invalid | users | `PATCH /users/me` | M3 | Unit-S, Int | Planned |
+| FR04 | Create an active profile after verification; email not shown to others | auth, users | `POST /auth/verify-email`, `GET /users/:id` | M1 (M3 for the public view) | Int | Implemented (M1–M3, in review) |
+| FR05 | Edit display name, interests, availability; email not editable | users | `PATCH /users/me` | M3 | Int, Manual | Implemented (M3, in review) |
+| FR06 | Validate edits like registration; update in place; record last-updated; save nothing if invalid | users | `PATCH /users/me` | M3 | Unit-S, Int | Implemented (M3, in review) |
 | FR07 | Remove account from the profile page with a permanent-removal warning and password | users | `DELETE /users/me` | M13 | Int, Manual | Planned |
 | FR08 | Removal effects (a)–(e); email reusable afterwards | users (+ activities, connections, messages via services) | `DELETE /users/me` | M13 | Int | Planned |
 | FR09 | Authenticate verified email + password; generic error; no login if unverified | auth | `POST /auth/login` | M2 | Unit-Svc, Int | Implemented (M2, in review) |
 | FR10 | Session lasts until Log Out or 30 minutes idle; then login is required | auth (common/auth) | `POST /auth/logout`, `GET /auth/me`, all protected routes | M2 | Unit-Svc, Int | Implemented (M2, in review) |
 | FR11 | 15-minute lock after 5 failures in 15 minutes; reset on success or expiry | auth | `POST /auth/login` | M2 | Unit-Svc, Int | Implemented (M2, in review) |
-| FR12 | View own profile with email, interests, availability, edit and remove actions | users | `GET /users/me` | M3 (remove action M13) | Int, Manual | Planned |
-| FR13 | View others' profiles (from the participant list, Discover, connections, conversations); shared interests marked; Connect, Report, Block; no email | users | `GET /users/:id` | M3 (actions M9, M11, M12) | Int, Manual | Planned |
+| FR12 | View own profile with email, interests, availability, edit and remove actions | users | `GET /users/me` | M3 (remove action M13) | Int, Manual | Partly implemented (M3; the remove-account action arrives in M13) |
+| FR13 | View others' profiles (from the participant list, Discover, connections, conversations); shared interests marked; Connect, Report, Block; no email | users | `GET /users/:id` | M3 (actions M9, M11, M12) | Int, Manual | Partly implemented (M3: profile, shared interests, no email; Connect/Report/Block in M9/M11/M12; opened from participant lists, Discover, connections and conversations as those arrive) |
 | FR14 | Recommended list conditions (a)–(f) | activities | `GET /activities/recommended` | M5 | Int | Planned |
 | FR15 | Recommended ordering, fields shown, open detail, "No matching activities found.", reflects profile changes | activities | `GET /activities/recommended` | M5 | Int, Manual | Planned |
 | FR16 | Search by any combination of type, date range, start-time range, location; clear criteria | activities, shared | `GET /activities` | M5 | Unit-S, Int, Manual | Planned |

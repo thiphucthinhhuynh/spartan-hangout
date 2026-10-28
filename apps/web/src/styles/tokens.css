@@ -26,7 +26,13 @@
   --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --shadow-card: 0 1px 2px rgb(28 42 58 / 6%), 0 4px 16px rgb(28 42 58 / 6%);
 
-  --layout-max-width: 640px;
+  /* Layout. Mobile-first: base styles are for phones; wider screens are added with media queries.
+     Breakpoints (media queries cannot read custom properties, so they are written out):
+       768px  — tablet: left navigation rail instead of the bottom tab bar
+       1024px — desktop: full left sidebar; split-screen sign-in pages */
   --header-height: 64px;
   --nav-height: 68px;
+  --sidebar-rail-width: 104px;
+  --sidebar-width: 264px;
+  --content-max-width: 1040px;
 }

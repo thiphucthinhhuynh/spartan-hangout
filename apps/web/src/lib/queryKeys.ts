@@ -6,4 +6,8 @@ export const queryKeys = {
   health: ['health'] as const,
   /** The logged-in student, or null when signed out. */
   me: ['me'] as const,
+  /** The logged-in student's full profile (GET /users/me). */
+  myProfile: ['profile', 'me'] as const,
+  /** Another student's public profile (GET /users/:id). */
+  student: (id: string) => ['profile', 'student', id] as const,
 };
