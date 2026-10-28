@@ -19,7 +19,7 @@ These are easiest to meet when the server can see and revoke sessions.
 - A middleware resolves the cookie to `req.user`. The session is valid while `now - last_seen_at < 30 min`. `last_seen_at` is refreshed at most once a minute (sliding expiry).
 - Logout deletes the row. Account removal cascades the deletion (FR08e).
 - Lockout counters live on the `user` row (`failed_login_count`, `first_failed_login_at`, `locked_until`).
-- Passwords are hashed with argon2id or bcrypt (chosen in M1).
+- Passwords are hashed with argon2id (the `argon2` package, chosen in M1; open question Q26).
 - CSRF: `SameSite=Lax`, JSON-only bodies, and an `Origin` check on non-GET requests.
 
 The session middleware is about 40 lines of our own code, using Prisma and `cookie-parser`.

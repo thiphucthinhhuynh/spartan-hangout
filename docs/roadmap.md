@@ -117,23 +117,23 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** a new student can register with an `@sjsu.edu` email, verify it, and end up with an active profile.
 **Features included:** FR01–FR04.
 **Dependencies:** M0. Decisions Q4 (activity types), Q15 (re-registration), Q26 (password hash).
-**Expected files/modules:** Prisma migration (`user`, `availability_slot`, `email_verification_token`); `packages/shared/src/schemas/auth.ts`; `apps/api/src/common/{time,email}.ts`; `apps/api/src/modules/auth/*`; `apps/web/src/features/auth/{RegisterPage,CheckEmailPage,VerifyEmailPage,api}.tsx`; `apps/web/src/features/profile/AvailabilityEditor.tsx`.
+**Expected files/modules:** Prisma migration (`user`, `availability_slot`, `email_verification_token`); `packages/shared/src/{schemas/auth,time,validation}.ts`; `apps/api/src/common/{time,email,crypto,password}.ts`, `apps/api/src/deps.ts`; `apps/api/src/modules/auth/*`; `apps/api/test/{globalSetup,helpers,auth.test}.ts`; `apps/web/src/features/auth/{RegisterPage,CheckEmailPage,VerifyEmailPage,ResendLinkForm,api}.tsx`; `apps/web/src/features/profile/{AvailabilityEditor,InterestPicker}.tsx`; `apps/web/src/app/layouts/AuthLayout.tsx`; `apps/web/src/lib/zodForm.ts`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 20 | Team decisions: Q4 activity type list, Q15 re-registration, Q26 password hashing | 2 | Not started |
-| 21 | Prisma migration: `user` (incl. lockout columns), `availability_slot`, `email_verification_token` with CHECK constraints | 10, 20 | Not started |
-| 22 | Shared: `ActivityType`/`UserStatus`/`Role` enums, limits in `constants.ts`, `registerSchema` (domain, password rule, display name, interests ≥ 1, slots with end > start) | 6, 20 | Not started |
-| 23 | `common/time.ts`: injectable `clock`, `HH:mm` ↔ minute-of-day helpers | 8 | Not started |
-| 24 | `common/email.ts`: Nodemailer transport (console in dev, SMTP in prod) and verification email template | 8 | Not started |
-| 25 | `auth.repository`: create pending user with slots and token hash; find by email; find a valid token | 21 | Not started |
-| 26 | `auth.service.register`: `@sjsu.edu` check, duplicate check, hash password, store, send link (FR01–FR03) | 22–25 | Not started |
-| 27 | `auth.service.verifyEmail` and `resendVerification`: single-use, 24-hour expiry, activate account (FR03–FR04) | 26 | Not started |
-| 28 | Routes and controller: `POST /auth/register`, `/auth/verify-email`, `/auth/resend-verification` | 26, 27 | Not started |
-| 29 | Web: `AvailabilityEditor` (add/remove rows of day + start + end) | 15, 22 | Not started |
-| 30 | Web: `RegisterPage` with interest chips, availability editor and per-field errors (FR02) | 28, 29 | Not started |
-| 31 | Web: `CheckEmailPage` (with resend) and `VerifyEmailPage` (reads the token from the URL) | 28 | Not started |
-| 32 | Automated tests (key cases): `registerSchema` unit tests; register/verify integration tests | 28 | Not started |
+| 20 | Team decisions: Q4 activity type list, Q15 re-registration, Q26 password hashing | 2 | Done (decided 2026-10-27: UI five types; reject + offer resend; argon2) |
+| 21 | Prisma migration: `user` (incl. lockout columns), `availability_slot`, `email_verification_token` with CHECK constraints | 10, 20 | In review (implemented, not merged) |
+| 22 | Shared: `ActivityType`/`UserStatus`/`Role` enums, limits in `constants.ts`, `registerSchema` (domain, password rule, display name, interests ≥ 1, slots with end > start) | 6, 20 | In review (implemented, not merged) |
+| 23 | `common/time.ts`: injectable `clock`, `HH:mm` ↔ minute-of-day helpers | 8 | In review (implemented, not merged) |
+| 24 | `common/email.ts`: Nodemailer transport (console in dev, SMTP in prod) and verification email template | 8 | In review (implemented, not merged) |
+| 25 | `auth.repository`: create pending user with slots and token hash; find by email; find a valid token | 21 | In review (implemented, not merged) |
+| 26 | `auth.service.register`: `@sjsu.edu` check, duplicate check, hash password, store, send link (FR01–FR03) | 22–25 | In review (implemented, not merged) |
+| 27 | `auth.service.verifyEmail` and `resendVerification`: single-use, 24-hour expiry, activate account (FR03–FR04) | 26 | In review (implemented, not merged) |
+| 28 | Routes and controller: `POST /auth/register`, `/auth/verify-email`, `/auth/resend-verification` | 26, 27 | In review (implemented, not merged) |
+| 29 | Web: `AvailabilityEditor` (add/remove rows of day + start + end) | 15, 22 | In review (implemented, not merged) |
+| 30 | Web: `RegisterPage` with interest chips, availability editor and per-field errors (FR02) | 28, 29 | In review (implemented, not merged) |
+| 31 | Web: `CheckEmailPage` (with resend) and `VerifyEmailPage` (reads the token from the URL) | 28 | In review (implemented, not merged) |
+| 32 | Automated tests (key cases): `registerSchema` unit tests; register/verify integration tests | 28 | In review (implemented, not merged) |
 
 **Completion criteria:** only `@sjsu.edu` can register, and a duplicate email is rejected with the reason. Each invalid field is identified. The dev console shows the link. An expired link is rejected and a new one can be requested. Verification activates the account. The email is stored but not exposed.
 

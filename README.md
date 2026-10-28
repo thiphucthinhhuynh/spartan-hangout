@@ -15,11 +15,12 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 |---|---|
 | Proposal, high-level requirements, functional requirements (FR01–FR57), US08 design diagrams, UI mockups | Done (course deliverables) |
 | Architecture & planning documentation (this repository's `docs/`) | **Drafted, awaiting team review** |
-| [Milestone 0 – Foundation](docs/roadmap.md#m0--project-foundation) | **Implemented, awaiting review.** Workspaces, Express skeleton with `GET /api/v1/health`, Prisma setup (no tables yet), React app shell with the four tabs, Docker Compose, CI |
-| Product features | **Not started.** Nothing under "Main features" exists yet |
-| Next step | [Milestone 1 – Registration & email verification](docs/roadmap.md#m1--registration--email-verification) |
+| [Milestone 0 – Foundation](docs/roadmap.md#m0--project-foundation) | **Committed to `main`** (roadmap tasks still marked "In review" until a teammate reviews them). Workspaces, Express skeleton with `GET /api/v1/health`, Prisma setup, React app shell with the four tabs, Docker Compose, CI |
+| [Milestone 1 – Registration & email verification](docs/roadmap.md#m1--registration--email-verification) | **Implemented, awaiting review.** Register with an `@sjsu.edu` email (FR01–FR02), verification link with 24-hour expiry and resend (FR03), account activation (FR04) |
+| Other product features | **Not started.** Login is next |
+| Next step | [Milestone 2 – Login, sessions & lockout](docs/roadmap.md#m2--login-sessions--lockout) |
 
-The setup commands and scripts below work today. Everything under "Main features" is still **planned**.
+The setup commands and scripts below work today. Of the "Main features", only registration and email verification exist so far; the rest is **planned**.
 
 ---
 
@@ -128,13 +129,14 @@ npm install
 cp apps/api/.env.example apps/api/.env
 
 docker compose up -d        # PostgreSQL with dev + test databases
+npm run db:migrate          # create the tables
 
 npm run dev                 # API on :3000, web on :5173 (Vite proxies /api to the API)
 ```
 
 Then open <http://localhost:5173>. <http://localhost:5173/api/v1/health> should return `{"status":"ok"}`.
 
-There are no database tables until Milestone 1. From then on, run `npm run db:migrate` after pulling new migrations. In development, verification emails (M1) won't actually be sent: the link is printed to the API console.
+Run `npm run db:migrate` again whenever you pull new migrations. To try registration, open <http://localhost:5173/register>. In development, verification emails aren't actually sent: the email, including its link, is printed in the API console (leave `SMTP_HOST` empty in `apps/api/.env`).
 
 | Script | Purpose |
 |---|---|

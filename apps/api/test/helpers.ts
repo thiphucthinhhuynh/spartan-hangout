@@ -1,0 +1,43 @@
+import type { EmailMessage, Mailer } from '../src/common/email.js';
+import type { Clock } from '../src/common/time.js';
+import { db } from '../src/db.js';
+
+/** Empties every application table (keeps Prisma's migration history). */
+export async function resetDb() {
+  const tables = await db.$queryRaw<{ tablename: string }[]>`
+    SELECT tablename FROM pg_tables
+    WHERE schemaname = 'public' AND tablename <> '_prisma_migrations'`;
+  if (tables.length === 0) return;
+  const list = tables.map((t) => `"${t.tablename}"`).join(', ');
+  await db.$executeRawUnsafe(`TRUNCATE ${list} RESTART IDENTITY CASCADE`);
+}
+
+/** Records emails instead of sending them. */
+export function createTestMailer() {
+  const sent: EmailMessage[] = [];
+  const mailer: Mailer = {
+    async send(message) {
+      sent.push(message);
+    },
+  };
+  return { mailer, sent };
+}
+
+/** A clock that only moves when told to. */
+export function createTestClock(start = new Date('2026-10-21T16:00:00Z')) {
+  let current = start.getTime();
+  const clock: Clock = { now: () => new Date(current) };
+  return {
+    clock,
+    advanceHours(hours: number) {
+      current += hours * 60 * 60 * 1000;
+    },
+  };
+}
+
+/** Pulls the token out of the verification link in an email. */
+export function tokenFromEmail(message: EmailMessage | undefined): string {
+  const match = message?.text.match(/verify-email\?token=([\w%-]+)/);
+  if (!match?.[1]) throw new Error('No verification link found in the email');
+  return decodeURIComponent(match[1]);
+}

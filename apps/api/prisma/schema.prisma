@@ -11,3 +11,83 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+/// Activity type list (open question Q4, decided 2026-10-27: the five types in the UI mockups).
+enum ActivityType {
+  STUDY
+  SPORTS
+  FOOD
+  SOCIAL
+  GAMING
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+}
+
+// ─── M1: accounts (FR01–FR04) ───────────────────────────────────────────────
+// CHECK constraints live in the migration SQL (Prisma cannot express them):
+//   user: email is lowercase and ends in @sjsu.edu; at least one interest
+//   availability_slot: day 0–6, minutes 0–1439, end after start
+
+model User {
+  id                 String         @id @default(uuid()) @db.Uuid
+  /// Stored lowercased. Never exposed to other students (FR04, FR13).
+  email              String         @unique
+  passwordHash       String         @map("password_hash")
+  displayName        String         @map("display_name") @db.VarChar(50)
+  interests          ActivityType[]
+  role               Role           @default(STUDENT)
+  status             UserStatus     @default(PENDING_VERIFICATION)
+  /// Login lockout state (FR11), used from M2.
+  failedLoginCount   Int            @default(0) @map("failed_login_count") @db.SmallInt
+  firstFailedLoginAt DateTime?      @map("first_failed_login_at") @db.Timestamptz(3)
+  lockedUntil        DateTime?      @map("locked_until") @db.Timestamptz(3)
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// "Last-updated" time for profile edits (FR06).
+  updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  availability       AvailabilitySlot[]
+  verificationTokens EmailVerificationToken[]
+
+  @@map("user")
+}
+
+/// Weekly availability as campus-local wall-clock time (ADR-0011).
+model AvailabilitySlot {
+  id          String @id @default(uuid()) @db.Uuid
+  userId      String @map("user_id") @db.Uuid
+  /// 0 = Sunday … 6 = Saturday
+  dayOfWeek   Int    @map("day_of_week") @db.SmallInt
+  /// Minutes after local midnight
+  startMinute Int    @map("start_minute") @db.SmallInt
+  endMinute   Int    @map("end_minute") @db.SmallInt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dayOfWeek])
+  @@map("availability_slot")
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  /// SHA-256 (hex) of the token in the emailed link; the raw token is never stored.
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(3)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_token")
+}

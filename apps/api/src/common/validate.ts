@@ -1,3 +1,4 @@
+import { issuesToFieldErrors } from '@sh/shared';
 import type { RequestHandler } from 'express';
 import type { z } from 'zod';
 import { ValidationError } from './errors.js';
@@ -14,7 +15,7 @@ interface RequestSchemas {
  */
 export function validate(schemas: RequestSchemas): RequestHandler {
   return (req, _res, next) => {
-    const fields: Record<string, string> = {};
+    let fields: Record<string, string> = {};
 
     for (const part of ['params', 'query', 'body'] as const) {
       const schema = schemas[part];
@@ -22,10 +23,7 @@ export function validate(schemas: RequestSchemas): RequestHandler {
 
       const result = schema.safeParse(req[part]);
       if (!result.success) {
-        for (const issue of result.error.issues) {
-          const key = issue.path.join('.') || part;
-          fields[key] ??= issue.message;
-        }
+        fields = { ...issuesToFieldErrors(result.error.issues, part), ...fields };
       } else if (part === 'query') {
         // Express 5 exposes req.query as a getter, so it cannot be assigned directly.
         Object.defineProperty(req, 'query', { value: result.data, writable: true });

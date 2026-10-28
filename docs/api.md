@@ -42,7 +42,6 @@
 | 409 | `DUPLICATE_PENDING_REPORT` | FR51 |
 | 410 | `TOKEN_EXPIRED` | Verification link older than 24 h (FR03) |
 | 422 | `VALIDATION_FAILED` | One or more invalid fields, listed in `fields` (FR02, FR06, FR27, FR36…) |
-| 422 | `INVALID_EMAIL_DOMAIN` | Not `@sjsu.edu` (FR01) |
 | 423 | `ACCOUNT_LOCKED` | FR11 |
 | 500 | `INTERNAL_ERROR` | Unexpected error; no details exposed |
 
@@ -58,9 +57,9 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `POST /auth/register` | Start registration; create an inactive account and email the link | Public | `registerSchema`: `{ email, password, displayName, interests: ActivityType[], availability: { dayOfWeek, start: "HH:mm", end: "HH:mm" }[] }` | `201 { message }` | `422 INVALID_EMAIL_DOMAIN`, `409 EMAIL_TAKEN`, `422 VALIDATION_FAILED` (each invalid field) |
-| `POST /auth/verify-email` | Activate the account from the emailed link | Public | `{ token }` | `200 { message }` | `410 TOKEN_EXPIRED`, `404 NOT_FOUND` (unknown or used token) |
-| `POST /auth/resend-verification` | Send a new link (FR03) | Public | `{ email }` | `202` (same response whether the email exists or not) | – |
+| `POST /auth/register` | Start registration; create an inactive account and email the link | Public | `registerSchema`: `{ email, password, displayName, interests: ActivityType[], availability: { dayOfWeek, start: "HH:mm", end: "HH:mm" }[] }` | `201 { message }` | `422 VALIDATION_FAILED` (each invalid field; a non-`@sjsu.edu` email is reported on `fields.email` with the reason, FR01), `409 EMAIL_TAKEN` (also for an account still waiting for verification, [Q15](open-questions.md#q15-registering-again-with-an-unverified-email)) |
+| `POST /auth/verify-email` | Activate the account from the emailed link | Public | `{ token }` | `200 { message }` | `410 TOKEN_EXPIRED`, `404 NOT_FOUND` (unknown, used, or replaced by a newer link) |
+| `POST /auth/resend-verification` | Send a new link (FR03); earlier unused links stop working | Public | `{ email }` | `202 { message }` (same response whether the email exists or not) | `422 VALIDATION_FAILED` |
 | `POST /auth/login` | Authenticate and start a session | Public | `loginSchema`: `{ email, password }` | `200 MeDto` + `Set-Cookie` | `401 INVALID_CREDENTIALS`, `403 EMAIL_NOT_VERIFIED`, `423 ACCOUNT_LOCKED` |
 | `POST /auth/logout` | End the session | Student | – | `204` (clears cookie) | – |
 | `GET /auth/me` | Current user, used by the client's auth guard | Student | – | `200 MeDto { id, displayName, role }` | `401` |

@@ -151,7 +151,8 @@ apps/api/
 │   ├── server.ts                 # starts HTTP server + scheduled job
 │   ├── app.ts                    # createApp(): builds the Express app (used by tests)
 │   ├── config/env.ts             # environment variables validated with Zod at startup
-│   ├── db.ts                     # PrismaClient singleton (Prisma 7 + @prisma/adapter-pg)
+│   ├── db.ts                     # PrismaClient singleton (Prisma 7 + @prisma/adapter-pg) + DbClient type
+│   ├── deps.ts                   # AppDeps: db, mailer, clock, appOrigin (tests override via createApp)
 │   ├── routes.ts                 # /api/v1 router; each module mounts its router here
 │   ├── health.ts                 # GET /api/v1/health
 │   ├── generated/prisma/         # Prisma client output (git-ignored; `npm run codegen`)
@@ -161,10 +162,12 @@ apps/api/
 │   │   ├── validate.ts           # validate({ body, query, params }) middleware using Zod
 │   │   ├── auth.ts               # session middleware, requireAuth, requireAdmin
 │   │   ├── relationships.ts      # isBlockedEitherWay(), areConnected(), blockedIdsFor()
-│   │   ├── time.ts               # campus timezone helpers + injectable clock
-│   │   └── email.ts              # Nodemailer transport (console in dev, SMTP in prod)
+│   │   ├── time.ts               # injectable clock; campus timezone helpers (M4)
+│   │   ├── crypto.ts             # random tokens + SHA-256 token hashing
+│   │   ├── password.ts           # argon2id hashing
+│   │   └── email.ts              # Mailer: SMTP via Nodemailer, or console output when SMTP_HOST is empty
 │   ├── modules/
-│   │   ├── auth/            auth.routes.ts  auth.controller.ts  auth.service.ts  auth.repository.ts
+│   │   ├── auth/            auth.routes.ts  auth.controller.ts  auth.service.ts  auth.repository.ts  auth.emails.ts
 │   │   ├── users/           users.routes.ts users.controller.ts users.service.ts users.mappers.ts
 │   │   ├── activities/      activities.routes.ts activities.controller.ts
 │   │   │                    activity.service.ts participation.service.ts
@@ -313,7 +316,7 @@ sequenceDiagram
 - **Idle timeout (FR10):** a session is valid while `now - last_seen_at < 30 min`. Each authenticated request refreshes `last_seen_at`, writing at most once per minute. **Logout** deletes the session row.
 - **Lockout (FR11):** the `user` table has `failed_login_count`, `first_failed_login_at` and `locked_until`. Five failures inside 15 minutes lock the account for 15 minutes. A successful login or the end of the lock resets the counter.
 - **Generic failure (FR09):** an unknown email and a wrong password return the same `INVALID_CREDENTIALS` message.
-- **Passwords:** stored with a slow password hash (argon2id or bcrypt; see [supporting libraries](#supporting-libraries)).
+- **Passwords:** stored as argon2id hashes (`argon2` package; [Q26](open-questions.md#q26-password-hashing-algorithm)).
 
 ### 9.2 Authorization
 
@@ -557,7 +560,7 @@ The layout is mobile-first because the mockups are phone screens. On wider scree
 
 | Concern | Measure |
 |---|---|
-| Passwords | Slow hash (argon2id or bcrypt). Never logged or returned |
+| Passwords | argon2id hash. Never logged or returned |
 | Tokens | Session and verification tokens are random (32 bytes), and only their SHA-256 hash is stored |
 | Cookies | `HttpOnly`, `SameSite=Lax`, `Secure` in production |
 | CSRF | SameSite=Lax cookies, JSON-only bodies, and an `Origin` header check against `APP_ORIGIN` on non-GET requests |
@@ -613,7 +616,7 @@ These are small libraries, each required by a specific FR or by basic safety. Th
 | Library | Workspace | Needed for |
 |---|---|---|
 | `vite` + `@vitejs/plugin-react` | web | Building and serving the React + TypeScript app (React needs a bundler) |
-| `argon2` *or* `bcrypt` | api | Storing passwords safely (FR02, FR09). Pick one in M1 |
+| `argon2` | api | Storing passwords safely as argon2id (FR02, FR09). Uses prebuilt binaries; its source-build install script is denied |
 | `nodemailer` | api | Sending verification links (FR03). Development uses a console transport |
 | `cookie-parser` | api | Reading the session cookie (FR10) |
 | `helmet` | api | Standard security headers |

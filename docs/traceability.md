@@ -5,14 +5,14 @@ Maps every functional requirement (FR01–FR57, from the *Functional Level Requi
 **Verification area** shows where automated or manual verification is *planned*. The specific test cases are the team's separate testing assignment ([roadmap task 137](roadmap.md#m14--testing-stabilization--release)).
 Abbreviations: **Unit-S** = shared Zod schema unit tests · **Unit-Svc** = service unit tests (fake clock/collaborators) · **Int** = API integration tests (Supertest + test DB) · **Manual** = manual UI test from the team's test-case document.
 
-**Status** stays `Planned` until the feature is merged, then becomes `Implemented`, then `Verified` once its tests pass (task 140).
+**Status** stays `Planned` until the feature is built, then becomes `Implemented` (marked "in review" until merged), then `Verified` once the team's test cases pass (task 140).
 
 | FR | Summary | Module | API endpoint(s) | Milestone | Verification area | Status |
 |---|---|---|---|---|---|---|
-| FR01 | Register only with `@sjsu.edu`; reject other domains and already-linked emails with a reason | auth | `POST /auth/register` | M1 | Unit-S, Int | Planned |
-| FR02 | Registration fields and rules (name 1–50, password rule, ≥ 1 interest, ≥ 1 valid slot); identify each invalid field | auth, shared | `POST /auth/register` | M1 | Unit-S, Int, Manual | Planned |
-| FR03 | Send verification link; inactive until used; 24-hour expiry; request a new link | auth | `POST /auth/register`, `POST /auth/verify-email`, `POST /auth/resend-verification` | M1 | Unit-Svc, Int | Planned |
-| FR04 | Create an active profile after verification; email not shown to others | auth, users | `POST /auth/verify-email`, `GET /users/:id` | M1 (M3 for the public view) | Int | Planned |
+| FR01 | Register only with `@sjsu.edu`; reject other domains and already-linked emails with a reason | auth | `POST /auth/register` | M1 | Unit-S, Int | Implemented (M1, in review) |
+| FR02 | Registration fields and rules (name 1–50, password rule, ≥ 1 interest, ≥ 1 valid slot); identify each invalid field | auth, shared | `POST /auth/register` | M1 | Unit-S, Int, Manual | Implemented (M1, in review) |
+| FR03 | Send verification link; inactive until used; 24-hour expiry; request a new link | auth | `POST /auth/register`, `POST /auth/verify-email`, `POST /auth/resend-verification` | M1 | Unit-Svc, Int | Implemented (M1, in review) |
+| FR04 | Create an active profile after verification; email not shown to others | auth, users | `POST /auth/verify-email`, `GET /users/:id` | M1 (M3 for the public view) | Int | Partly implemented (activation in M1; login M2; public view M3) |
 | FR05 | Edit display name, interests, availability; email not editable | users | `PATCH /users/me` | M3 | Int, Manual | Planned |
 | FR06 | Validate edits like registration; update in place; record last-updated; save nothing if invalid | users | `PATCH /users/me` | M3 | Unit-S, Int | Planned |
 | FR07 | Remove account from the profile page with a permanent-removal warning and password | users | `DELETE /users/me` | M13 | Int, Manual | Planned |

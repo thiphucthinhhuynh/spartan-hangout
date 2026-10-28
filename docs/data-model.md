@@ -35,7 +35,7 @@ erDiagram
 
 | Enum | Values | Source |
 |---|---|---|
-| `ActivityType` | `STUDY`, `SPORTS`, `FOOD`, `SOCIAL`, `GAMING` | UI mockups. The FRs say only "the Activity Type list" ([Q4](open-questions.md#q4-activity-type-list)) |
+| `ActivityType` | `STUDY`, `SPORTS`, `FOOD`, `SOCIAL`, `GAMING` | The five types in the UI mockups ([Q4](open-questions.md#q4-activity-type-list), decided 2026-10-27) |
 | `ActivityStatus` | `OPEN`, `FULL`, `CANCELLED`, `COMPLETED` | FR18 |
 | `UserStatus` | `PENDING_VERIFICATION`, `ACTIVE` | FR03–FR04 |
 | `Role` | `STUDENT`, `ADMIN` | FR53 |
@@ -51,10 +51,10 @@ erDiagram
 | Column | Type | Constraints / notes | FR |
 |---|---|---|---|
 | `id` | uuid | PK | |
-| `email` | text | **unique**; stored lowercased; `CHECK (email LIKE '%@sjsu.edu')`. Never in public DTOs | FR01, FR04, FR13 |
+| `email` | text | **unique**; `CHECK (email = lower(email) AND email LIKE '%_@sjsu.edu')`. Never in public DTOs | FR01, FR04, FR13 |
 | `password_hash` | text | | FR02, FR09 |
 | `display_name` | varchar(50) | 1–50 characters | FR02 |
-| `interests` | `ActivityType[]` | at least 1 element (checked by app and `CHECK (cardinality(interests) >= 1)`) | FR02 |
+| `interests` | `ActivityType[]` | at least 1 element: `CHECK (interests IS NOT NULL AND cardinality(interests) >= 1)` (Prisma creates list columns as nullable) | FR02 |
 | `role` | Role | default `STUDENT` | FR53 |
 | `status` | UserStatus | default `PENDING_VERIFICATION` | FR03–FR04 |
 | `failed_login_count` | smallint | default 0 | FR11 |
@@ -68,8 +68,8 @@ erDiagram
 |---|---|---|---|
 | `id` | uuid | PK | |
 | `user_id` | uuid | FK → user, **ON DELETE CASCADE** | FR08a |
-| `day_of_week` | smallint | 0 (Sun) – 6 (Sat) | FR02 |
-| `start_minute` | smallint | 0–1439, campus-local wall-clock time | FR02 |
+| `day_of_week` | smallint | 0 (Sun) – 6 (Sat); `CHECK` | FR02 |
+| `start_minute` | smallint | 0–1439, campus-local wall-clock time; `CHECK` | FR02 |
 | `end_minute` | smallint | `CHECK (end_minute > start_minute)` | FR02 |
 
 At least one slot per user is enforced in the service (FR02, FR06). Editing the profile replaces the whole set of slots in one transaction.

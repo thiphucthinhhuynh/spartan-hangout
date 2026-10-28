@@ -11,7 +11,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q1 | [What "Discover" means](#q1-what-discover-means) | UI ↔ FR conflict | Open |
 | Q2 | [Create screen lacks description and end time](#q2-create-screen-lacks-description-and-end-time) | UI ↔ FR conflict | Open |
 | Q3 | [One activity, multiple categories?](#q3-one-activity-multiple-categories) | UI ↔ FR conflict | Open |
-| Q4 | [Activity type list](#q4-activity-type-list) | Unclear requirement | Open |
+| Q4 | [Activity type list](#q4-activity-type-list) | Unclear requirement | Decided 2026-10-27 |
 | Q5 | [Location: free text or a list, and the detail line](#q5-location-free-text-or-a-list-and-the-detail-line) | UI ↔ FR conflict | Open |
 | Q6 | [Activity images](#q6-activity-images) | UI without FR | Open |
 | Q7 | [Other UI elements with no requirement](#q7-other-ui-elements-with-no-requirement) | UI without FR | Open |
@@ -22,7 +22,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q12 | [Reason shown when a block prevents joining](#q12-reason-shown-when-a-block-prevents-joining) | FR ↔ FR tension | Open |
 | Q13 | [Account removal side effects](#q13-account-removal-side-effects) | Unclear requirement | Open |
 | Q14 | [Administrator accounts](#q14-administrator-accounts) | Unclear requirement | Open |
-| Q15 | [Registering again with an unverified email](#q15-registering-again-with-an-unverified-email) | Unclear requirement | Open |
+| Q15 | [Registering again with an unverified email](#q15-registering-again-with-an-unverified-email) | Unclear requirement | Decided 2026-10-27 |
 | Q16 | [Lockout and enumeration details](#q16-lockout-and-enumeration-details) | Unclear requirement | Open |
 | Q17 | [Links for notifications that are not about an activity](#q17-links-for-notifications-that-are-not-about-an-activity) | Unclear requirement | Open |
 | Q18 | [Whitespace-only messages and fields](#q18-whitespace-only-messages-and-fields) | Unclear requirement | Open |
@@ -33,7 +33,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q23 | [Hosting and email provider](#q23-hosting-and-email-provider) | Architecture | Open |
 | Q24 | [Frontend component testing](#q24-frontend-component-testing) | Architecture | Open |
 | Q25 | [Target devices](#q25-target-devices) | Architecture / UX | Open |
-| Q26 | [Password hashing algorithm](#q26-password-hashing-algorithm) | Architecture | Open |
+| Q26 | [Password hashing algorithm](#q26-password-hashing-algorithm) | Architecture | Decided 2026-10-27 |
 
 ---
 
@@ -63,7 +63,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 
 - **Source:** The FRs refer to "the Activity Type list" but never list the values. The UI shows Study, Sports, Food, Social and Gaming. The proposal also mentions hiking.
 - **Decision needed:** the final list, and whether it's fixed (an enum) or managed by admins. Admin management isn't in the FRs.
-- **Working assumption:** a fixed enum of the five UI values in `packages/shared/src/enums.ts`.
+- **Decision (2026-10-27):** a fixed list of the five UI values: Study, Sports, Food, Social, Gaming. Defined in `packages/shared/src/enums.ts` and as the Prisma `ActivityType` enum. Adding a type later needs a migration.
 
 ### Q5. Location: free text or a list, and the detail line
 
@@ -139,7 +139,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** FR01 rejects "an email address already linked to an account". FR03 keeps unverified accounts inactive and lets the user request a new link.
 - **Decision needed:** can someone who never verified register again (to fix a typo in their name or password), or must they use "resend link"? Do unverified accounts expire?
-- **Working assumption:** a pending account counts as "linked", and the registration error offers "resend verification link". No automatic expiry.
+- **Decision (2026-10-27):** a pending account counts as "already linked" (FR01). Registering again returns `EMAIL_TAKEN`, with a message saying the account is waiting for verification, and the page offers "Send a new verification link". Unverified accounts don't expire.
 
 ### Q16. Lockout and enumeration details
 
@@ -197,4 +197,4 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 ### Q26. Password hashing algorithm
 
 - **Decision needed (M1):** argon2id (stronger, but a native module that can be awkward to build on some machines) or bcrypt (very common; `bcryptjs` is pure JavaScript).
-- **Working assumption:** none yet. Both satisfy the architecture.
+- **Decision (2026-10-27):** argon2id via the `argon2` package, using its prebuilt binaries (its source-build install script is denied in `package.json` `allowScripts`, so no C++ toolchain is needed).

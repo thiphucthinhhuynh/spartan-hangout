@@ -57,15 +57,7 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Apply migrations to the test database
-        working-directory: apps/api
-        run: |
-          if [ -d prisma/migrations ]; then
-            npx prisma migrate deploy
-          else
-            echo "No migrations yet."
-          fi
-
+      # The API test setup applies migrations to the test database first (apps/api/test/globalSetup.ts).
       - name: Test
         run: npm test
 

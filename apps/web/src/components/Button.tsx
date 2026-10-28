@@ -1,20 +1,29 @@
 import type { ButtonHTMLAttributes } from 'react';
+import { Link, type LinkProps } from 'react-router';
 import styles from './Button.module.css';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'ghost';
+
+interface StyleProps {
+  variant?: Variant;
   fullWidth?: boolean;
 }
 
-export function Button({
-  variant = 'primary',
-  fullWidth = false,
-  type = 'button',
-  className,
-  ...props
-}: ButtonProps) {
-  const classes = [styles.button, styles[variant], fullWidth && styles.fullWidth, className]
+function buttonClassName({ variant = 'primary', fullWidth = false }: StyleProps, extra?: string) {
+  return [styles.button, styles[variant], fullWidth && styles.fullWidth, extra]
     .filter(Boolean)
     .join(' ');
-  return <button type={type} className={classes} {...props} />;
+}
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & StyleProps;
+
+export function Button({ variant, fullWidth, type = 'button', className, ...props }: ButtonProps) {
+  return (
+    <button type={type} className={buttonClassName({ variant, fullWidth }, className)} {...props} />
+  );
+}
+
+/** A router link that looks like a button (e.g. "Create account"). */
+export function LinkButton({ variant, fullWidth, className, ...props }: LinkProps & StyleProps) {
+  return <Link className={buttonClassName({ variant, fullWidth }, className)} {...props} />;
 }

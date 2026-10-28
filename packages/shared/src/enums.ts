@@ -1,5 +1,24 @@
-// String-literal enums shared by the API and the web app.
-// ActivityType is intentionally absent until open question Q4 (the activity type list) is decided.
+// String-literal enums shared by the API and the web app. Values match the Prisma enums.
+
+/** Activity type list (open question Q4, decided 2026-10-27: the five types in the UI mockups). */
+export const ActivityType = {
+  STUDY: 'STUDY',
+  SPORTS: 'SPORTS',
+  FOOD: 'FOOD',
+  SOCIAL: 'SOCIAL',
+  GAMING: 'GAMING',
+} as const;
+export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType];
+
+export const ACTIVITY_TYPES = Object.values(ActivityType);
+
+export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
+  STUDY: 'Study',
+  SPORTS: 'Sports',
+  FOOD: 'Food',
+  SOCIAL: 'Social',
+  GAMING: 'Gaming',
+};
 
 export const ActivityStatus = {
   OPEN: 'OPEN',
