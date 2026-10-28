@@ -7,6 +7,8 @@ export interface AppDeps {
   db: PrismaClient;
   mailer: Mailer;
   clock: Clock;
-  /** Public URL of the web app, for links in emails. */
+  /** Public URL of the web app: links in emails, and the only Origin allowed to send writes. */
   appOrigin: string;
+  /** Mark the session cookie Secure (HTTPS only). On in production. */
+  secureCookies: boolean;
 }

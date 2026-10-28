@@ -2,21 +2,28 @@ import {
   ErrorCode,
   LIMITS,
   timeToMinutes,
+  type LoginInput,
+  type MeDto,
   type MessageResponse,
   type RegisterInput,
 } from '@sh/shared';
 import { generateToken, hashToken } from '../../common/crypto.js';
 import { AppError, ConflictError, NotFoundError } from '../../common/errors.js';
-import { hashPassword } from '../../common/password.js';
+import { hashPassword, verifyAgainstDummy, verifyPassword } from '../../common/password.js';
 import { addHours } from '../../common/time.js';
 import type { AppDeps } from '../../deps.js';
 import { Prisma, UserStatus } from '../../generated/prisma/client.js';
-import * as repo from './auth.repository.js';
 import { verificationEmail } from './auth.emails.js';
+import { afterFailedLogin, CLEARED_LOCKOUT, isLocked, minutesLeft } from './auth.lockout.js';
+import * as repo from './auth.repository.js';
+import type { SessionService } from './session.service.js';
 
 const INVALID_LINK_MESSAGE = 'This verification link is invalid or has already been used.';
 
-export function createAuthService({ db, mailer, clock, appOrigin }: AppDeps) {
+export function createAuthService(
+  { db, mailer, clock, appOrigin }: AppDeps,
+  sessions: SessionService,
+) {
   /** Stores a fresh link for the user (replacing unused ones) and returns the raw token. */
   async function issueVerificationToken(client: Prisma.TransactionClient, userId: string) {
     const token = generateToken();
@@ -109,10 +116,64 @@ export function createAuthService({ db, mailer, clock, appOrigin }: AppDeps) {
         message: `If ${email} has an account waiting for verification, we sent it a new link.`,
       };
     },
+
+    /**
+     * FR09–FR11: check the password, enforce the lockout, and start a session.
+     * Returns the raw session token for the cookie.
+     */
+    async login(input: LoginInput): Promise<{ user: MeDto; token: string }> {
+      const now = clock.now();
+      const user = await repo.findUserForLogin(db, input.email);
+      if (!user) {
+        // Same work and same answer as a wrong password (FR09). Unknown emails are not
+        // counted toward a lockout (open question Q16).
+        await verifyAgainstDummy(input.password);
+        throw invalidCredentials();
+      }
+
+      if (user.lockedUntil && isLocked(user, now)) throw accountLocked(user.lockedUntil, now);
+
+      if (!(await verifyPassword(user.passwordHash, input.password))) {
+        const next = afterFailedLogin(user, now);
+        await repo.saveLockoutState(db, user.id, next);
+        throw next.lockedUntil ? accountLocked(next.lockedUntil, now) : invalidCredentials();
+      }
+
+      // Correct password: a successful attempt resets the counter (FR11).
+      if (user.failedLoginCount > 0 || user.lockedUntil) {
+        await repo.saveLockoutState(db, user.id, CLEARED_LOCKOUT);
+      }
+      // Checked only after the password, so this does not reveal unverified accounts (FR09).
+      if (user.status !== UserStatus.ACTIVE) {
+        throw new AppError(
+          403,
+          ErrorCode.EMAIL_NOT_VERIFIED,
+          'Verify your SJSU email before logging in. Check your inbox or request a new link.',
+        );
+      }
+
+      const token = await sessions.start(user.id);
+      return { user: { id: user.id, displayName: user.displayName, role: user.role }, token };
+    },
   };
 }
 
 export type AuthService = ReturnType<typeof createAuthService>;
+
+/** FR09: never say whether the email or the password was wrong. */
+function invalidCredentials() {
+  return new AppError(401, ErrorCode.INVALID_CREDENTIALS, 'Incorrect email or password.');
+}
+
+/** FR11 (open question Q16: a locked account is told so). */
+function accountLocked(lockedUntil: Date, now: Date) {
+  const minutes = minutesLeft(lockedUntil, now);
+  return new AppError(
+    423,
+    ErrorCode.ACCOUNT_LOCKED,
+    `Too many failed login attempts. Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`,
+  );
+}
 
 /** FR01 (with open question Q15: a pending account counts as "already linked"). */
 function emailTaken(status: UserStatus) {

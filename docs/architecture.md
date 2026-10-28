@@ -160,7 +160,8 @@ apps/api/
 │   │   ├── errors.ts             # AppError + subclasses, error codes
 │   │   ├── errorHandler.ts       # Express error middleware → JSON error envelope
 │   │   ├── validate.ts           # validate({ body, query, params }) middleware using Zod
-│   │   ├── auth.ts               # session middleware, requireAuth, requireAdmin
+│   │   ├── auth.ts               # AuthUser type on req.user, requireAuth, requireAdmin
+│   │   ├── originCheck.ts        # CSRF: reject cross-site Origin on non-GET requests
 │   │   ├── relationships.ts      # isBlockedEitherWay(), areConnected(), blockedIdsFor()
 │   │   ├── time.ts               # injectable clock; campus timezone helpers (M4)
 │   │   ├── crypto.ts             # random tokens + SHA-256 token hashing
@@ -168,6 +169,7 @@ apps/api/
 │   │   └── email.ts              # Mailer: SMTP via Nodemailer, or console output when SMTP_HOST is empty
 │   ├── modules/
 │   │   ├── auth/            auth.routes.ts  auth.controller.ts  auth.service.ts  auth.repository.ts  auth.emails.ts
+│   │   │                    session.service.ts  auth.middleware.ts  auth.cookies.ts  auth.lockout.ts
 │   │   ├── users/           users.routes.ts users.controller.ts users.service.ts users.mappers.ts
 │   │   ├── activities/      activities.routes.ts activities.controller.ts
 │   │   │                    activity.service.ts participation.service.ts
@@ -312,10 +314,13 @@ sequenceDiagram
     A-->>W: Set-Cookie sh_sid (httpOnly)
 ```
 
-- **Session:** a random token is sent in an `HttpOnly; SameSite=Lax; Secure` (in production) cookie. The `session` table stores only its SHA-256 hash, plus `user_id` and `last_seen_at`.
+- **Session:** a random token is sent in the `sh_sid` cookie (`HttpOnly; SameSite=Lax; Path=/`, `Secure` in production, `Max-Age` 30 minutes renewed together with `last_seen_at`). The `session` table stores only its SHA-256 hash, plus `user_id` and `last_seen_at`.
+- **Where the code lives:** the session service and the middleware that sets `req.user` belong to the `auth` module (`session.service.ts`, `auth.middleware.ts`). The generic guards `requireAuth` / `requireAdmin` live in `common/auth.ts`, so other modules never import from `auth`.
 - **Idle timeout (FR10):** a session is valid while `now - last_seen_at < 30 min`. Each authenticated request refreshes `last_seen_at`, writing at most once per minute. **Logout** deletes the session row.
 - **Lockout (FR11):** the `user` table has `failed_login_count`, `first_failed_login_at` and `locked_until`. Five failures inside 15 minutes lock the account for 15 minutes. A successful login or the end of the lock resets the counter.
-- **Generic failure (FR09):** an unknown email and a wrong password return the same `INVALID_CREDENTIALS` message.
+- **Generic failure (FR09):** an unknown email and a wrong password return the same `INVALID_CREDENTIALS` message. Unknown emails still run a dummy password check, so timing doesn't give them away. Unverified accounts are reported (`EMAIL_NOT_VERIFIED`) only after a correct password.
+- **Locked accounts** are told so with the minutes remaining (`423 ACCOUNT_LOCKED`, [Q16](open-questions.md#q16-lockout-and-enumeration-details)). The lockout rules are a pure function (`auth.lockout.ts`) with their own unit tests.
+- **Background polling (M7+)** must not count as activity, or an open tab would never time out. See [Q27](open-questions.md#q27-background-polling-and-the-30-minute-idle-timeout).
 - **Passwords:** stored as argon2id hashes (`argon2` package; [Q26](open-questions.md#q26-password-hashing-algorithm)).
 
 ### 9.2 Authorization
@@ -581,7 +586,7 @@ The layout is mobile-first because the mockups are phone screens. On wider scree
 - **Local development:** Docker Compose runs PostgreSQL ([ADR-0012](adr/0012-docker-compose-for-local-development.md)). The API and web app run on the host with `npm run dev`, and Vite proxies `/api` to Express.
 - **CI:** GitHub Actions runs install, lint, type-check, build and tests against a PostgreSQL service container on every pull request and on pushes to `main` ([ADR-0013](adr/0013-github-actions-ci.md)).
 - **Production (decided in Milestone 14):** one Node process serves both `/api/v1` and the built SPA from `apps/web/dist`. Same origin means no CORS and simple cookies. It needs a managed PostgreSQL database and SMTP credentials. `prisma migrate deploy` runs on release. The hosting and email providers are open questions ([Q23](open-questions.md#q23-hosting-and-email-provider)).
-- **Configuration:** `DATABASE_URL`, `SESSION_COOKIE_SECURE`, `APP_ORIGIN`, `SMTP_*`, `EMAIL_FROM`, `CAMPUS_TIMEZONE` (default `America/Los_Angeles`).
+- **Configuration:** `DATABASE_URL`, `APP_ORIGIN`, `SMTP_*`, `EMAIL_FROM`, `CAMPUS_TIMEZONE` (default `America/Los_Angeles`, from M4). The session cookie is `Secure` whenever `NODE_ENV=production`.
 - **Scale assumption:** a single API instance. The scheduled job is idempotent, so a second instance would do no harm.
 
 ---

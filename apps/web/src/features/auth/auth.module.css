@@ -53,12 +53,6 @@
   text-decoration: none;
 }
 
-.trust {
-  font-size: 0.8125rem;
-  text-align: center;
-  color: var(--color-muted);
-}
-
 .devNote {
   padding: var(--space-3) var(--space-4);
   border: 1px dashed var(--color-border);
@@ -82,4 +76,70 @@
 
 .center {
   text-align: center;
+}
+
+.trust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.trust svg {
+  color: var(--color-primary);
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  height: 200px;
+  padding: var(--space-4);
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #003a70 100%);
+}
+
+.heroMark {
+  position: absolute;
+  top: -24px;
+  right: -16px;
+  width: 220px;
+  height: 220px;
+  color: var(--color-accent);
+  opacity: 0.35;
+}
+
+.heroPill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.heroPill svg {
+  color: var(--color-primary);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--color-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
 }

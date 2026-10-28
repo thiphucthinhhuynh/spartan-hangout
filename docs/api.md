@@ -13,6 +13,7 @@
 | Times | Responses use ISO-8601 UTC strings. Activity create and edit take `date` (`YYYY-MM-DD`), `startTime` and `endTime` (`HH:mm`) in campus-local time ([ADR-0011](adr/0011-time-and-timezone-handling.md)) |
 | Lists | `?page=1&pageSize=20` (max 50) → `{ items, page, pageSize, hasMore }`. Chat and DM threads return the full history and accept `?after=<messageId>` for polling |
 | Block-hidden | Resources hidden by a block (FR57) return `404 NOT_FOUND` |
+| CSRF | A non-GET request whose `Origin` header is not the web app's origin gets `403 FORBIDDEN` (architecture §13) |
 | Common errors | Every `Student`/`Admin` endpoint can also return `401 UNAUTHENTICATED` (no session or session expired, FR10) and `422 VALIDATION_FAILED`. These aren't repeated in the tables below |
 
 ## Errors
@@ -60,7 +61,7 @@
 | `POST /auth/register` | Start registration; create an inactive account and email the link | Public | `registerSchema`: `{ email, password, displayName, interests: ActivityType[], availability: { dayOfWeek, start: "HH:mm", end: "HH:mm" }[] }` | `201 { message }` | `422 VALIDATION_FAILED` (each invalid field; a non-`@sjsu.edu` email is reported on `fields.email` with the reason, FR01), `409 EMAIL_TAKEN` (also for an account still waiting for verification, [Q15](open-questions.md#q15-registering-again-with-an-unverified-email)) |
 | `POST /auth/verify-email` | Activate the account from the emailed link | Public | `{ token }` | `200 { message }` | `410 TOKEN_EXPIRED`, `404 NOT_FOUND` (unknown, used, or replaced by a newer link) |
 | `POST /auth/resend-verification` | Send a new link (FR03); earlier unused links stop working | Public | `{ email }` | `202 { message }` (same response whether the email exists or not) | `422 VALIDATION_FAILED` |
-| `POST /auth/login` | Authenticate and start a session | Public | `loginSchema`: `{ email, password }` | `200 MeDto` + `Set-Cookie` | `401 INVALID_CREDENTIALS`, `403 EMAIL_NOT_VERIFIED`, `423 ACCOUNT_LOCKED` |
+| `POST /auth/login` | Authenticate and start a session | Public | `loginSchema`: `{ email, password }` | `200 MeDto` + `Set-Cookie: sh_sid` (HttpOnly, SameSite=Lax, Max-Age 30 min renewed on use) | `401 INVALID_CREDENTIALS` (unknown email or wrong password, same message), `403 EMAIL_NOT_VERIFIED` (only after a correct password), `423 ACCOUNT_LOCKED` (5 failures in 15 min; minutes remaining in the message) |
 | `POST /auth/logout` | End the session | Student | – | `204` (clears cookie) | – |
 | `GET /auth/me` | Current user, used by the client's auth guard | Student | – | `200 MeDto { id, displayName, role }` | `401` |
 

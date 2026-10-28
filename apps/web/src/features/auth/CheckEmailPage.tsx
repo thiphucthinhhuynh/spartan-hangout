@@ -1,5 +1,5 @@
 import { LIMITS } from '@sh/shared';
-import { useLocation } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { MailIcon } from '../../components/icons.js';
 import styles from './auth.module.css';
 import { ResendLinkForm } from './ResendLinkForm.js';
@@ -31,6 +31,10 @@ export function CheckEmailPage() {
         <p className={styles.lead}>Didn't get it?</p>
         <ResendLinkForm defaultEmail={email} />
       </section>
+
+      <p className={styles.footer}>
+        Already verified? <Link to="/login">Log in</Link>
+      </p>
     </>
   );
 }

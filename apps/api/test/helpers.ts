@@ -1,5 +1,6 @@
 import type { EmailMessage, Mailer } from '../src/common/email.js';
 import type { Clock } from '../src/common/time.js';
+import { hashPassword } from '../src/common/password.js';
 import { db } from '../src/db.js';
 
 /** Empties every application table (keeps Prisma's migration history). */
@@ -32,6 +33,9 @@ export function createTestClock(start = new Date('2026-10-21T16:00:00Z')) {
     advanceHours(hours: number) {
       current += hours * 60 * 60 * 1000;
     },
+    advanceMinutes(minutes: number) {
+      current += minutes * 60 * 1000;
+    },
   };
 }
 
@@ -40,4 +44,23 @@ export function tokenFromEmail(message: EmailMessage | undefined): string {
   const match = message?.text.match(/verify-email\?token=([\w%-]+)/);
   if (!match?.[1]) throw new Error('No verification link found in the email');
   return decodeURIComponent(match[1]);
+}
+
+/** Inserts a student directly (bypassing registration). Active unless told otherwise. */
+export async function createUser({
+  email = 'sammy.spartan@sjsu.edu',
+  password = 'goSpartans1',
+  displayName = 'Sammy Spartan',
+  status = 'ACTIVE' as 'ACTIVE' | 'PENDING_VERIFICATION',
+} = {}) {
+  return db.user.create({
+    data: {
+      email,
+      passwordHash: await hashPassword(password),
+      displayName,
+      interests: ['STUDY'],
+      status,
+      availability: { create: [{ dayOfWeek: 3, startMinute: 960, endMinute: 1080 }] },
+    },
+  });
 }

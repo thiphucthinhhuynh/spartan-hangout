@@ -79,3 +79,17 @@ export const ArrowRightIcon = (props: IconProps) => (
     <path d="M5 12h14M12 5l7 7-7 7" />
   </Icon>
 );
+
+export const MapPinIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+    <circle cx="12" cy="10" r="3" />
+  </Icon>
+);
+
+export const ShieldCheckIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </Icon>
+);

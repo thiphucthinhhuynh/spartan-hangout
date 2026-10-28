@@ -2,7 +2,7 @@ import { ErrorCode, registerSchema, type ActivityType } from '@sh/shared';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Button } from '../../components/Button.js';
-import { ArrowRightIcon, MailIcon } from '../../components/icons.js';
+import { ArrowRightIcon, MailIcon, ShieldCheckIcon } from '../../components/icons.js';
 import { TextField } from '../../components/TextField.js';
 import { ApiError } from '../../lib/apiClient.js';
 import { focusFirstInvalidField, validateForm, type FieldErrors } from '../../lib/zodForm.js';
@@ -73,7 +73,7 @@ export function RegisterPage() {
     <>
       <div className={styles.intro}>
         <h1 className={styles.title}>
-          Your campus. <span className={styles.accent}>Your people.</span>
+          Join <span className={styles.accent}>Spartan Hangout</span>
         </h1>
         <p className={styles.lead}>Create your account with your SJSU email to get started.</p>
       </div>
@@ -142,9 +142,11 @@ export function RegisterPage() {
         </section>
       )}
 
-      <p className={styles.trust}>Just Spartans. Verified with your SJSU email.</p>
       <p className={styles.footer}>
-        <Link to="/">Back to Spartan Hangout</Link>
+        Already have an account? <Link to="/login">Log in</Link>
+      </p>
+      <p className={styles.trust}>
+        <ShieldCheckIcon width={18} height={18} /> Just Spartans. Verified with your SJSU email.
       </p>
     </>
   );

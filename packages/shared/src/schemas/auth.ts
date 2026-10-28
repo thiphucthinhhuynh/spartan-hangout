@@ -86,3 +86,13 @@ export const resendVerificationSchema = z.object({
   email: sjsuEmailSchema,
 });
 export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
+
+/**
+ * POST /auth/login (FR09). Only "is something there" checks: the password rules apply when
+ * choosing a password, not when typing it, and FR09 forbids hinting which field was wrong.
+ */
+export const loginSchema = z.object({
+  email: sjsuEmailSchema,
+  password: z.string().min(1, 'Enter your password.'),
+});
+export type LoginInput = z.infer<typeof loginSchema>;

@@ -22,7 +22,7 @@ These are easiest to meet when the server can see and revoke sessions.
 - Passwords are hashed with argon2id (the `argon2` package, chosen in M1; open question Q26).
 - CSRF: `SameSite=Lax`, JSON-only bodies, and an `Origin` check on non-GET requests.
 
-The session middleware is about 40 lines of our own code, using Prisma and `cookie-parser`.
+The session service and middleware are about 80 lines of our own code in the `auth` module, using Prisma and `cookie-parser`. The cookie's `Max-Age` (30 minutes) is renewed whenever `last_seen_at` is, so the browser and the server agree on when a session ends.
 
 ## Alternatives considered
 

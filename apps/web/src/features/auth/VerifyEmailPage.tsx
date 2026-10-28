@@ -62,8 +62,8 @@ export function VerifyEmailPage() {
             {verify.data.message}
           </p>
         </div>
-        <LinkButton to="/" fullWidth>
-          Continue
+        <LinkButton to="/login" fullWidth>
+          Log in
         </LinkButton>
       </>
     );

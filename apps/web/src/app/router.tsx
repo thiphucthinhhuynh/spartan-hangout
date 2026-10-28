@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import { CheckEmailPage } from '../features/auth/CheckEmailPage.js';
+import { LoginPage } from '../features/auth/LoginPage.js';
 import { RegisterPage } from '../features/auth/RegisterPage.js';
 import { VerifyEmailPage } from '../features/auth/VerifyEmailPage.js';
 import { DiscoverPage } from '../features/discover/DiscoverPage.js';
@@ -9,25 +10,34 @@ import { MyProfilePage } from '../features/profile/MyProfilePage.js';
 import { AppShell } from './layouts/AppShell.js';
 import { AuthLayout } from './layouts/AuthLayout.js';
 import { NotFoundPage } from './NotFoundPage.js';
+import { RequireAuth } from './RequireAuth.js';
 
-// Route table (docs/architecture.md §12.2). Login and the auth guard arrive in M2.
+// Route table (docs/architecture.md §12.2).
 export const router = createBrowserRouter([
+  // Public: registration and login (FR10).
   {
     element: <AuthLayout />,
     children: [
+      { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'register/check-email', element: <CheckEmailPage /> },
       { path: 'verify-email', element: <VerifyEmailPage /> },
     ],
   },
+  // Everything else needs a logged-in student.
   {
-    element: <AppShell />,
+    element: <RequireAuth />,
     children: [
-      { index: true, element: <DiscoverPage /> },
-      { path: 'plans', element: <MyPlansPage /> },
-      { path: 'inbox', element: <InboxPage /> },
-      { path: 'profile', element: <MyProfilePage /> },
-      { path: '*', element: <NotFoundPage /> },
+      {
+        element: <AppShell />,
+        children: [
+          { index: true, element: <DiscoverPage /> },
+          { path: 'plans', element: <MyPlansPage /> },
+          { path: 'inbox', element: <InboxPage /> },
+          { path: 'profile', element: <MyProfilePage /> },
+          { path: '*', element: <NotFoundPage /> },
+        ],
+      },
     ],
   },
 ]);

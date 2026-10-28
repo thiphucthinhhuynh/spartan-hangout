@@ -15,7 +15,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q5 | [Location: free text or a list, and the detail line](#q5-location-free-text-or-a-list-and-the-detail-line) | UI ↔ FR conflict | Open |
 | Q6 | [Activity images](#q6-activity-images) | UI without FR | Open |
 | Q7 | [Other UI elements with no requirement](#q7-other-ui-elements-with-no-requirement) | UI without FR | Open |
-| Q8 | [Login screen shows only an email field](#q8-login-screen-shows-only-an-email-field) | UI ↔ FR conflict | Open |
+| Q8 | [Login screen shows only an email field](#q8-login-screen-shows-only-an-email-field) | UI ↔ FR conflict | Decided 2026-10-27 |
 | Q9 | [Search UI vs FR16 criteria](#q9-search-ui-vs-fr16-criteria) | UI ↔ FR conflict | Open |
 | Q10 | [Featured activities vs Recommended Activities](#q10-featured-activities-vs-recommended-activities) | UI ↔ FR conflict | Open |
 | Q11 | [No unblock and no disconnect](#q11-no-unblock-and-no-disconnect) | Unclear requirement | Open |
@@ -23,7 +23,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q13 | [Account removal side effects](#q13-account-removal-side-effects) | Unclear requirement | Open |
 | Q14 | [Administrator accounts](#q14-administrator-accounts) | Unclear requirement | Open |
 | Q15 | [Registering again with an unverified email](#q15-registering-again-with-an-unverified-email) | Unclear requirement | Decided 2026-10-27 |
-| Q16 | [Lockout and enumeration details](#q16-lockout-and-enumeration-details) | Unclear requirement | Open |
+| Q16 | [Lockout and enumeration details](#q16-lockout-and-enumeration-details) | Unclear requirement | Decided 2026-10-27 |
 | Q17 | [Links for notifications that are not about an activity](#q17-links-for-notifications-that-are-not-about-an-activity) | Unclear requirement | Open |
 | Q18 | [Whitespace-only messages and fields](#q18-whitespace-only-messages-and-fields) | Unclear requirement | Open |
 | Q19 | [Requirement numbering across documents](#q19-requirement-numbering-across-documents) | Documentation | Open |
@@ -34,6 +34,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q24 | [Frontend component testing](#q24-frontend-component-testing) | Architecture | Open |
 | Q25 | [Target devices](#q25-target-devices) | Architecture / UX | Open |
 | Q26 | [Password hashing algorithm](#q26-password-hashing-algorithm) | Architecture | Decided 2026-10-27 |
+| Q27 | [Background polling and the 30-minute idle timeout](#q27-background-polling-and-the-30-minute-idle-timeout) | Architecture | Open (needed by M7) |
 
 ---
 
@@ -96,7 +97,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** p.1 shows "Sign in with your SJSU email" with one email field and "Continue". FR09 requires email **and password**.
 - **Options:** a two-step form (email, then password), or one form with both fields.
-- **Working assumption:** one form with both fields, the simplest way to satisfy FR09.
+- **Decision (2026-10-27):** one form with both fields. The page keeps the mockup's layout and "Continue with SJSU email" button, with a password field added under the email field.
 
 ### Q9. Search UI vs FR16 criteria
 
@@ -147,7 +148,11 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
   - FR09 forbids revealing whether the email or the password was wrong, but showing "account locked" (FR11) reveals that the account exists. Is that acceptable?
   - Should failed attempts against **non-existent** emails also be "locked" to keep behavior uniform?
   - Should there also be per-IP rate limiting? It isn't in the FRs and would need a small library.
-- **Working assumption:** show a locked message (FR11 implies the user should know). No IP rate limiting.
+- **Decision (2026-10-27):**
+  - A locked account is told so: "Too many failed login attempts. Try again in N minutes." (`423 ACCOUNT_LOCKED`). The fifth failure already returns this message.
+  - Only real accounts are counted and locked. Unknown emails always get the generic `INVALID_CREDENTIALS` message, after a dummy password check so the response time is the same.
+  - No IP rate limiting for now; revisit in the M14 security review.
+  - An unverified account is only reported as unverified after a correct password, so a wrong password never reveals that the account exists.
 
 ### Q17. Links for notifications that are not about an activity
 
@@ -198,3 +203,13 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Decision needed (M1):** argon2id (stronger, but a native module that can be awkward to build on some machines) or bcrypt (very common; `bcryptjs` is pure JavaScript).
 - **Decision (2026-10-27):** argon2id via the `argon2` package, using its prebuilt binaries (its source-build install script is denied in `package.json` `allowScripts`, so no C++ toolchain is needed).
+
+### Q27. Background polling and the 30-minute idle timeout
+
+- **Source:** FR10 ends a session after 30 minutes of *inactivity*. The architecture (§12.4) polls the unread-notification count every 30 seconds from M7 on, and open chats every 5 seconds. Every API request currently counts as activity, so an open tab would keep the session alive forever.
+- **Options:**
+  (a) Polling requests send a header (e.g. `X-Background-Refresh: 1`) and the session middleware doesn't count them as activity.
+  (b) Only count requests that change something (non-GET) as activity.
+  (c) Accept it: an open tab counts as an active session.
+- **Working assumption:** none yet; decide before M7 (task 93). Option (a) is the smallest change.
+

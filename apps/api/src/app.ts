@@ -4,6 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { createMailer } from './common/email.js';
 import { errorHandler, notFoundHandler } from './common/errorHandler.js';
+import { originCheck } from './common/originCheck.js';
 import { systemClock } from './common/time.js';
 import { env } from './config/env.js';
 import { db } from './db.js';
@@ -20,6 +21,7 @@ export function createApp(overrides: Partial<AppDeps> = {}) {
     mailer: createMailer(env),
     clock: systemClock,
     appOrigin: env.APP_ORIGIN,
+    secureCookies: env.NODE_ENV === 'production',
     ...overrides,
   };
 
@@ -27,6 +29,7 @@ export function createApp(overrides: Partial<AppDeps> = {}) {
   app.use(helmet());
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
+  app.use(originCheck(deps.appOrigin));
 
   app.use(API_PREFIX, createApiRouter(deps));
 

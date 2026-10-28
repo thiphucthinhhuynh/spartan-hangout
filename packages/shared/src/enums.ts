@@ -20,6 +20,12 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   GAMING: 'Gaming',
 };
 
+export const Role = {
+  STUDENT: 'STUDENT',
+  ADMIN: 'ADMIN',
+} as const; // FR53: administrators only review reports
+export type Role = (typeof Role)[keyof typeof Role];
+
 export const ActivityStatus = {
   OPEN: 'OPEN',
   FULL: 'FULL',

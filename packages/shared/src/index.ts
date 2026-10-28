@@ -1,4 +1,5 @@
 export * from './constants.js';
+export * from './dto/auth.js';
 export * from './dto/common.js';
 export * from './enums.js';
 export * from './errors.js';

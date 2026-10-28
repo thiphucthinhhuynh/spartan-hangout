@@ -144,19 +144,19 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** verified students can log in and out, sessions expire after 30 idle minutes, and repeated failures lock the account.
 **Features included:** FR09–FR11.
 **Dependencies:** M1. Decisions Q8 (login layout), Q16 (lockout/enumeration).
-**Expected files/modules:** Prisma migration (`session`); `apps/api/src/common/auth.ts`; `apps/api/src/modules/auth/*` (login, logout, me); `apps/web/src/features/auth/LoginPage.tsx`; route guard in `app/router.tsx`.
+**Expected files/modules:** Prisma migration (`session`); `apps/api/src/common/{auth,originCheck}.ts`; `apps/api/src/modules/auth/{session.service,auth.middleware,auth.cookies,auth.lockout}.ts` plus login/logout/me in the existing auth files; `apps/api/test/login.test.ts`; `apps/web/src/features/auth/LoginPage.tsx`; `apps/web/src/app/RequireAuth.tsx`; global 401 handling in `app/providers.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 33 | Team decisions: Q8 login layout, Q16 lockout & enumeration details | 2 | Not started |
-| 34 | Prisma migration: `session` table | 21 | Not started |
-| 35 | `auth.repository` session functions: create (hashed token), resolve, slide `last_seen_at`, delete | 34 | Not started |
-| 36 | `common/auth.ts`: session middleware (`req.user`, 30-minute idle), `requireAuth`, `requireAdmin`, Origin check on non-GET | 35 | Not started |
-| 37 | `auth.service.login`: generic invalid-credentials error, unverified rejection, 5-in-15-minute lockout using `clock` (FR09, FR11) | 35, 33 | Not started |
-| 38 | `auth.service.logout`; routes `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | 36, 37 | Not started |
-| 39 | Web: `LoginPage` (mockup p.1) with invalid, unverified and locked states; link to Create account | 38 | Not started |
-| 40 | Web: auth guard using the `['me']` query, `/login?next=` redirect, global 401 handling, Log out on Profile tab | 38, 14 | Not started |
-| 41 | Automated tests (key cases): lockout and idle-timeout unit tests with a fake clock; login integration | 38 | Not started |
+| 33 | Team decisions: Q8 login layout, Q16 lockout & enumeration details | 2 | Done (decided 2026-10-27: one form; locked accounts told; only real accounts counted; no IP limit) |
+| 34 | Prisma migration: `session` table | 21 | In review (implemented, not merged) |
+| 35 | `auth.repository` session functions: create (hashed token), resolve, slide `last_seen_at`, delete | 34 | In review (implemented, not merged) |
+| 36 | `common/auth.ts`: session middleware (`req.user`, 30-minute idle), `requireAuth`, `requireAdmin`, Origin check on non-GET | 35 | In review (implemented, not merged) |
+| 37 | `auth.service.login`: generic invalid-credentials error, unverified rejection, 5-in-15-minute lockout using `clock` (FR09, FR11) | 35, 33 | In review (implemented, not merged) |
+| 38 | `auth.service.logout`; routes `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | 36, 37 | In review (implemented, not merged) |
+| 39 | Web: `LoginPage` (mockup p.1) with invalid, unverified and locked states; link to Create account | 38 | In review (implemented, not merged) |
+| 40 | Web: auth guard using the `['me']` query, `/login?next=` redirect, global 401 handling, Log out on Profile tab | 38, 14 | In review (implemented, not merged) |
+| 41 | Automated tests (key cases): lockout and idle-timeout unit tests with a fake clock; login integration | 38 | In review (implemented, not merged) |
 
 **Completion criteria:** login works only for verified accounts with the correct password, and the error is generic. The lock engages after 5 failures and clears after 15 minutes or a successful login. A session idle for 30 minutes requires logging in again. Every route except registration and login redirects logged-out users.
 
@@ -278,7 +278,7 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 | 90 | Verify that Cancelled activities are excluded from search and recommendations, read-only, and visible only to their members (FR20, FR32) | 89 | Not started |
 | 91 | `notifications.service`: list (newest first, paged), unread count, mark read; routes under `/notifications` (FR42) | 56 | Not started |
 | 92 | Web: `CancelDialog` (confirmation + optional reason); "Cancelled" label on the detail page | 89 | Not started |
-| 93 | Team decision Q21; web: header bell with unread badge (30 s polling) and `NotificationsPage`; opening one marks it read and follows its link | 91 | Not started |
+| 93 | Team decisions Q21 (bell vs Inbox) and Q27 (polling must not keep sessions alive); web: header bell with unread badge (30 s polling) and `NotificationsPage`; opening one marks it read and follows its link | 91 | Not started |
 | 94 | Automated tests (key cases): who receives notifications on edit, cancel, join, leave and removal | 91 | Not started |
 
 **Completion criteria:** cancelling notifies every other participant and is irreversible. The notification list is newest first with an unread count. Opening a notification marks it read and opens the related activity.

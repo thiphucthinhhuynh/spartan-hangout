@@ -67,3 +67,59 @@ export async function consumeVerificationToken(client: DbClient, tokenId: string
 export function activateUser(client: DbClient, userId: string) {
   return client.user.update({ where: { id: userId }, data: { status: UserStatus.ACTIVE } });
 }
+
+// ─── Login & sessions (M2) ──────────────────────────────────────────────────
+
+export function findUserForLogin(client: DbClient, email: string) {
+  return client.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      displayName: true,
+      role: true,
+      status: true,
+      passwordHash: true,
+      failedLoginCount: true,
+      firstFailedLoginAt: true,
+      lockedUntil: true,
+    },
+  });
+}
+
+export function saveLockoutState(
+  client: DbClient,
+  userId: string,
+  state: { failedLoginCount: number; firstFailedLoginAt: Date | null; lockedUntil: Date | null },
+) {
+  return client.user.update({ where: { id: userId }, data: state });
+}
+
+export function createSession(
+  client: DbClient,
+  session: { userId: string; tokenHash: string; lastSeenAt: Date },
+) {
+  return client.session.create({ data: session });
+}
+
+export function findSession(client: DbClient, tokenHash: string) {
+  return client.session.findUnique({
+    where: { tokenHash },
+    select: {
+      id: true,
+      lastSeenAt: true,
+      user: { select: { id: true, displayName: true, role: true, status: true } },
+    },
+  });
+}
+
+export function touchSession(client: DbClient, sessionId: string, lastSeenAt: Date) {
+  return client.session.update({ where: { id: sessionId }, data: { lastSeenAt } });
+}
+
+export function deleteSession(client: DbClient, sessionId: string) {
+  return client.session.deleteMany({ where: { id: sessionId } });
+}
+
+export function deleteSessionByTokenHash(client: DbClient, tokenHash: string) {
+  return client.session.deleteMany({ where: { tokenHash } });
+}
