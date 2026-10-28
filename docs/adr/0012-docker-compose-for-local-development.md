@@ -9,7 +9,7 @@ Four developers, likely on different operating systems (including WSL), need the
 
 ## Decision
 
-- `docker-compose.yml` runs **one PostgreSQL service** (version pinned), with a named volume and port 5432.
+- `docker-compose.yml` runs **one PostgreSQL service** (`postgres:17-alpine`, the same image CI uses), with a named volume and port 5432.
 - An init script creates two databases: `spartan_hangout` (development) and `spartan_hangout_test` (tests).
 - The API and web app run on the host (`npm run dev`) for fast hot reload. They are **not** containerized for development.
 - Verification emails use a **console transport** in development (the link is printed in the API log), so no mail container is needed.

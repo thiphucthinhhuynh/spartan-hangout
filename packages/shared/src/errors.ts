@@ -1,0 +1,37 @@
+/** Error codes returned in the API error envelope (see docs/api.md#errors). */
+export const ErrorCode = {
+  BAD_REQUEST: 'BAD_REQUEST',
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  EMAIL_TAKEN: 'EMAIL_TAKEN',
+  ACTIVITY_FULL: 'ACTIVITY_FULL',
+  ACTIVITY_NOT_OPEN: 'ACTIVITY_NOT_OPEN',
+  ACTIVITY_STARTED: 'ACTIVITY_STARTED',
+  ALREADY_PARTICIPANT: 'ALREADY_PARTICIPANT',
+  REMOVED_FROM_ACTIVITY: 'REMOVED_FROM_ACTIVITY',
+  JOIN_NOT_ALLOWED: 'JOIN_NOT_ALLOWED',
+  LIMIT_BELOW_COUNT: 'LIMIT_BELOW_COUNT',
+  CHAT_READ_ONLY: 'CHAT_READ_ONLY',
+  CONNECTION_NOT_ALLOWED: 'CONNECTION_NOT_ALLOWED',
+  NOT_CONNECTED: 'NOT_CONNECTED',
+  DUPLICATE_PENDING_REPORT: 'DUPLICATE_PENDING_REPORT',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  INVALID_EMAIL_DOMAIN: 'INVALID_EMAIL_DOMAIN',
+  ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+} as const;
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+/** Shape of every non-2xx JSON response from the API. */
+export interface ApiErrorBody {
+  error: {
+    code: ErrorCode;
+    message: string;
+    /** Per-field messages for VALIDATION_FAILED, keyed by field path (e.g. "title"). */
+    fields: Record<string, string> | null;
+  };
+}

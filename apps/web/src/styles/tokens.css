@@ -1,0 +1,32 @@
+/* Design tokens taken from the UI mockups (docs/architecture.md §12.3). */
+:root {
+  --color-primary: #0055a2; /* SJSU blue */
+  --color-primary-hover: #00467f;
+  --color-primary-soft: #e8f0f9;
+  --color-accent: #e5a823; /* SJSU gold */
+  --color-accent-soft: #fdf3d7;
+  --color-ink: #1c2a3a;
+  --color-muted: #6b7685;
+  --color-border: #e1e6ed;
+  --color-surface: #f5f7fa;
+  --color-card: #ffffff;
+  --color-danger: #c62828;
+
+  --radius-input: 12px;
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --shadow-card: 0 1px 2px rgb(28 42 58 / 6%), 0 4px 16px rgb(28 42 58 / 6%);
+
+  --layout-max-width: 640px;
+  --header-height: 64px;
+  --nav-height: 68px;
+}

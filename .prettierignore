@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+package-lock.json
+apps/api/src/generated/
+apps/api/prisma/migrations/
+# Docs are hand-formatted (wide tables); don't let Prettier reflow them.
+*.md

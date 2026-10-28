@@ -15,10 +15,11 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 |---|---|
 | Proposal, high-level requirements, functional requirements (FR01–FR57), US08 design diagrams, UI mockups | Done (course deliverables) |
 | Architecture & planning documentation (this repository's `docs/`) | **Drafted, awaiting team review** |
-| Application code | **Not started.** Nothing below under "Main features" exists yet |
-| Next step | [Milestone 0 – Foundation](docs/roadmap.md#m0--project-foundation), starting only after the team approves these docs |
+| [Milestone 0 – Foundation](docs/roadmap.md#m0--project-foundation) | **Implemented, awaiting review.** Workspaces, Express skeleton with `GET /api/v1/health`, Prisma setup (no tables yet), React app shell with the four tabs, Docker Compose, CI |
+| Product features | **Not started.** Nothing under "Main features" exists yet |
+| Next step | [Milestone 1 – Registration & email verification](docs/roadmap.md#m1--registration--email-verification) |
 
-Everything in this README that describes the app's behavior, commands or folders is **planned**. Nothing has been implemented yet.
+The setup commands and scripts below work today. Everything under "Main features" is still **planned**.
 
 ---
 
@@ -42,13 +43,15 @@ User-story numbers follow the **Functional Level Requirements** document. See [t
 
 | Layer | Technology |
 |---|---|
-| Language | TypeScript (strict) across the frontend, backend and shared package |
-| Frontend | React, React Router, TanStack Query; built with Vite; styled with CSS Modules |
-| Backend | Node.js (LTS), Express, Zod |
-| Database | PostgreSQL, accessed through Prisma ORM |
-| Shared code | An npm workspace package with Zod schemas, enums, constants and DTO types |
-| Testing (planned) | Vitest, Supertest |
+| Language | TypeScript 6.0 (strict) across the frontend, backend and shared package |
+| Frontend | React 19, React Router 8, TanStack Query 5; built with Vite 8; styled with CSS Modules |
+| Backend | Node.js 24 LTS, Express 5, Zod 4 |
+| Database | PostgreSQL 17, accessed through Prisma ORM 7 (with its `pg` driver adapter) |
+| Shared code | An npm workspace package (`@sh/shared`) with Zod schemas, enums, constants and DTO types |
+| Testing | Vitest 5, Supertest |
 | Dev / CI | Docker Compose (PostgreSQL), GitHub Actions |
+
+TypeScript is held at 6.0 because typescript-eslint doesn't support TypeScript 7 yet. Prisma is pinned to the stable 7.10 line.
 
 A few small supporting libraries are required by specific FRs, for example password hashing and sending verification emails. They are listed and justified in [architecture.md § Supporting libraries](docs/architecture.md#supporting-libraries). There is no Redux or Zustand, no WebSockets, no message queue and no microservices.
 
@@ -73,63 +76,76 @@ flowchart LR
 
 Details: [docs/architecture.md](docs/architecture.md).
 
-## Repository structure (planned)
+## Repository structure
+
+Folders marked *(later)* are created by the milestone that first needs them.
 
 ```
 spartan-hangout/
 ├── apps/
 │   ├── web/                    # React SPA (feature-organized)
 │   │   └── src/
-│   │       ├── app/            # router, providers, layouts
-│   │       ├── components/     # shared UI components
-│   │       ├── lib/            # api client, formatting helpers
-│   │       └── features/       # auth, discover, activities, plans, chat, inbox, people, profile, moderation, admin
+│   │       ├── app/            # router, providers, AppShell layout
+│   │       ├── components/     # Button, TextField, Chip, Card, EmptyState, Logo, icons
+│   │       ├── lib/            # apiClient (ApiError), queryKeys
+│   │       ├── styles/         # design tokens + global CSS
+│   │       └── features/       # discover, plans, inbox, profile (placeholders); more per milestone
 │   └── api/                    # Express API
-│       ├── prisma/             # schema.prisma, migrations, seed
+│       ├── prisma/             # schema.prisma, seed.ts; migrations/ (later)
+│       ├── prisma.config.ts    # Prisma CLI config (schema, migrations, seed, database URL)
 │       ├── src/
-│       │   ├── modules/        # auth, users, activities, connections, messages, notifications, moderation
-│       │   ├── common/         # relationship policy, errors, time, middleware
-│       │   └── jobs/           # in-process scheduled job (mark activities Completed)
-│       └── test/               # integration tests (Supertest), added in later milestones
+│       │   ├── app.ts          # createApp(): Express app without listening (used by tests)
+│       │   ├── server.ts       # starts the HTTP server
+│       │   ├── config/env.ts   # environment variables validated with Zod
+│       │   ├── db.ts           # Prisma client
+│       │   ├── routes.ts       # /api/v1 router
+│       │   ├── common/         # errors, error handler, validate(); auth & relationships (later)
+│       │   ├── modules/        # (later) auth, users, activities, connections, messages, notifications, moderation
+│       │   ├── jobs/           # (later) scheduled job that marks activities Completed
+│       │   └── generated/      # Prisma client output (git-ignored, created by `npm run codegen`)
+│       └── test/               # Supertest integration tests
 ├── packages/
-│   └── shared/                 # Zod schemas, enums, constants, messages, DTO types
+│   └── shared/                 # constants, enums, error codes, messages; Zod schemas & DTOs per milestone
+├── docker/postgres/init.sql    # creates the test database
 ├── docs/                       # architecture, ADRs, API, data model, roadmap, traceability, open questions
-├── .github/workflows/          # CI
+├── .github/                    # CI workflow, PR template
 ├── docker-compose.yml          # PostgreSQL for development and tests
 └── package.json                # npm workspaces root
 ```
 
 ## Development prerequisites
 
-- Node.js LTS (the exact version will be pinned in `.nvmrc` in Milestone 0) and npm
-- Docker with Docker Compose
+- **Node.js 24** (pinned in `.nvmrc`; with nvm: `nvm install && nvm use`) and npm 11
+- **Docker** with Docker Compose. On WSL, turn on *WSL integration* for your distro in Docker Desktop settings
 - Git
 
-## Planned setup
-
-These commands are **not available yet**. Milestone 0 creates them.
+## Setup
 
 ```bash
-git clone <repo-url> spartan-hangout && cd spartan-hangout
+git clone https://github.com/thiphucthinhhuynh/spartan-hangout.git && cd spartan-hangout
+nvm use                     # Node 24
 npm install
 cp apps/api/.env.example apps/api/.env
 
-docker compose up -d        # PostgreSQL (dev + test databases)
-npm run db:migrate          # apply Prisma migrations
-npm run db:seed             # demo students and activities
+docker compose up -d        # PostgreSQL with dev + test databases
 
 npm run dev                 # API on :3000, web on :5173 (Vite proxies /api to the API)
 ```
 
-In development, verification emails are not actually sent. The verification link is printed to the API console.
+Then open <http://localhost:5173>. <http://localhost:5173/api/v1/health> should return `{"status":"ok"}`.
 
-| Planned script | Purpose |
+There are no database tables until Milestone 1. From then on, run `npm run db:migrate` after pulling new migrations. In development, verification emails (M1) won't actually be sent: the link is printed to the API console.
+
+| Script | Purpose |
 |---|---|
-| `npm run dev` | Run the API and web app in watch mode |
-| `npm run build` | Type-check and build every workspace |
+| `npm run dev` | Shared package, API and web app in watch mode |
+| `npm run build` | Build the API (`apps/api/dist`) and web app (`apps/web/dist`) |
+| `npm run typecheck` | `tsc --noEmit` in every workspace |
 | `npm run lint` | ESLint |
-| `npm test` | Vitest (unit, plus Supertest integration tests) |
-| `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle |
+| `npm run format` / `format:check` | Prettier write / check |
+| `npm test` | Vitest in every workspace; API tests use `DATABASE_URL_TEST` (needs `docker compose up -d`) |
+| `npm run codegen` | Build `@sh/shared` and generate the Prisma client. Runs automatically before `dev`, `build`, `typecheck` and `test` |
+| `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle (Prisma) |
 
 ## Documentation
 

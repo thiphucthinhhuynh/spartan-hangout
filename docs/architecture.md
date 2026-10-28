@@ -151,7 +151,10 @@ apps/api/
 │   ├── server.ts                 # starts HTTP server + scheduled job
 │   ├── app.ts                    # createApp(): builds the Express app (used by tests)
 │   ├── config/env.ts             # environment variables validated with Zod at startup
-│   ├── db.ts                     # PrismaClient singleton
+│   ├── db.ts                     # PrismaClient singleton (Prisma 7 + @prisma/adapter-pg)
+│   ├── routes.ts                 # /api/v1 router; each module mounts its router here
+│   ├── health.ts                 # GET /api/v1/health
+│   ├── generated/prisma/         # Prisma client output (git-ignored; `npm run codegen`)
 │   ├── common/
 │   │   ├── errors.ts             # AppError + subclasses, error codes
 │   │   ├── errorHandler.ts       # Express error middleware → JSON error envelope
@@ -172,7 +175,8 @@ apps/api/
 │   │   └── moderation/      moderation.routes.ts moderation.controller.ts reports.service.ts blocks.service.ts
 │   └── jobs/
 │       └── completeActivities.ts # FR20
-└── test/                          # integration tests (later milestones)
+├── prisma.config.ts               # Prisma CLI config: schema, migrations, seed, DATABASE_URL
+└── test/                          # Supertest integration tests (M0: health smoke test)
 ```
 
 Not every module has every file. See [§5.3](#53-which-modules-get-which-layers).
@@ -613,7 +617,9 @@ These are small libraries, each required by a specific FR or by basic safety. Th
 | `nodemailer` | api | Sending verification links (FR03). Development uses a console transport |
 | `cookie-parser` | api | Reading the session cookie (FR10) |
 | `helmet` | api | Standard security headers |
+| `@prisma/adapter-pg` + `pg` | api | The PostgreSQL driver Prisma 7 requires (Prisma no longer bundles its own connection engine) |
 | `tsx` | api (dev) | Running TypeScript in watch mode during development |
+| `concurrently` | root (dev) | Running the shared, API and web watchers with one `npm run dev` |
 | `eslint`, `prettier`, `typescript` | all (dev) | Code quality |
 | `vitest`, `supertest` | all (dev) | Planned testing tools |
 

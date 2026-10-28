@@ -1,0 +1,13 @@
+// Spartan Hangout database schema.
+// Tables are added milestone by milestone; see docs/data-model.md for the full plan.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
