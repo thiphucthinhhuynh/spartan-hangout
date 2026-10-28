@@ -9,11 +9,11 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | # | Topic | Type | Status |
 |---|---|---|---|
 | Q1 | [What "Discover" means](#q1-what-discover-means) | UI ↔ FR conflict | Open |
-| Q2 | [Create screen lacks description and end time](#q2-create-screen-lacks-description-and-end-time) | UI ↔ FR conflict | Open |
-| Q3 | [One activity, multiple categories?](#q3-one-activity-multiple-categories) | UI ↔ FR conflict | Open |
+| Q2 | [Create screen lacks description and end time](#q2-create-screen-lacks-description-and-end-time) | UI ↔ FR conflict | Decided 2026-10-27 |
+| Q3 | [One activity, multiple categories?](#q3-one-activity-multiple-categories) | UI ↔ FR conflict | Decided 2026-10-27 |
 | Q4 | [Activity type list](#q4-activity-type-list) | Unclear requirement | Decided 2026-10-27 |
-| Q5 | [Location: free text or a list, and the detail line](#q5-location-free-text-or-a-list-and-the-detail-line) | UI ↔ FR conflict | Open |
-| Q6 | [Activity images](#q6-activity-images) | UI without FR | Open |
+| Q5 | [Location: free text or a list, and the detail line](#q5-location-free-text-or-a-list-and-the-detail-line) | UI ↔ FR conflict | Decided 2026-10-27 |
+| Q6 | [Activity images](#q6-activity-images) | UI without FR | Decided 2026-10-27 |
 | Q7 | [Other UI elements with no requirement](#q7-other-ui-elements-with-no-requirement) | UI without FR | Open |
 | Q8 | [Login screen shows only an email field](#q8-login-screen-shows-only-an-email-field) | UI ↔ FR conflict | Decided 2026-10-27 |
 | Q9 | [Search UI vs FR16 criteria](#q9-search-ui-vs-fr16-criteria) | UI ↔ FR conflict | Open |
@@ -27,7 +27,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q17 | [Links for notifications that are not about an activity](#q17-links-for-notifications-that-are-not-about-an-activity) | Unclear requirement | Open |
 | Q18 | [Whitespace-only messages and fields](#q18-whitespace-only-messages-and-fields) | Unclear requirement | Open |
 | Q19 | [Requirement numbering across documents](#q19-requirement-numbering-across-documents) | Documentation | Open |
-| Q20 | [Timezone](#q20-timezone) | Unclear requirement | Open |
+| Q20 | [Timezone](#q20-timezone) | Unclear requirement | Decided 2026-10-27 |
 | Q21 | [Inbox vs notifications bell](#q21-inbox-vs-notifications-bell) | UI ↔ FR gap | Open |
 | Q22 | [Organizer updates after an activity starts](#q22-organizer-updates-after-an-activity-starts) | Unclear requirement | Open |
 | Q23 | [Hosting and email provider](#q23-hosting-and-email-provider) | Architecture | Open |
@@ -51,13 +51,13 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 ### Q2. Create screen lacks description and end time
 
 - **Source:** The Create Activity mockup (p.3) has title, category, date, time, location and limit. FR26 also requires a **description (1–500)** and an **end time**.
-- **Working assumption:** the FR governs, and the form adds both fields. The design file needs updating.
+- **Decision (2026-10-27):** follow FR26. The Create form keeps the mockup layout and adds Description (1–500 characters) and End time. The UI design file should be updated to match.
 - **Affects:** api.md `POST /activities`, roadmap M4.
 
 ### Q3. One activity, multiple categories?
 
 - **Source:** The Discover mockup shows a card tagged "Social · Food". FR26 says "an activity type", which is singular, and FR14c and FR16 match on one type.
-- **Working assumption:** one type per activity, as the FR says. The mockup is treated as illustrative.
+- **Decision (2026-10-27):** one type per activity, as FR26 says. The mockup's "Social · Food" card is illustrative.
 - **Affects:** data-model `activity.type`.
 
 ### Q4. Activity type list
@@ -70,13 +70,13 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 
 - **Source:** The Create mockup shows Location as a **dropdown** with a chevron. FR26 says free text of 1–100 characters, and FR16 matches any part of it. The detail mockup shows a second line, "2nd floor · Group Study Room 225", but there's no field for it in FR26.
 - **Options:** free text; a list of campus places plus free text; a list only. Separately: drop the second line, or add an optional "location details" field. Adding the field would need an FR change.
-- **Working assumption:** a single free-text `location` (FR26). No detail line.
+- **Decision (2026-10-27):** a single free-text `location` field of 1–100 characters (FR26), e.g. "King Library, 2nd floor, Room 225". No dropdown and no separate detail line.
 
 ### Q6. Activity images
 
 - **Source:** Every mockup shows a photo for each activity. No FR mentions images or uploads.
 - **Options:** (a) no images, (b) a fixed default illustration per activity type shipped with the frontend (no upload), (c) organizer uploads, which is new scope and needs storage.
-- **Working assumption:** none yet. The UI leaves room for an image, and the decision is due before M4's frontend steps.
+- **Decision (2026-10-27):** a built-in illustration per activity type (the type's icon on a type-colored background, plus a "Study together"-style label) wherever the mockups show a photo. No uploads and no file storage.
 
 ### Q7. Other UI elements with no requirement
 
@@ -172,7 +172,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 ### Q20. Timezone
 
 - **Source:** No FR states a timezone, but FR14d, FR20, FR21b and FR27 all depend on local dates and times.
-- **Working assumption:** a single campus timezone, `America/Los_Angeles` ([ADR-0011](adr/0011-time-and-timezone-handling.md)).
+- **Decision (2026-10-27):** a single campus time zone, `America/Los_Angeles` ([ADR-0011](adr/0011-time-and-timezone-handling.md)). Forms say "Times are in San José (campus) time".
 
 ### Q21. Inbox vs notifications bell
 

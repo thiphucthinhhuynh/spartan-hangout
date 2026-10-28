@@ -61,3 +61,27 @@
 .error {
   color: var(--color-danger);
 }
+
+.multiline {
+  align-items: stretch;
+  padding: var(--space-3) var(--space-4);
+}
+
+.textarea {
+  min-height: 96px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.counter {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}

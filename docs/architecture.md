@@ -533,6 +533,8 @@ Routes marked with an open question are **tentative**.
 
 An auth guard runs `GET /auth/me` (a TanStack Query query). If the user isn't logged in, it redirects to `/login?next=…`.
 
+`<ScrollRestoration />` (in `AppShell` and `AuthLayout`) makes each new page start at the top, and Back returns to the previous scroll position.
+
 ### 12.3 Styling and responsive layout
 
 Styles use CSS Modules (built into Vite) plus global CSS custom properties taken from the mockups. There is no CSS framework.
@@ -602,7 +604,7 @@ Rules for every new screen:
 - **Local development:** Docker Compose runs PostgreSQL ([ADR-0012](adr/0012-docker-compose-for-local-development.md)). The API and web app run on the host with `npm run dev`, and Vite proxies `/api` to Express.
 - **CI:** GitHub Actions runs install, lint, type-check, build and tests against a PostgreSQL service container on every pull request and on pushes to `main` ([ADR-0013](adr/0013-github-actions-ci.md)).
 - **Production (decided in Milestone 14):** one Node process serves both `/api/v1` and the built SPA from `apps/web/dist`. Same origin means no CORS and simple cookies. It needs a managed PostgreSQL database and SMTP credentials. `prisma migrate deploy` runs on release. The hosting and email providers are open questions ([Q23](open-questions.md#q23-hosting-and-email-provider)).
-- **Configuration:** `DATABASE_URL`, `APP_ORIGIN`, `SMTP_*`, `EMAIL_FROM`, `CAMPUS_TIMEZONE` (default `America/Los_Angeles`, from M4). The session cookie is `Secure` whenever `NODE_ENV=production`.
+- **Configuration:** `DATABASE_URL`, `APP_ORIGIN`, `SMTP_*`, `EMAIL_FROM`, The campus time zone is the shared constant `CAMPUS_TIME_ZONE` (`America/Los_Angeles`), not configuration (ADR-0011). The session cookie is `Secure` whenever `NODE_ENV=production`.
 - **Scale assumption:** a single API instance. The scheduled job is idempotent, so a second instance would do no harm.
 
 ---

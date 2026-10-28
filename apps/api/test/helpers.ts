@@ -79,3 +79,12 @@ export async function loggedInAgent(
     throw new Error(`Test login failed: ${res.status} ${JSON.stringify(res.body)}`);
   return agent;
 }
+
+/** Puts students into an activity directly (joining arrives in Milestone 6) and updates the count. */
+export async function addParticipants(activityId: string, userIds: string[]) {
+  await db.participation.createMany({ data: userIds.map((userId) => ({ activityId, userId })) });
+  await db.activity.update({
+    where: { id: activityId },
+    data: { participantCount: { increment: userIds.length } },
+  });
+}

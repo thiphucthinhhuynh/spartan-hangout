@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, ScrollRestoration } from 'react-router';
 import { MapPinIcon } from '../../components/icons.js';
 import { Logo } from '../../components/Logo.js';
 import styles from './AuthLayout.module.css';
@@ -42,6 +42,7 @@ export function AuthLayout() {
         <main className={styles.main}>
           <Outlet />
         </main>
+        <ScrollRestoration />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from 'react';
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, ScrollRestoration } from 'react-router';
 import { CalendarIcon, CompassIcon, MessageIcon, UserIcon } from '../../components/icons.js';
 import { Logo } from '../../components/Logo.js';
 import styles from './AppShell.module.css';
@@ -50,6 +50,8 @@ export function AppShell() {
       <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
+      {/* New pages start at the top; Back returns to where you were. */}
+      <ScrollRestoration />
     </div>
   );
 }

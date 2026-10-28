@@ -1,0 +1,491 @@
+/* Activities: phones first, then tablet (768px) and desktop (1024px). See architecture §12.3. */
+
+/* ─── Type illustration (Q6) ─── */
+
+.art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--type-study-bg);
+  color: var(--type-study-fg);
+}
+
+.art[data-type='SPORTS'] {
+  background: var(--type-sports-bg);
+  color: var(--type-sports-fg);
+}
+
+.art[data-type='FOOD'] {
+  background: var(--type-food-bg);
+  color: var(--type-food-fg);
+}
+
+.art[data-type='SOCIAL'] {
+  background: var(--type-social-bg);
+  color: var(--type-social-fg);
+}
+
+.art[data-type='GAMING'] {
+  background: var(--type-gaming-bg);
+  color: var(--type-gaming-fg);
+}
+
+.banner {
+  height: 180px;
+  border-radius: var(--radius-card);
+}
+
+.banner .artIcon {
+  width: 96px;
+  height: 96px;
+  stroke-width: 1.25;
+  opacity: 0.85;
+}
+
+.thumb {
+  width: 112px;
+  height: 112px;
+  flex-shrink: 0;
+  border-radius: var(--radius-input);
+}
+
+.thumb .artIcon {
+  width: 44px;
+  height: 44px;
+  stroke-width: 1.5;
+}
+
+.artPill {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.typeChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ─── Spots ─── */
+
+.spots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.spotsHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.spotsCount {
+  font-weight: 700;
+}
+
+.spotsPill {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.segments {
+  display: flex;
+  gap: 6px;
+}
+
+.segment,
+.segmentFilled {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+}
+
+.segmentFilled {
+  background: var(--color-primary);
+}
+
+.track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+}
+
+.trackFill {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+/* ─── Form ─── */
+
+.formPage {
+  max-width: 720px;
+}
+
+.formCard {
+  padding: var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.fieldLabel {
+  padding: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.fieldHint,
+.fieldError {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.fieldError {
+  color: var(--color-danger);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Date on its own line, then start and end side by side; one row from tablet up. */
+.whenRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4) var(--space-3);
+  margin-bottom: calc(-1 * var(--space-3));
+}
+
+.whenRow > :first-child {
+  grid-column: 1 / -1;
+}
+
+.stepperField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: 0 var(--space-2) 0 var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+}
+
+.stepper:focus-within {
+  border-color: var(--color-primary);
+}
+
+.stepperInvalid {
+  border-color: var(--color-danger);
+}
+
+.stepperIcon {
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+
+.stepperInput {
+  width: 3.5ch;
+  border: none;
+  background: transparent;
+  font-size: 1.0625rem;
+  text-align: right;
+  appearance: textfield;
+}
+
+.stepperInput::-webkit-inner-spin-button,
+.stepperInput::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.stepperUnit {
+  flex: 1;
+  font-size: 1.0625rem;
+}
+
+.stepperButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.stepperPlus {
+  background: var(--color-primary-soft);
+}
+
+.stepperButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: #fdecea;
+  color: var(--color-danger);
+}
+
+.publish {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.formActions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-2);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ─── Detail page ─── */
+
+.detail {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.detail > .backLink {
+  margin-bottom: 0;
+  justify-self: start;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.statusBadge {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.notice {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--color-accent-soft);
+}
+
+.sectionTitle {
+  margin-bottom: var(--space-2);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.description {
+  color: var(--color-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.sideCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.infoIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-input);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.infoPrimary {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.infoSecondary {
+  font-size: 0.9375rem;
+  color: var(--color-muted);
+}
+
+.host {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+}
+
+.host a {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ─── Tablet ─── */
+
+@media (min-width: 768px) {
+  .formCard {
+    padding: var(--space-6);
+  }
+
+  .whenRow {
+    grid-template-columns: 1.3fr 1fr 1fr;
+  }
+
+  .whenRow > :first-child {
+    grid-column: auto;
+  }
+
+  .formActions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .banner {
+    height: 240px;
+  }
+}
+
+/* ─── Desktop: details card beside the content, staying in view ─── */
+
+@media (min-width: 1024px) {
+  .detail {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    /* The last row takes any extra height, so a tall side card doesn't spread the left column. */
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      'back back'
+      'art side'
+      'title side'
+      'about side';
+    align-items: start;
+    gap: var(--space-4) var(--space-6);
+  }
+
+  .detail > .backLink {
+    grid-area: back;
+  }
+
+  .detailArt {
+    grid-area: art;
+  }
+
+  .titleBlock {
+    grid-area: title;
+  }
+
+  .about {
+    grid-area: about;
+  }
+
+  .detailSide {
+    position: sticky;
+    top: var(--space-5);
+    grid-area: side;
+  }
+
+  .title {
+    font-size: 2.25rem;
+  }
+
+  .banner {
+    height: 280px;
+  }
+}

@@ -251,7 +251,7 @@ Partial unique indexes prevent a second pending report on the same target (FR51)
 | `activity (organizer_id, start_at)` | My plans; account removal; block removal (FR08, FR56) |
 | `participation (user_id)` | My plans; excluding joined activities from recommendations |
 | `notification (recipient_id, created_at DESC)` | Notification list (FR42) |
-| `notification (recipient_id) WHERE read_at IS NULL` | Unread count (FR42) |
+| `notification (recipient_id) WHERE read_at IS NULL` | Unread count (FR42). Added in M7 with the unread-count endpoint (a partial index Prisma doesn't model, so check for migration drift then) |
 | `activity_message (activity_id, created_at)` | Chat history (FR36) |
 | `direct_message (conversation_id, created_at)` | DM history (FR47) |
 | `block (blocked_id)` | Reverse block lookups (FR57) |
@@ -273,6 +273,11 @@ Location search (FR16) uses `ILIKE '%text%'` (Prisma `contains` with `mode: 'ins
 | Duplicate pending report (FR51) | Partial unique index |
 | Denormalized `participant_count` drifts | Only changed in the same transaction as participation inserts and deletes. The invariant `participant_count = COUNT(participation)` is a planned integration-test assertion |
 
-## Seed data (planned, M4)
+## Seed data (M4)
 
-A development-only seed (roadmap task 67): a handful of demo students with different interests and availability, and activities resembling the mockups (Midterm Study Group 5/8, Pickup Soccer, Coffee & Meet New Friends), including one that is full. This is **demo data**, not test data. The product test data belongs to the team's testing assignment.
+`npm run db:seed` (`apps/api/prisma/seed.ts`, roadmap task 67) adds development demo data:
+
+- 7 active students (`maya.chen`, `alex.rivera`, `jordan.lee`, `priya.nair`, `sam.kim`, `lena.tran`, `sammy.spartan` `@sjsu.edu`), all with the password `goSpartans1`, with different interests and availability
+- 5 activities dated relative to today: Midterm Study Group (5/8, like mockup p.4), Pickup Soccer, Coffee & Meet New Friends, a Full game night, and a Completed lunch from yesterday
+
+It runs in one transaction, does nothing if the demo accounts already exist, refuses if only some of them exist, and refuses when `NODE_ENV=production`. Administrator accounts are not seeded until Q14 is decided (task 121). This is **demo data**, not test data: the product test data belongs to the team's testing assignment.

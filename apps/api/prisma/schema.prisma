@@ -33,6 +33,25 @@ enum UserStatus {
   ACTIVE
 }
 
+enum ActivityStatus {
+  OPEN
+  FULL
+  CANCELLED
+  COMPLETED
+}
+
+enum NotificationType {
+  ACTIVITY_CHANGED
+  ACTIVITY_CANCELLED
+  ACTIVITY_UPDATE
+  REMOVED_FROM_ACTIVITY
+  PARTICIPANT_JOINED
+  PARTICIPANT_LEFT
+  CONNECTION_REQUEST
+  CONNECTION_ACCEPTED
+  DIRECT_MESSAGE
+}
+
 // ─── M1: accounts (FR01–FR04) ───────────────────────────────────────────────
 // CHECK constraints live in the migration SQL (Prisma cannot express them):
 //   user: email is lowercase and ends in @sjsu.edu; at least one interest
@@ -55,13 +74,17 @@ model User {
   /// "Last-updated" time for profile edits (FR06).
   updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  availability       AvailabilitySlot[]
-  verificationTokens EmailVerificationToken[]
-  sessions           Session[]
-  blocksMade         Block[]                  @relation("blocker")
-  blocksReceived     Block[]                  @relation("blocked")
-  connectionsAsA     Connection[]             @relation("connectionA")
-  connectionsAsB     Connection[]             @relation("connectionB")
+  availability        AvailabilitySlot[]
+  verificationTokens  EmailVerificationToken[]
+  sessions            Session[]
+  blocksMade          Block[]                  @relation("blocker")
+  blocksReceived      Block[]                  @relation("blocked")
+  connectionsAsA      Connection[]             @relation("connectionA")
+  connectionsAsB      Connection[]             @relation("connectionB")
+  organizedActivities Activity[]               @relation("organizer")
+  participations      Participation[]
+  notifications       Notification[]           @relation("recipient")
+  notificationsCaused Notification[]           @relation("actor")
 
   @@map("user")
 }
@@ -145,4 +168,74 @@ model Connection {
   @@id([userAId, userBId])
   @@index([userBId])
   @@map("connection")
+}
+
+// ─── M4: activities, participation, notifications ───────────────────────────
+// CHECK constraints in the migration SQL: participant limit 2–100, count between 0 and the limit,
+// end after start.
+
+/// FR26–FR32. Times are UTC instants; the form's date and times are campus-local (ADR-0011).
+model Activity {
+  id                 String         @id @default(uuid()) @db.Uuid
+  /// Null only after the organizer deletes their account (shown as "Deleted Student").
+  organizerId        String?        @map("organizer_id") @db.Uuid
+  title              String         @db.VarChar(100)
+  description        String         @db.VarChar(500)
+  type               ActivityType
+  startAt            DateTime       @map("start_at") @db.Timestamptz(3)
+  endAt              DateTime       @map("end_at") @db.Timestamptz(3)
+  location           String         @db.VarChar(100)
+  /// Includes the organizer (FR26).
+  participantLimit   Int            @map("participant_limit") @db.SmallInt
+  /// Denormalized for the atomic join (ADR-0010); always equals the participation row count.
+  participantCount   Int            @default(1) @map("participant_count") @db.SmallInt
+  status             ActivityStatus @default(OPEN)
+  cancellationReason String?        @map("cancellation_reason") @db.VarChar(200)
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// "Last-updated" time for edits (FR30).
+  updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organizer      User?           @relation("organizer", fields: [organizerId], references: [id], onDelete: SetNull)
+  participations Participation[]
+  notifications  Notification[]
+
+  @@index([status, startAt])
+  @@index([organizerId, startAt])
+  @@map("activity")
+}
+
+/// A student in an activity. The organizer has a row too (FR28). The row is also the chat access.
+model Participation {
+  activityId  String   @map("activity_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  isOrganizer Boolean  @default(false) @map("is_organizer")
+  joinedAt    DateTime @default(now()) @map("joined_at") @db.Timestamptz(3)
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([activityId, userId])
+  @@index([userId])
+  @@map("participation")
+}
+
+/// In-app notification (FR40–FR42). Created inside the transaction of the change that caused it.
+model Notification {
+  id            String           @id @default(uuid()) @db.Uuid
+  recipientId   String           @map("recipient_id") @db.Uuid
+  type          NotificationType
+  activityId    String?          @map("activity_id") @db.Uuid
+  /// Title at the time of the notification, so it still reads correctly after a rename (FR42).
+  activityTitle String?          @map("activity_title") @db.VarChar(100)
+  actorId       String?          @map("actor_id") @db.Uuid
+  body          String?          @db.VarChar(500)
+  readAt        DateTime?        @map("read_at") @db.Timestamptz(3)
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  recipient User      @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     User?     @relation("actor", fields: [actorId], references: [id], onDelete: SetNull)
+  activity  Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId, createdAt(sort: Desc)])
+  @@map("notification")
 }

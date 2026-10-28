@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { AppDeps } from './deps.js';
 import { healthHandler } from './health.js';
+import { createActivitiesRouter } from './modules/activities/activities.routes.js';
 import { createAuthModule } from './modules/auth/auth.routes.js';
 import { createUsersRouter } from './modules/users/users.routes.js';
 
@@ -15,6 +16,7 @@ export function createApiRouter(deps: AppDeps) {
   router.get('/health', healthHandler);
   router.use('/auth', auth.router);
   router.use('/users', createUsersRouter(deps));
+  router.use('/activities', createActivitiesRouter(deps));
 
   return router;
 }

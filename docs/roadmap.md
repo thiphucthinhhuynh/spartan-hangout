@@ -192,27 +192,27 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can create activities, view details and edit their own. Activities move to Completed automatically.
 **Features included:** FR18, FR20, FR26–FR30, FR40a (change notifications are stored; the UI comes in M7).
 **Dependencies:** M3. Decisions Q2, Q3, Q5, Q6, Q20.
-**Expected files/modules:** Prisma migration (`activity`, `participation`, `notification`); `packages/shared/src/schemas/activity.ts`, `dto/activity.ts`; `apps/api/src/modules/activities/{activities.routes,activities.controller,activity.service,activities.repository,activities.mappers}.ts`; `apps/api/src/modules/notifications/notifications.service.ts`; `apps/api/src/jobs/completeActivities.ts`; `apps/web/src/features/activities/*`.
+**Expected files/modules:** Prisma migration (`activity`, `participation`, `notification`); `packages/shared/src/{schemas/activity,dto/activity,time}.ts` (campus-time conversion); `apps/api/src/modules/activities/{activities.routes,activities.controller,activity.service,activities.repository,activities.mappers}.ts`; `apps/api/src/modules/notifications/notifications.service.ts`; `apps/api/src/jobs/completeActivities.ts`; `apps/api/prisma/seed.ts`; `apps/api/test/activities.test.ts`; `apps/web/src/features/activities/*`; `apps/web/src/components/TextArea.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 52 | Team decisions: Q2 create-form fields, Q3 single type, Q5 location input, Q6 images, Q20 timezone | 2 | Not started |
-| 53 | Prisma migration: `activity` (CHECKs), `participation`, `notification`, with indexes from data-model.md | 42, 52 | Not started |
-| 54 | Shared: `activityCreateSchema`, `activityUpdateSchema`, `ActivityStatus`/`NotificationType` enums, `ActivityCardDto`/`ActivityDetailDto` | 22 | Not started |
-| 55 | `common/time.ts`: campus-local date + time → UTC (handles daylight saving), same-date check | 23 | Not started |
-| 56 | `notifications.service.create(tx, …)` / `createMany` (backend only) | 53 | Not started |
-| 57 | `activities.repository`: insert activity + organizer participation; find with viewer participation; conditional update with limit guard and status recompute | 53 | Not started |
-| 58 | `activity.service.create` (FR26–FR28) | 54, 55, 57 | Not started |
-| 59 | `activity.service.getDetail`: visibility (FR18, FR20), capability flags; `activities.mappers` (derived Completed, "Deleted Student") | 57 | Not started |
-| 60 | `activity.service.update`: organizer only, Open/Full and not started, limit ≥ count, status recompute, notify participants when title, type, date, times or location change (FR29–FR30, FR40a) | 56, 57 | Not started |
-| 61 | `jobs/completeActivities.ts` + start it from `server.ts` (FR20) | 53 | Not started |
-| 62 | Routes: `POST /activities`, `GET /activities/:id`, `PATCH /activities/:id` | 58–60 | Not started |
-| 63 | Web components: `ActivityCard`, `SpotsBar`, `Avatar`, type chip | 15, 54 | Not started |
-| 64 | Web: `CreateActivityPage` (mockup p.3 + FR26 fields) with participant stepper and per-field errors | 62, 63 | Not started |
-| 65 | Web: `ActivityDetailPage` (mockup p.4), read-only; organizer sees Edit | 62, 63 | Not started |
-| 66 | Web: `EditActivityPage` | 64, 65 | Not started |
-| 67 | Dev seed: demo students and activities resembling the mockups (admin provisioning comes in task 121) | 62 | Not started |
-| 68 | Automated tests (key cases): create/edit validation; status recompute with a fake clock; daylight-saving conversion unit tests | 62 | Not started |
+| 52 | Team decisions: Q2 create-form fields, Q3 single type, Q5 location input, Q6 images, Q20 timezone | 2 | Done (decided 2026-10-27: follow FR26; one type; free-text location; illustration per type; America/Los_Angeles) |
+| 53 | Prisma migration: `activity` (CHECKs), `participation`, `notification`, with indexes from data-model.md | 42, 52 | In review (implemented, not merged) |
+| 54 | Shared: `activityCreateSchema`, `activityUpdateSchema`, `ActivityStatus`/`NotificationType` enums, `ActivityCardDto`/`ActivityDetailDto` | 22 | In review (implemented, not merged) |
+| 55 | `common/time.ts`: campus-local date + time → UTC (handles daylight saving), same-date check | 23 | In review (implemented, not merged) |
+| 56 | `notifications.service.create(tx, …)` / `createMany` (backend only) | 53 | In review (implemented, not merged) |
+| 57 | `activities.repository`: insert activity + organizer participation; find with viewer participation; conditional update with limit guard and status recompute | 53 | In review (implemented, not merged) |
+| 58 | `activity.service.create` (FR26–FR28) | 54, 55, 57 | In review (implemented, not merged) |
+| 59 | `activity.service.getDetail`: visibility (FR18, FR20), capability flags; `activities.mappers` (derived Completed, "Deleted Student") | 57 | In review (implemented, not merged) |
+| 60 | `activity.service.update`: organizer only, Open/Full and not started, limit ≥ count, status recompute, notify participants when title, type, date, times or location change (FR29–FR30, FR40a) | 56, 57 | In review (implemented, not merged) |
+| 61 | `jobs/completeActivities.ts` + start it from `server.ts` (FR20) | 53 | In review (implemented, not merged) |
+| 62 | Routes: `POST /activities`, `GET /activities/:id`, `PATCH /activities/:id` | 58–60 | In review (implemented, not merged) |
+| 63 | Web components: `SpotsBar`, type chip, type illustration (`Avatar` exists since M3) | 15, 54 | In review (implemented, not merged; `ActivityCard` moved to task 74, where activity lists first appear) |
+| 64 | Web: `CreateActivityPage` (mockup p.3 + FR26 fields) with participant stepper and per-field errors | 62, 63 | In review (implemented, not merged) |
+| 65 | Web: `ActivityDetailPage` (mockup p.4), read-only; organizer sees Edit | 62, 63 | In review (implemented, not merged) |
+| 66 | Web: `EditActivityPage` | 64, 65 | In review (implemented, not merged) |
+| 67 | Dev seed: demo students and activities resembling the mockups (admin provisioning comes in task 121) | 62 | In review (implemented, not merged) |
+| 68 | Automated tests (key cases): create/edit validation; status recompute with a fake clock; daylight-saving conversion unit tests | 62 | In review (implemented, not merged) |
 
 **Completion criteria:** creating an activity stores it as Open with count 1 and the organizer as first participant. The detail view shows every FR18 field. Only the organizer can edit, only before the start, and a limit below the count is rejected. Ended activities show as Completed. Field changes create notifications for participants (visible in M7).
 
@@ -232,7 +232,7 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 | 71 | `activities.repository.search`: combined filters, Open + future, block exclusion, soonest first, paging (FR16–FR17) | 57, 43 | Not started |
 | 72 | `activities.repository.recommended`: raw SQL with the six FR14 conditions (timezone-aware availability) | 57, 43 | Not started |
 | 73 | `activity.service.search` / `recommended`; routes `GET /activities`, `GET /activities/recommended` | 71, 72 | Not started |
-| 74 | Web: `DiscoverPage` (mockup p.2): greeting, Create button, type chips, Recommended list, "No matching activities found." | 73, 69 | Not started |
+| 74 | Web: `ActivityCard` (moved from task 63) and `DiscoverPage` (mockup p.2): greeting, Create button, type chips, Recommended list, "No matching activities found." | 73, 69 | Not started |
 | 75 | Web: `SearchPage` with FR16 filters stored in URL params, clearable criteria, "No activities found." | 73, 69 | Not started |
 | 76 | Automated tests (key cases): one integration test per FR14 condition; combined search filters | 73 | Not started |
 

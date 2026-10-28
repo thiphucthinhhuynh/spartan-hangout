@@ -34,6 +34,19 @@ export const ActivityStatus = {
 } as const; // FR18
 export type ActivityStatus = (typeof ActivityStatus)[keyof typeof ActivityStatus];
 
+export const NotificationType = {
+  ACTIVITY_CHANGED: 'ACTIVITY_CHANGED',
+  ACTIVITY_CANCELLED: 'ACTIVITY_CANCELLED',
+  ACTIVITY_UPDATE: 'ACTIVITY_UPDATE',
+  REMOVED_FROM_ACTIVITY: 'REMOVED_FROM_ACTIVITY',
+  PARTICIPANT_JOINED: 'PARTICIPANT_JOINED',
+  PARTICIPANT_LEFT: 'PARTICIPANT_LEFT',
+  CONNECTION_REQUEST: 'CONNECTION_REQUEST',
+  CONNECTION_ACCEPTED: 'CONNECTION_ACCEPTED',
+  DIRECT_MESSAGE: 'DIRECT_MESSAGE',
+} as const; // FR40–FR42, FR45–FR46, FR49
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
+
 export const ReportReason = {
   HARASSMENT: 'HARASSMENT',
   SPAM: 'SPAM',

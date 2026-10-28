@@ -21,11 +21,12 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 | [Milestone 1 – Registration & email verification](docs/roadmap.md#m1--registration--email-verification) | **Committed to `main`.** Register with an `@sjsu.edu` email (FR01–FR02), verification link with 24-hour expiry and resend (FR03), account activation (FR04) |
 | [Milestone 2 – Login, sessions & lockout](docs/roadmap.md#m2--login-sessions--lockout) | **Committed to `main`.** Log in and out (FR09), 30-minute idle sessions (FR10), lockout after 5 failed attempts (FR11) |
 | Responsive layout | **Implemented, awaiting review.** Phone layout from the mockups; tablet icon rail and desktop sidebar ([Q25](docs/open-questions.md#q25-target-devices)) |
-| [Milestone 3 – Profiles & relationship policy](docs/roadmap.md#m3--profiles--relationship-policy) | **Implemented, awaiting review.** View your own profile with your private email (FR12), edit name, interests and free times (FR05–FR06), view other students' profiles with shared interests highlighted and no email (FR13). Block and connection tables exist for later milestones |
-| Other product features | **Not started.** Activities are next |
-| Next step | [Milestone 4 – Activities: create, view, edit, lifecycle](docs/roadmap.md#m4--activities-create-view-edit-lifecycle) |
+| [Milestone 3 – Profiles & relationship policy](docs/roadmap.md#m3--profiles--relationship-policy) | **Committed to `main`.** Own profile with private email (FR12), edit profile (FR05–FR06), other students' profiles with shared interests and no email (FR13) |
+| [Milestone 4 – Activities: create, view, edit, lifecycle](docs/roadmap.md#m4--activities-create-view-edit-lifecycle) | **Implemented, awaiting review.** Create an activity (FR26–FR28), its detail page (FR18), organizer edits with participant notifications stored (FR29–FR30, FR40a), automatic Completed status (FR20), demo seed data |
+| Other product features | **Not started.** Finding activities (Recommended and search) is next |
+| Next step | [Milestone 5 – Finding activities](docs/roadmap.md#m5--finding-activities) |
 
-The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout and profiles exist so far; the rest is **planned**.
+The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, and creating, viewing and editing activities exist so far; the rest is **planned**.
 
 ---
 
@@ -135,6 +136,7 @@ cp apps/api/.env.example apps/api/.env
 
 docker compose up -d        # PostgreSQL with dev + test databases
 npm run db:migrate          # create the tables
+npm run db:seed             # optional: demo students and activities (password: goSpartans1)
 
 npm run dev                 # API on :3000, web on :5173 (Vite proxies /api to the API)
 ```
@@ -153,7 +155,7 @@ Run `npm run db:migrate` again whenever you pull new migrations. Open <http://lo
 | `npm test` | Vitest in every workspace; API tests use `DATABASE_URL_TEST` (needs `docker compose up -d`) |
 | `npm run codegen` | Build `@sh/shared` and generate the Prisma client. Runs automatically before `dev`, `build`, `typecheck` and `test` |
 | `npm run check-node` | Stop with a clear message unless this terminal uses the Node version in `.nvmrc`. Runs automatically before `dev`, `build`, `typecheck` and `test` |
-| `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle (Prisma) |
+| `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle (Prisma). `db:seed` adds demo students (e.g. `sammy.spartan@sjsu.edu`, password `goSpartans1`) and activities; see [data-model.md](docs/data-model.md#seed-data-m4) |
 
 ### Troubleshooting
 

@@ -23,6 +23,18 @@
   --space-5: 24px;
   --space-6: 32px;
 
+  /* Activity type illustrations (open question Q6: a built-in illustration per type) */
+  --type-study-bg: #e8f0f9;
+  --type-study-fg: #0055a2;
+  --type-sports-bg: #e5f4ea;
+  --type-sports-fg: #1e6b3a;
+  --type-food-bg: #fdeee3;
+  --type-food-fg: #a34a12;
+  --type-social-bg: #f1eafb;
+  --type-social-fg: #5e3696;
+  --type-gaming-bg: #fdf3d7;
+  --type-gaming-fg: #7a5600;
+
   --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --shadow-card: 0 1px 2px rgb(28 42 58 / 6%), 0 4px 16px rgb(28 42 58 / 6%);
 

@@ -17,8 +17,8 @@ SJSU is in San José, so every user shares one campus timezone. The FRs don't st
 
 - Store **instants** (`start_at`, `end_at`, every `*_at`) as `timestamptz` in UTC.
 - Store **availability** as `day_of_week` (0–6) plus `start_minute` and `end_minute` (minutes after local midnight).
-- One configured **campus timezone**, `CAMPUS_TIMEZONE=America/Los_Angeles`.
-- **Input:** activity forms send `date`, `startTime` and `endTime` in campus-local time. The server converts them to UTC with a small helper in `common/time.ts` built on `Intl.DateTimeFormat`, so it handles daylight saving time.
+- One **campus time zone**, `America/Los_Angeles`, defined once as `CAMPUS_TIME_ZONE` in `packages/shared/src/constants.ts` (a constant, not configuration, because the browser needs it too).
+- **Input:** activity forms send `date`, `startTime` and `endTime` in campus-local time. `campusDateTimeToUtc()` and `utcToCampusParts()` in `packages/shared/src/time.ts` convert between campus-local values and UTC instants. They're built on `Intl.DateTimeFormat`, so they handle daylight saving time, and they live in the shared package because the API and the forms both need them. Unit tests cover both 2026 daylight-saving switches.
 - **Matching (FR14d):** done in SQL with `EXTRACT(DOW FROM start_at AT TIME ZONE :tz)` and the local minute of day.
 - **Display:** the client formats with `Intl.DateTimeFormat(..., { timeZone: 'America/Los_Angeles' })`.
 - **Clock injection:** services get `clock.now()` instead of calling `new Date()` directly, so time-based rules can be tested.

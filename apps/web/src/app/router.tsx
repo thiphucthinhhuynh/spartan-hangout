@@ -1,4 +1,7 @@
 import { createBrowserRouter } from 'react-router';
+import { ActivityDetailPage } from '../features/activities/ActivityDetailPage.js';
+import { CreateActivityPage } from '../features/activities/CreateActivityPage.js';
+import { EditActivityPage } from '../features/activities/EditActivityPage.js';
 import { CheckEmailPage } from '../features/auth/CheckEmailPage.js';
 import { LoginPage } from '../features/auth/LoginPage.js';
 import { RegisterPage } from '../features/auth/RegisterPage.js';
@@ -39,6 +42,9 @@ export const router = createBrowserRouter([
           { path: 'profile', element: <MyProfilePage /> },
           { path: 'profile/edit', element: <EditProfilePage /> },
           { path: 'users/:id', element: <StudentProfilePage /> },
+          { path: 'activities/new', element: <CreateActivityPage /> },
+          { path: 'activities/:id', element: <ActivityDetailPage /> },
+          { path: 'activities/:id/edit', element: <EditActivityPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
