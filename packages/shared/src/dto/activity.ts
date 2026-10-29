@@ -26,7 +26,7 @@ export type ViewerRole = 'organizer' | 'participant' | 'none';
 
 /**
  * GET /activities/:id (FR18). The `can*` flags tell the UI which actions to offer; the server still
- * checks every action. Join, leave, cancel and report turn on in Milestones 6, 7 and 11.
+ * checks every action. Cancel and report turn on in Milestones 7 and 11.
  */
 export interface ActivityDetailDto extends ActivityCardDto {
   description: string;
@@ -36,11 +36,18 @@ export interface ActivityDetailDto extends ActivityCardDto {
   viewerRole: ViewerRole;
   canEdit: boolean;
   canJoin: boolean;
-  /** Why the viewer can't join, when that is worth showing (from Milestone 6). */
+  /** Why the viewer can't join (FR21), when they aren't in it and the activity is still live. */
   joinBlockedReason: string | null;
   canLeave: boolean;
   canCancel: boolean;
   canReport: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+/** GET /activities/:id/participants (FR19). The organizer comes first. */
+export interface ParticipantDto {
+  userId: string;
+  displayName: string;
+  isOrganizer: boolean;
 }

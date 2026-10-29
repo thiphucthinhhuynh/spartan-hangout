@@ -26,10 +26,11 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 | [Milestone 3 – Profiles & relationship policy](docs/roadmap.md#m3--profiles--relationship-policy) | **Committed to `main`.** Own profile with private email (FR12), edit profile (FR05–FR06), other students' profiles with shared interests and no email (FR13) |
 | [Milestone 4 – Activities: create, view, edit, lifecycle](docs/roadmap.md#m4--activities-create-view-edit-lifecycle) | **Implemented, awaiting review.** Create an activity (FR26–FR28), its detail page (FR18), organizer edits with participant notifications stored (FR29–FR30, FR40a), automatic Completed status (FR20), demo seed data |
 | [Milestone 5 – Finding activities](docs/roadmap.md#m5--finding-activities) | **Implemented, awaiting review.** Recommended list on Discover (FR14–FR15) and search by category, date range, start-time range and location (FR16–FR17), using the working assumptions for [Q1](docs/open-questions.md#q1-what-discover-means), [Q9](docs/open-questions.md#q9-search-ui-vs-fr16-criteria) and [Q10](docs/open-questions.md#q10-featured-activities-vs-recommended-activities) |
-| Other product features | **Not started.** Joining and leaving activities is next |
-| Next step | [Milestone 6 – Joining, leaving & participants](docs/roadmap.md#m6--joining-leaving--participants) |
+| [Milestone 6 – Joining, leaving & participants](docs/roadmap.md#m6--joining-leaving--participants) | **Implemented, awaiting review.** Join with the FR21 checks and a race-safe last spot (FR21–FR23), leave (FR24–FR25), organizer removes participants (FR33–FR34), participant list (FR19), join/leave notifications stored for the organizer (FR41), My plans |
+| Other product features | **Not started.** Cancellation and the notifications screen are next |
+| Next step | [Milestone 7 – Cancellation & notifications](docs/roadmap.md#m7--cancellation--notifications) |
 
-The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, and finding them (Recommended and search) exist so far; the rest is **planned**.
+The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, finding them (Recommended and search), and joining, leaving and removing participants exist so far; the rest is **planned**.
 
 ---
 

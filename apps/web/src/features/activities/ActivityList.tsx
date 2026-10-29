@@ -2,8 +2,8 @@ import type { ActivityCardDto, Paged } from '@sh/shared';
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { Button } from '../../components/Button.js';
 import { EmptyState } from '../../components/EmptyState.js';
-import { ActivityCard } from '../activities/ActivityCard.js';
-import styles from './discover.module.css';
+import { ActivityCard } from './ActivityCard.js';
+import styles from './ActivityCard.module.css';
 
 interface ActivityListProps {
   query: UseInfiniteQueryResult<InfiniteData<Paged<ActivityCardDto>>>;

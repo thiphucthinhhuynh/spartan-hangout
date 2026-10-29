@@ -14,8 +14,7 @@ Inside the join transaction, after the FR21 condition checks:
 ```sql
 UPDATE activity
 SET participant_count = participant_count + 1,
-    status = CASE WHEN participant_count + 1 = participant_limit THEN 'FULL' ELSE status END,
-    updated_at = now()
+    status = CASE WHEN participant_count + 1 = participant_limit THEN 'FULL' ELSE status END
 WHERE id = $1
   AND status = 'OPEN'
   AND participant_count < participant_limit
@@ -23,6 +22,7 @@ WHERE id = $1
 RETURNING *;
 ```
 
+- `updated_at` is not touched: it is the "last updated" time of organizer edits (FR30), and a join isn't an edit. (Changed during M6.)
 - 0 rows → roll back, return `409 ACTIVITY_FULL` ("This activity is full."). If the reason is actually a status change or start time, the service reports that more specific reason.
 - 1 row → insert the `participation` row (its PK `(activity_id, user_id)` blocks duplicates), create the organizer notification, commit.
 

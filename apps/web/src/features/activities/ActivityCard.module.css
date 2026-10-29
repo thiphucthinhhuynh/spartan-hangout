@@ -1,4 +1,4 @@
-/* Activity card in lists (Discover, search; My plans from M6). */
+/* Activity cards and the lists that hold them (Discover, search, My plans). */
 
 .card {
   display: flex;
@@ -61,4 +61,25 @@
   background: var(--color-accent-soft);
   font-size: 0.8125rem;
   font-weight: 700;
+}
+
+/* ─── Lists ─── */
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.more {
+  display: flex;
+  margin: var(--space-4) auto 0;
+}
+
+@media (min-width: 768px) {
+  .list {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  }
 }

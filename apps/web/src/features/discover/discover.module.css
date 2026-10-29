@@ -57,21 +57,6 @@
   color: var(--color-muted);
 }
 
-/* ─── Lists ─── */
-
-.list {
-  display: grid;
-  gap: var(--space-3);
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.more {
-  display: flex;
-  margin: var(--space-4) auto 0;
-}
-
 /* ─── Search (FR16) ─── */
 
 .searchLayout {
@@ -166,10 +151,6 @@
 /* ─── Tablet ─── */
 
 @media (min-width: 768px) {
-  .list {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  }
-
   .filterActions {
     flex-direction: row;
   }

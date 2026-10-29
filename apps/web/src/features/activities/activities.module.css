@@ -418,6 +418,117 @@
   text-decoration: none;
 }
 
+/* ─── Participants (FR19) ─── */
+
+.going {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--type-sports-fg);
+  font-weight: 700;
+}
+
+.people {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+}
+
+.personName {
+  min-width: 0;
+  color: var(--color-ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.organizerLabel {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.removeButton {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  margin-left: auto;
+  color: var(--color-danger);
+}
+
+/* ─── Join result screens (mockups p.5, p.6) ─── */
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 480px;
+  margin: var(--space-5) auto 0;
+  text-align: center;
+}
+
+.resultIcon {
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+}
+
+.resultSuccess {
+  background: var(--type-sports-bg);
+  color: var(--type-sports-fg);
+}
+
+.resultTitle {
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.resultLead {
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  text-align: left;
+}
+
+.resultActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.resultLink {
+  font-weight: 600;
+}
+
 /* ─── Tablet ─── */
 
 @media (min-width: 768px) {
@@ -449,12 +560,13 @@
   .detail {
     grid-template-columns: minmax(0, 1fr) 360px;
     /* The last row takes any extra height, so a tall side card doesn't spread the left column. */
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
     grid-template-areas:
       'back back'
       'art side'
       'title side'
-      'about side';
+      'about side'
+      'participants side';
     align-items: start;
     gap: var(--space-4) var(--space-6);
   }
@@ -473,6 +585,10 @@
 
   .about {
     grid-area: about;
+  }
+
+  .participants {
+    grid-area: participants;
   }
 
   .detailSide {

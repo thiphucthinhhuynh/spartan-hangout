@@ -1,7 +1,9 @@
 import { createBrowserRouter } from 'react-router';
 import { ActivityDetailPage } from '../features/activities/ActivityDetailPage.js';
+import { ActivityFullPage } from '../features/activities/ActivityFullPage.js';
 import { CreateActivityPage } from '../features/activities/CreateActivityPage.js';
 import { EditActivityPage } from '../features/activities/EditActivityPage.js';
+import { JoinSuccessPage } from '../features/activities/JoinSuccessPage.js';
 import { CheckEmailPage } from '../features/auth/CheckEmailPage.js';
 import { LoginPage } from '../features/auth/LoginPage.js';
 import { RegisterPage } from '../features/auth/RegisterPage.js';
@@ -47,6 +49,8 @@ export const router = createBrowserRouter([
           { path: 'activities/new', element: <CreateActivityPage /> },
           { path: 'activities/:id', element: <ActivityDetailPage /> },
           { path: 'activities/:id/edit', element: <EditActivityPage /> },
+          { path: 'activities/:id/joined', element: <JoinSuccessPage /> },
+          { path: 'activities/:id/full', element: <ActivityFullPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

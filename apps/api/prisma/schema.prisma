@@ -83,6 +83,7 @@ model User {
   connectionsAsB      Connection[]             @relation("connectionB")
   organizedActivities Activity[]               @relation("organizer")
   participations      Participation[]
+  activityRemovals    ActivityRemoval[]
   notifications       Notification[]           @relation("recipient")
   notificationsCaused Notification[]           @relation("actor")
 
@@ -195,8 +196,9 @@ model Activity {
   /// "Last-updated" time for edits (FR30).
   updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  organizer      User?           @relation("organizer", fields: [organizerId], references: [id], onDelete: SetNull)
+  organizer      User?             @relation("organizer", fields: [organizerId], references: [id], onDelete: SetNull)
   participations Participation[]
+  removals       ActivityRemoval[]
   notifications  Notification[]
 
   @@index([status, startAt])
@@ -217,6 +219,24 @@ model Participation {
   @@id([activityId, userId])
   @@index([userId])
   @@map("participation")
+}
+
+// ─── M6: removals ───────────────────────────────────────────────────────────
+
+/// The organizer removed this student (FR33–FR34). While the row exists they can't rejoin (FR21d).
+model ActivityRemoval {
+  activityId String   @map("activity_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  /// Optional reason from the organizer; null for block removals (FR56).
+  reason     String?  @db.VarChar(200)
+  removedAt  DateTime @default(now()) @map("removed_at") @db.Timestamptz(3)
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([activityId, userId])
+  @@index([userId])
+  @@map("activity_removal")
 }
 
 /// In-app notification (FR40–FR42). Created inside the transaction of the change that caused it.

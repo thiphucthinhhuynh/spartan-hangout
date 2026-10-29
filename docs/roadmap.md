@@ -245,22 +245,22 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can join and leave activities safely under concurrency, and organizers can remove participants.
 **Features included:** FR19, FR21–FR25, FR33–FR34, FR41; the My plans tab (FR18 entry point).
 **Dependencies:** M5.
-**Expected files/modules:** Prisma migration (`activity_removal`); `apps/api/src/modules/activities/participation.service.ts`; `activities.repository` (reserve/release spot); `apps/web/src/features/activities/{ParticipantList,JoinSuccessPage,ActivityFullPage}.tsx`; `apps/web/src/features/plans/MyPlansPage.tsx`.
+**Expected files/modules:** Prisma migration (`activity_removal`); `apps/api/src/modules/activities/{participation.service,participation.rules}.ts`; `activities.repository` (reserve/release spot); `apps/api/test/participation.test.ts`; `apps/web/src/features/activities/{ParticipantList,JoinSuccessPage,ActivityFullPage}.tsx`; `apps/web/src/components/ConfirmDialog.tsx`; `apps/web/src/features/plans/MyPlansPage.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 77 | Prisma migration: `activity_removal` | 53 | Not started |
-| 78 | `activities.repository`: `reserveSpot` (atomic conditional UPDATE), `releaseSpot`, insert/delete participation, list participants | 77 | Not started |
-| 79 | `participation.service.join`: FR21 checks (a–e) → reserve → insert → notify organizer, in one transaction (FR21–FR23, FR41) | 78, 56, 43 | Not started |
-| 80 | `participation.service.leave`: non-organizer, Open/Full, not started; release spot; notify organizer (FR24–FR25, FR41) | 78 | Not started |
-| 81 | `participation.service.removeParticipant`: organizer only, removal record, optional reason, notify the removed student (FR33–FR34) | 78, 77 | Not started |
-| 82 | Routes: `GET /activities/:id/participants`, `POST …/join`, `POST …/leave`, `DELETE …/participants/:userId` | 79–81 | Not started |
-| 83 | `GET /activities/mine` (joined/organizing × upcoming/past) | 57 | Not started |
-| 84 | Web: `ParticipantList` on the detail page (avatars, full list, "Organizer" label, links to profiles) (FR19) | 82 | Not started |
-| 85 | Web: Join button → `JoinSuccessPage` (p.6) or `ActivityFullPage` (p.5); show the other FR21 reasons inline | 82 | Not started |
-| 86 | Web: Leave with a confirmation dialog; organizer Remove with confirmation and optional reason | 82 | Not started |
-| 87 | Web: `MyPlansPage` (Joined / Organizing, Upcoming / Past) | 83 | Not started |
-| 88 | Automated tests (key cases): parallel joins for the last spot → exactly one success (FR23); `participant_count` equals the number of rows; join-condition unit tests | 82 | Not started |
+| 77 | Prisma migration: `activity_removal` | 53 | In review (implemented, not merged) |
+| 78 | `activities.repository`: `reserveSpot` (atomic conditional UPDATE), `releaseSpot`, insert/delete participation, list participants | 77 | In review (implemented, not merged) |
+| 79 | `participation.service.join`: FR21 checks (a–e) → reserve → insert → notify organizer, in one transaction (FR21–FR23, FR41) | 78, 56, 43 | In review (implemented, not merged) |
+| 80 | `participation.service.leave`: non-organizer, Open/Full, not started; release spot; notify organizer (FR24–FR25, FR41) | 78 | In review (implemented, not merged) |
+| 81 | `participation.service.removeParticipant`: organizer only, removal record, optional reason, notify the removed student (FR33–FR34) | 78, 77 | In review (implemented, not merged) |
+| 82 | Routes: `GET /activities/:id/participants`, `POST …/join`, `POST …/leave`, `DELETE …/participants/:userId` | 79–81 | In review (implemented, not merged) |
+| 83 | `GET /activities/mine` (joined/organizing × upcoming/past) | 57 | In review (implemented, not merged) |
+| 84 | Web: `ParticipantList` on the detail page (avatars, full list, "Organizer" label, links to profiles) (FR19) | 82 | In review (implemented, not merged) |
+| 85 | Web: Join button → `JoinSuccessPage` (p.6) or `ActivityFullPage` (p.5); show the other FR21 reasons inline | 82 | In review (implemented, not merged) |
+| 86 | Web: Leave with a confirmation dialog; organizer Remove with confirmation and optional reason | 82 | In review (implemented, not merged) |
+| 87 | Web: `MyPlansPage` (Joined / Organizing, Upcoming / Past) | 83 | In review (implemented, not merged) |
+| 88 | Automated tests (key cases): parallel joins for the last spot → exactly one success (FR23); `participant_count` equals the number of rows; join-condition unit tests | 82 | In review (implemented, not merged) |
 
 **Completion criteria:** a join succeeds only when all FR21 conditions hold. Simultaneous joins for the last spot admit exactly one student, and the rest see "This activity is full." The status flips Full ⇄ Open correctly. Removed students can't rejoin. The organizer gets join and leave notifications. My plans lists the student's activities.
 

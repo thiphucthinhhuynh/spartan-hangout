@@ -60,6 +60,7 @@ export function findActivityForViewer(client: DbClient, activityId: string, view
     select: {
       ...activitySelect,
       participations: { where: { userId: viewerId }, select: { isOrganizer: true } },
+      removals: { where: { userId: viewerId }, select: { userId: true } },
     },
   });
 }
@@ -223,4 +224,109 @@ export async function findActivitiesInOrder(client: DbClient, ids: string[]) {
   });
   const byId = new Map(rows.map((row) => [row.id, row]));
   return ids.flatMap((id) => byId.get(id) ?? []);
+}
+
+// ─── Participation (FR19, FR21–FR25, FR33–FR34) ─────────────────────────────
+// Every change to participation also changes participant_count in the same transaction, with the
+// activity row updated first so its row lock orders concurrent joins, leaves and removals
+// (ADR-0010). updated_at is left alone: it is the "last updated" time of organizer edits (FR30).
+
+/**
+ * FR22–FR23: takes one spot if the activity is still Open, not started and not full, and makes it
+ * Full when that was the last spot. Returns false when another request got there first.
+ */
+export async function reserveSpot(client: DbClient, activityId: string, now: Date) {
+  const rows = await client.$queryRaw<{ id: string }[]>`
+    UPDATE "activity" SET
+      participant_count = participant_count + 1,
+      status = (CASE WHEN participant_count + 1 >= participant_limit THEN 'FULL' ELSE 'OPEN' END)::"ActivityStatus"
+    WHERE id = ${activityId}::uuid
+      AND status = 'OPEN'
+      AND participant_count < participant_limit
+      AND start_at > ${now}
+    RETURNING id`;
+  return rows.length === 1;
+}
+
+/** FR25, FR34: gives a spot back (Full becomes Open) while Open or Full and not started. */
+export async function releaseSpot(client: DbClient, activityId: string, now: Date) {
+  const rows = await client.$queryRaw<{ id: string }[]>`
+    UPDATE "activity" SET
+      participant_count = participant_count - 1,
+      status = 'OPEN'::"ActivityStatus"
+    WHERE id = ${activityId}::uuid
+      AND status IN ('OPEN', 'FULL')
+      AND start_at > ${now}
+    RETURNING id`;
+  return rows.length === 1;
+}
+
+export function insertParticipation(
+  client: DbClient,
+  activityId: string,
+  userId: string,
+  now: Date,
+) {
+  return client.participation.create({ data: { activityId, userId, joinedAt: now } });
+}
+
+/** Removes a non-organizer participant. Returns false when there was no such row. */
+export async function deleteParticipation(client: DbClient, activityId: string, userId: string) {
+  const { count } = await client.participation.deleteMany({
+    where: { activityId, userId, isOrganizer: false },
+  });
+  return count === 1;
+}
+
+export function insertRemoval(
+  client: DbClient,
+  activityId: string,
+  userId: string,
+  reason: string | null,
+  now: Date,
+) {
+  return client.activityRemoval.create({ data: { activityId, userId, reason, removedAt: now } });
+}
+
+/** FR19: everyone in the activity, organizer first, then in the order they joined. */
+export function listParticipants(client: DbClient, activityId: string) {
+  return client.participation.findMany({
+    where: { activityId },
+    select: { userId: true, isOrganizer: true, user: { select: { displayName: true } } },
+    orderBy: [{ isOrganizer: 'desc' }, { joinedAt: 'asc' }, { userId: 'asc' }],
+  });
+}
+
+export type MyActivitiesFilter = {
+  role: 'joined' | 'organizing';
+  when: 'upcoming' | 'past';
+};
+
+/**
+ * "My plans": activities the student joined or organizes. Upcoming = Open or Full and not ended,
+ * soonest first; past = ended, Completed or Cancelled, most recent first.
+ */
+export function findMyActivities(
+  client: DbClient,
+  userId: string,
+  { role, when }: MyActivitiesFilter,
+  now: Date,
+  window: PageWindow,
+) {
+  const live = [ActivityStatus.OPEN, ActivityStatus.FULL];
+  return client.activity.findMany({
+    where: {
+      participations: { some: { userId, isOrganizer: role === 'organizing' } },
+      ...(when === 'upcoming'
+        ? { status: { in: live }, endAt: { gt: now } }
+        : { OR: [{ status: { notIn: live } }, { endAt: { lte: now } }] }),
+    },
+    select: activitySelect,
+    orderBy:
+      when === 'upcoming'
+        ? [{ startAt: 'asc' }, { id: 'asc' }]
+        : [{ startAt: 'desc' }, { id: 'asc' }],
+    take: window.limit,
+    skip: window.offset,
+  });
 }

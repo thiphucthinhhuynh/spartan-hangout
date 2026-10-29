@@ -124,6 +124,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 - **Source:** FR21 says a failed join "shall display the reason". FR54 says the blocked student "shall not be notified", and FR56 hides the reason for a block-caused removal.
 - **Decision needed:** the exact message, for example a generic "You can't join this activity."
 - **Working assumption:** error code `JOIN_NOT_ALLOWED` with generic text that doesn't mention blocking.
+- **Built so far (M6, 2026-10-28):** implemented with this assumption; the text is "You can’t join this activity." The status stays Open until the team decides.
 
 ### Q13. Account removal side effects
 

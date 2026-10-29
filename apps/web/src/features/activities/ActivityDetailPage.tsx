@@ -1,15 +1,24 @@
-import { ActivityStatus, MESSAGES } from '@sh/shared';
+import { ActivityStatus, ErrorCode, MESSAGES } from '@sh/shared';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Avatar } from '../../components/Avatar.js';
 import { Button, LinkButton } from '../../components/Button.js';
+import { ConfirmDialog } from '../../components/ConfirmDialog.js';
 import { EmptyState } from '../../components/EmptyState.js';
-import { ArrowLeftIcon, CalendarIcon, MapPinIcon, PencilIcon } from '../../components/icons.js';
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  CheckIcon,
+  MapPinIcon,
+  PencilIcon,
+} from '../../components/icons.js';
 import { ApiError } from '../../lib/apiClient.js';
 import { formatActivityDay, formatActivityTimes } from '../../lib/format.js';
 import { useCurrentUser } from '../auth/api.js';
 import styles from './activities.module.css';
 import { ActivityTypeArt, TypeChip } from './ActivityTypeArt.js';
-import { useActivity } from './api.js';
+import { useActivity, useJoinActivity, useLeaveActivity } from './api.js';
+import { ParticipantList } from './ParticipantList.js';
 import { SpotsBar } from './SpotsBar.js';
 
 const STATUS_LABELS: Partial<Record<ActivityStatus, string>> = {
@@ -18,12 +27,15 @@ const STATUS_LABELS: Partial<Record<ActivityStatus, string>> = {
   COMPLETED: 'Completed',
 };
 
-/** Activity details (mockup p.4 · FR18). Joining (M6) and cancelling (M7) come later. */
+/** Activity details (mockup p.4 · FR18–FR19, FR21, FR24). Cancelling arrives in M7. */
 export function ActivityDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const me = useCurrentUser();
   const query = useActivity(id);
+  const join = useJoinActivity(id);
+  const leave = useLeaveActivity(id);
+  const [confirmLeave, setConfirmLeave] = useState(false);
 
   if (query.isPending) return <EmptyState title="Loading activity…" />;
   if (query.isError) {
@@ -49,6 +61,22 @@ export function ActivityDetailPage() {
   const statusLabel = STATUS_LABELS[activity.status];
   const organizer = activity.organizer;
   const hostIsMe = organizer.id === me.id;
+  // FR21: a full activity has its own screen (mockup p.5); other reasons show inline.
+  const joinError =
+    join.error instanceof ApiError && join.error.code !== ErrorCode.ACTIVITY_FULL
+      ? join.error.message
+      : null;
+
+  function handleJoin() {
+    join.mutate(undefined, {
+      onSuccess: () => navigate(`/activities/${activity.id}/joined`),
+      onError: (err) => {
+        if (err instanceof ApiError && err.code === ErrorCode.ACTIVITY_FULL) {
+          navigate(`/activities/${activity.id}/full`);
+        }
+      },
+    });
+  }
 
   return (
     <article className={styles.detail}>
@@ -109,15 +137,30 @@ export function ActivityDetailPage() {
 
           <SpotsBar count={activity.participantCount} limit={activity.participantLimit} />
 
-          {activity.canEdit ? (
+          {activity.canEdit && (
             <LinkButton to={`/activities/${activity.id}/edit`} variant="secondary" fullWidth>
               <PencilIcon width={18} height={18} aria-hidden="true" /> Edit activity
             </LinkButton>
-          ) : (
-            activity.viewerRole === 'none' &&
-            activity.status === ActivityStatus.OPEN && (
-              <p className={styles.fieldHint}>Joining activities arrives in Milestone 6.</p>
-            )
+          )}
+          {activity.canJoin && (
+            <Button fullWidth disabled={join.isPending} onClick={handleJoin}>
+              {join.isPending ? 'Joining…' : 'Join activity'}
+            </Button>
+          )}
+          {(joinError ?? activity.joinBlockedReason) && (
+            <p className={styles.notice} role={joinError ? 'alert' : undefined}>
+              {joinError ?? activity.joinBlockedReason}
+            </p>
+          )}
+          {activity.viewerRole === 'participant' && (
+            <p className={styles.going}>
+              <CheckIcon width={18} height={18} aria-hidden="true" /> You're going
+            </p>
+          )}
+          {activity.canLeave && (
+            <Button variant="secondary" fullWidth onClick={() => setConfirmLeave(true)}>
+              Leave activity
+            </Button>
           )}
         </div>
       </aside>
@@ -128,6 +171,32 @@ export function ActivityDetailPage() {
         </h2>
         <p className={styles.description}>{activity.description}</p>
       </section>
+
+      <section className={styles.participants} aria-labelledby="participants-heading">
+        <h2 id="participants-heading" className={styles.sectionTitle}>
+          Who's going
+        </h2>
+        {/* FR33: canEdit holds exactly when the organizer may remove participants. */}
+        <ParticipantList activityId={activity.id} canRemove={activity.canEdit} />
+      </section>
+
+      <ConfirmDialog
+        open={confirmLeave}
+        title="Leave this activity?"
+        confirmLabel="Leave"
+        busy={leave.isPending}
+        error={leave.error?.message}
+        onCancel={() => {
+          setConfirmLeave(false);
+          leave.reset();
+        }}
+        onConfirm={() => leave.mutate(undefined, { onSuccess: () => setConfirmLeave(false) })}
+      >
+        <p>
+          Your spot opens up for someone else and you'll lose access to the group chat. You can join
+          again later if there's still room.
+        </p>
+      </ConfirmDialog>
     </article>
   );
 }

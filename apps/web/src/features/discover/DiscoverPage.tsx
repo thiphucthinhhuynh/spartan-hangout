@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { PageHeader } from '../../app/layouts/PageHeader.js';
 import { LinkButton } from '../../components/Button.js';
 import { PlusIcon, SearchIcon } from '../../components/icons.js';
-import { ActivityList } from './ActivityList.js';
+import { ActivityList } from '../activities/ActivityList.js';
 import { useRecommended } from './api.js';
 import styles from './discover.module.css';
 

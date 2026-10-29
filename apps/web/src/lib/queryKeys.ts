@@ -12,10 +12,14 @@ export const queryKeys = {
   student: (id: string) => ['profile', 'student', id] as const,
   /** One activity's detail (GET /activities/:id). */
   activity: (id: string) => ['activity', id] as const,
+  /** One activity's participants (GET /activities/:id/participants); refreshed with the activity. */
+  participants: (id: string) => ['activity', id, 'participants'] as const,
   /** Every activity list; invalidate this after creating or editing an activity. */
   activities: ['activities'] as const,
   /** The Recommended list (GET /activities/recommended). */
   recommended: ['activities', 'recommended'] as const,
   /** Search results for one set of criteria (GET /activities). */
   activitySearch: (criteria: object) => ['activities', 'search', criteria] as const,
+  /** My plans (GET /activities/mine). */
+  myActivities: (role: string, when: string) => ['activities', 'mine', role, when] as const,
 };

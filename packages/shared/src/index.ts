@@ -9,6 +9,7 @@ export * from './messages.js';
 export * from './schemas/activity.js';
 export * from './schemas/activitySearch.js';
 export * from './schemas/auth.js';
+export * from './schemas/participation.js';
 export * from './schemas/profile.js';
 export * from './time.js';
 export * from './validation.js';

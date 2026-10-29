@@ -12,6 +12,7 @@ import {
   type ActivityDetailDto,
   type ActivitySearchInput,
   type ActivityUpdateInput,
+  type MyActivitiesInput,
   type Paged,
   type PaginationInput,
   type ViewerRole,
@@ -23,6 +24,7 @@ import {
   NotFoundError,
   ValidationError,
 } from '../../common/errors.js';
+import { isBlockedEitherWay } from '../../common/relationships.js';
 import type { AppDeps } from '../../deps.js';
 import { createNotifications } from '../notifications/notifications.service.js';
 import * as repo from './activities.repository.js';
@@ -79,17 +81,23 @@ export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock
         ? 'organizer'
         : 'participant'
       : 'none';
-    return { activity, viewerRole };
+    // FR21d–e, only needed for students who could still join.
+    const removed = activity.removals.length > 0;
+    const blocked =
+      viewerRole === 'none' && activity.organizerId !== null
+        ? await isBlockedEitherWay(db, viewerId, activity.organizerId)
+        : false;
+    return { activity, viewerRole, joinContext: { removed, blocked } };
   }
 
   async function getDetail(viewerId: string, activityId: string): Promise<ActivityDetailDto> {
     const now = clock.now();
-    const { activity, viewerRole } = await loadForViewer(activityId, viewerId);
+    const { activity, viewerRole, joinContext } = await loadForViewer(activityId, viewerId);
     // FR20, FR32: Completed and Cancelled activities stay viewable only by their own members.
     const status = effectiveStatus(activity, now);
     const ended = status === ActivityStatus.COMPLETED || status === ActivityStatus.CANCELLED;
     if (ended && viewerRole === 'none') throw new NotFoundError(ACTIVITY_NOT_FOUND);
-    return toActivityDetailDto(activity, viewerRole, now);
+    return toActivityDetailDto(activity, viewerRole, now, joinContext);
   }
 
   /** Fetches one row past the page to know whether there is more (docs/api.md: "Lists"). */
@@ -110,6 +118,15 @@ export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock
 
   return {
     getDetail,
+    loadForViewer,
+
+    /** "My plans" (FR18 entry point): joined or organizing, upcoming or past. */
+    mine(viewerId: string, { page, pageSize, role, when }: MyActivitiesInput) {
+      return pageOfCards({ page, pageSize }, async (window) => {
+        const rows = await repo.findMyActivities(db, viewerId, { role, when }, clock.now(), window);
+        return rows.map((row) => row.id);
+      });
+    },
 
     /** FR16–FR17: every given criterion applies; with none, every activity FR17 allows. */
     search(viewerId: string, { page, pageSize, ...criteria }: ActivitySearchInput) {

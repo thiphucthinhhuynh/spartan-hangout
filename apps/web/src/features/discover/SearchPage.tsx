@@ -10,7 +10,7 @@ import { PageHeader } from '../../app/layouts/PageHeader.js';
 import { XIcon } from '../../components/icons.js';
 import { formatShortDate, formatTimeOfDay } from '../../lib/format.js';
 import { validateForm } from '../../lib/zodForm.js';
-import { ActivityList } from './ActivityList.js';
+import { ActivityList } from '../activities/ActivityList.js';
 import { criteriaToParams, useActivitySearch } from './api.js';
 import styles from './discover.module.css';
 import { CRITERIA_KEYS, SearchFilters, type CriteriaValues } from './SearchFilters.js';

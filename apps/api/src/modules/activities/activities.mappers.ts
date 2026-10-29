@@ -6,6 +6,7 @@ import {
   type ActivityType,
   type ViewerRole,
 } from '@sh/shared';
+import { joinProblem } from './participation.rules.js';
 
 // Activity rows → API responses. `now` is passed in so derived values are testable.
 
@@ -54,14 +55,25 @@ export function toActivityCardDto(activity: ActivityRow, now: Date): ActivityCar
   };
 }
 
+/** What the join rules need to know about the viewer besides their role (FR21d–e). */
+export interface ViewerJoinContext {
+  removed: boolean;
+  blocked: boolean;
+}
+
 export function toActivityDetailDto(
   activity: ActivityRow,
   viewerRole: ViewerRole,
   now: Date,
+  { removed, blocked }: ViewerJoinContext = { removed: false, blocked: false },
 ): ActivityDetailDto {
   const card = toActivityCardDto(activity, now);
   const live = card.status === ActivityStatus.OPEN || card.status === ActivityStatus.FULL;
   const notStarted = activity.startAt > now;
+  const problem = joinProblem(
+    { ...activity, status: card.status, viewerRole, removed, blocked },
+    now,
+  );
   return {
     ...card,
     description: activity.description,
@@ -71,10 +83,12 @@ export function toActivityDetailDto(
     viewerRole,
     // FR29: only the organizer, only while Open or Full and before the start.
     canEdit: viewerRole === 'organizer' && live && notStarted,
-    // Turned on by later milestones: join/leave (M6), cancel (M7), report (M11).
-    canJoin: false,
-    joinBlockedReason: null,
-    canLeave: false,
+    // FR21: the reason is shown to students who aren't in a live activity.
+    canJoin: problem === null,
+    joinBlockedReason: problem && viewerRole === 'none' && live ? problem.message : null,
+    // FR24: the organizer can't leave.
+    canLeave: viewerRole === 'participant' && live && notStarted,
+    // Turned on by later milestones: cancel (M7), report (M11).
     canCancel: false,
     canReport: false,
     createdAt: activity.createdAt.toISOString(),
