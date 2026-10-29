@@ -2,7 +2,13 @@ import { ErrorCode, loginSchema } from '@sh/shared';
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { Button } from '../../components/Button.js';
-import { ArrowRightIcon, MailIcon, MapPinIcon, ShieldCheckIcon } from '../../components/icons.js';
+import {
+  ArrowRightIcon,
+  CompassIcon,
+  MailIcon,
+  MapPinIcon,
+  ShieldCheckIcon,
+} from '../../components/icons.js';
 import { TextField } from '../../components/TextField.js';
 import { ApiError } from '../../lib/apiClient.js';
 import { focusFirstInvalidField, validateForm } from '../../lib/zodForm.js';
@@ -16,6 +22,9 @@ function safeNextPath(next: string | null): string {
   return next;
 }
 
+/** The seeded demo student (apps/api/prisma/seed.ts; open question Q28). */
+const DEMO_USER = { email: 'sammy.spartan@sjsu.edu', password: 'goSpartans1' };
+
 /** Sign in (mockup p.1 · FR09–FR11). One form with email and password (open question Q8). */
 export function LoginPage() {
   const navigate = useNavigate();
@@ -23,6 +32,7 @@ export function LoginPage() {
   const next = safeNextPath(searchParams.get('next'));
   const me = useMe();
   const login = useLogin();
+  const demoLogin = useLogin();
   const [values, setValues] = useState({ email: '', password: '' });
   const [attempted, setAttempted] = useState(false);
 
@@ -36,6 +46,7 @@ export function LoginPage() {
   function set(key: 'email' | 'password', value: string) {
     setValues((current) => ({ ...current, [key]: value }));
     if (login.isError) login.reset();
+    if (demoLogin.isError) demoLogin.reset();
   }
 
   function handleSubmit(event: FormEvent) {
@@ -44,6 +55,17 @@ export function LoginPage() {
     if (!validation.success) return focusFirstInvalidField();
     login.mutate(validation.data, { onSuccess: () => navigate(next, { replace: true }) });
   }
+
+  function handleDemo() {
+    if (login.isError) login.reset();
+    demoLogin.mutate(DEMO_USER, { onSuccess: () => navigate(next, { replace: true }) });
+  }
+
+  const demoError =
+    demoLogin.error instanceof ApiError && demoLogin.error.code === ErrorCode.INVALID_CREDENTIALS
+      ? 'The demo account isn’t set up on this server yet.'
+      : demoLogin.error?.message;
+  const busy = login.isPending || demoLogin.isPending;
 
   return (
     <>
@@ -95,12 +117,28 @@ export function LoginPage() {
           </p>
         )}
 
-        <Button type="submit" fullWidth disabled={login.isPending}>
+        <Button type="submit" fullWidth disabled={busy}>
           {login.isPending ? (
             'Signing in…'
           ) : (
             <>
               <ArrowRightIcon width={20} height={20} /> Continue with SJSU email
+            </>
+          )}
+        </Button>
+
+        {demoError && (
+          <p className={styles.alert} role="alert">
+            {demoError}
+          </p>
+        )}
+
+        <Button variant="accent" fullWidth disabled={busy} onClick={handleDemo}>
+          {demoLogin.isPending ? (
+            'Signing in…'
+          ) : (
+            <>
+              <CompassIcon width={20} height={20} /> Continue as Demo User
             </>
           )}
         </Button>

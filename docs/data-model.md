@@ -257,7 +257,7 @@ Partial unique indexes prevent a second pending report on the same target (FR51)
 | `block (blocked_id)` | Reverse block lookups (FR57) |
 | Pair unique indexes on `connection_request`, `conversation` | FR45, FR47 |
 
-Location search (FR16) uses `ILIKE '%text%'` (Prisma `contains` with `mode: 'insensitive'`). At campus scale a sequential scan over upcoming Open activities is fine, so no special text index is planned.
+Location search (FR16) uses `ILIKE '%text%'` in the search query, with `%`, `_` and `\` in the student's text escaped so they match literally. At campus scale a sequential scan over upcoming Open activities is fine, so no special text index is planned.
 
 ## Concurrency considerations
 

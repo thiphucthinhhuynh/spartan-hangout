@@ -7,6 +7,7 @@ import { LoginPage } from '../features/auth/LoginPage.js';
 import { RegisterPage } from '../features/auth/RegisterPage.js';
 import { VerifyEmailPage } from '../features/auth/VerifyEmailPage.js';
 import { DiscoverPage } from '../features/discover/DiscoverPage.js';
+import { SearchPage } from '../features/discover/SearchPage.js';
 import { InboxPage } from '../features/inbox/InboxPage.js';
 import { StudentProfilePage } from '../features/people/StudentProfilePage.js';
 import { MyPlansPage } from '../features/plans/MyPlansPage.js';
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
         element: <AppShell />,
         children: [
           { index: true, element: <DiscoverPage /> },
+          { path: 'search', element: <SearchPage /> },
           { path: 'plans', element: <MyPlansPage /> },
           { path: 'inbox', element: <InboxPage /> },
           { path: 'profile', element: <MyProfilePage /> },

@@ -23,6 +23,8 @@ export function useUpdateProfile() {
       );
       // Shared-interest marks on other students' profiles depend on my interests.
       void queryClient.invalidateQueries({ queryKey: ['profile', 'student'] });
+      // Recommended depends on my interests and availability (FR15).
+      void queryClient.invalidateQueries({ queryKey: queryKeys.recommended });
     },
   });
 }

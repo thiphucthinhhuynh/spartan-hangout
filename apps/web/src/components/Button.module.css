@@ -27,6 +27,15 @@
   background: var(--color-primary-hover);
 }
 
+.accent {
+  background: var(--color-accent);
+  color: var(--color-ink); /* white on gold is too low-contrast */
+}
+
+.accent:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
 .secondary {
   background: var(--color-card);
   border-color: var(--color-border);

@@ -72,6 +72,29 @@ export function formatActivityTimes(startIso: string, endIso: string): string {
   return `${start} – ${end} · ${formatDuration(minutes)}`;
 }
 
+const shortDayFormat = new Intl.DateTimeFormat('en-US', {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  timeZone: CAMPUS_TIME_ZONE,
+});
+
+/** "Wed, Oct 21 · 4:00 PM – 6:00 PM" in campus time, for activity cards (FR15, FR17). */
+export function formatCardWhen(startIso: string, endIso: string): string {
+  const day = shortDayFormat.format(new Date(startIso));
+  return `${day} · ${timeFormat.format(new Date(startIso))} – ${timeFormat.format(new Date(endIso))}`;
+}
+
+/** "2026-10-22" → "Oct 22" (a campus-local date from a search field). */
+export function formatShortDate(date: string): string {
+  const [year = 0, month = 1, day = 1] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
 /** "3 spots left", "1 spot left", "No spots left" */
 export function formatOpenSpots(openSpots: number): string {
   if (openSpots <= 0) return 'No spots left';

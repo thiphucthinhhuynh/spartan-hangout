@@ -7,6 +7,7 @@ export * from './enums.js';
 export * from './errors.js';
 export * from './messages.js';
 export * from './schemas/activity.js';
+export * from './schemas/activitySearch.js';
 export * from './schemas/auth.js';
 export * from './schemas/profile.js';
 export * from './time.js';

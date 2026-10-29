@@ -1,8 +1,10 @@
+import { CAMPUS_TIME_ZONE, type ActivitySearchCriteria } from '@sh/shared';
 import type { DbClient } from '../../db.js';
-import { ActivityStatus, type ActivityType } from '../../generated/prisma/client.js';
+import { ActivityStatus, Prisma, type ActivityType } from '../../generated/prisma/client.js';
 
 // Activity queries. The guarded update is raw SQL because the status has to be recomputed from
-// the row's current participant count in the same statement (ADR-0010).
+// the row's current participant count in the same statement (ADR-0010). Search and
+// recommendations are raw SQL because they match campus-local dates and times (ADR-0011).
 
 const activitySelect = {
   id: true,
@@ -107,4 +109,118 @@ export async function completeEndedActivities(client: DbClient, now: Date): Prom
     data: { status: ActivityStatus.COMPLETED },
   });
   return count;
+}
+
+// ─── Finding activities (FR14–FR17) ─────────────────────────────────────────
+
+export interface PageWindow {
+  limit: number;
+  offset: number;
+}
+
+const localStart = Prisma.sql`(a.start_at AT TIME ZONE ${CAMPUS_TIME_ZONE}::text)`;
+const localEnd = Prisma.sql`(a.end_at AT TIME ZONE ${CAMPUS_TIME_ZONE}::text)`;
+
+/** Minutes after campus-local midnight, comparable with availability_slot minutes. */
+function minuteOfDay(local: Prisma.Sql) {
+  return Prisma.sql`(EXTRACT(HOUR FROM ${local}) * 60 + EXTRACT(MINUTE FROM ${local}))`;
+}
+
+/** FR14f, FR17: no block in either direction between the viewer and the organizer. */
+function notBlockedWithOrganizer(viewerId: string) {
+  return Prisma.sql`NOT EXISTS (
+    SELECT 1 FROM "block" b
+    WHERE (b.blocker_id = ${viewerId}::uuid AND b.blocked_id = a.organizer_id)
+       OR (b.blocker_id = a.organizer_id AND b.blocked_id = ${viewerId}::uuid))`;
+}
+
+/** `%` and `_` in the student's text are matched literally. */
+function containsPattern(text: string) {
+  return `%${text.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
+}
+
+/** Ids of the activities meeting every condition, soonest first (FR15, FR17). */
+async function pageOfIds(client: DbClient, conditions: Prisma.Sql[], window: PageWindow) {
+  const rows = await client.$queryRaw<{ id: string }[]>`
+    SELECT a.id FROM "activity" a
+    WHERE ${Prisma.join(conditions, ' AND ')}
+    ORDER BY a.start_at ASC, a.id ASC
+    LIMIT ${window.limit} OFFSET ${window.offset}`;
+  return rows.map((row) => row.id);
+}
+
+/**
+ * FR16–FR17: Open, not yet started, organizer not blocked either way, plus every criterion given.
+ * Dates and start times are compared in campus time; both ends of each range are included.
+ */
+export function searchActivityIds(
+  client: DbClient,
+  viewerId: string,
+  criteria: ActivitySearchCriteria,
+  now: Date,
+  window: PageWindow,
+) {
+  const conditions = [
+    Prisma.sql`a.status = 'OPEN'`,
+    Prisma.sql`a.start_at > ${now}`,
+    notBlockedWithOrganizer(viewerId),
+  ];
+  if (criteria.type) conditions.push(Prisma.sql`a.type = ${criteria.type}::"ActivityType"`);
+  if (criteria.fromDate)
+    conditions.push(Prisma.sql`${localStart}::date >= ${criteria.fromDate}::date`);
+  if (criteria.toDate) conditions.push(Prisma.sql`${localStart}::date <= ${criteria.toDate}::date`);
+  if (criteria.earliestStart) {
+    conditions.push(Prisma.sql`${localStart}::time >= ${criteria.earliestStart}::time`);
+  }
+  if (criteria.latestStart) {
+    conditions.push(Prisma.sql`${localStart}::time <= ${criteria.latestStart}::time`);
+  }
+  if (criteria.location) {
+    conditions.push(Prisma.sql`a.location ILIKE ${containsPattern(criteria.location)}`);
+  }
+  return pageOfIds(client, conditions, window);
+}
+
+/**
+ * FR14 (a)–(f), architecture §11.3: Open, in the future, one of the viewer's interests, the whole
+ * activity inside one of the viewer's availability slots for that weekday, not already organizing
+ * or taking part, and no block with the organizer. Reads the profile live, so edits apply at once
+ * (FR15).
+ */
+export function recommendedActivityIds(
+  client: DbClient,
+  viewerId: string,
+  now: Date,
+  window: PageWindow,
+) {
+  return pageOfIds(
+    client,
+    [
+      Prisma.sql`a.status = 'OPEN'`,
+      Prisma.sql`a.start_at > ${now}`,
+      Prisma.sql`a.type = ANY (SELECT unnest(u.interests) FROM "user" u WHERE u.id = ${viewerId}::uuid)`,
+      Prisma.sql`EXISTS (
+        SELECT 1 FROM "availability_slot" s
+        WHERE s.user_id = ${viewerId}::uuid
+          AND s.day_of_week = EXTRACT(DOW FROM ${localStart})
+          AND s.start_minute <= ${minuteOfDay(localStart)}
+          AND s.end_minute >= ${minuteOfDay(localEnd)})`,
+      Prisma.sql`NOT EXISTS (
+        SELECT 1 FROM "participation" p
+        WHERE p.activity_id = a.id AND p.user_id = ${viewerId}::uuid)`,
+      notBlockedWithOrganizer(viewerId),
+    ],
+    window,
+  );
+}
+
+/** The card fields for the given activities, in the order of `ids`. */
+export async function findActivitiesInOrder(client: DbClient, ids: string[]) {
+  if (ids.length === 0) return [];
+  const rows = await client.activity.findMany({
+    where: { id: { in: ids } },
+    select: activitySelect,
+  });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  return ids.flatMap((id) => byId.get(id) ?? []);
 }

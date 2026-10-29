@@ -7,9 +7,13 @@ import {
   NotificationType,
   START_IN_PAST_MESSAGE,
   utcToCampusParts,
+  type ActivityCardDto,
   type ActivityCreateInput,
   type ActivityDetailDto,
+  type ActivitySearchInput,
   type ActivityUpdateInput,
+  type Paged,
+  type PaginationInput,
   type ViewerRole,
 } from '@sh/shared';
 import {
@@ -22,7 +26,7 @@ import {
 import type { AppDeps } from '../../deps.js';
 import { createNotifications } from '../notifications/notifications.service.js';
 import * as repo from './activities.repository.js';
-import { effectiveStatus, toActivityDetailDto } from './activities.mappers.js';
+import { effectiveStatus, toActivityCardDto, toActivityDetailDto } from './activities.mappers.js';
 
 const ACTIVITY_NOT_FOUND = 'We couldn’t find that activity.';
 
@@ -88,8 +92,38 @@ export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock
     return toActivityDetailDto(activity, viewerRole, now);
   }
 
+  /** Fetches one row past the page to know whether there is more (docs/api.md: "Lists"). */
+  async function pageOfCards(
+    { page, pageSize }: PaginationInput,
+    findIds: (window: repo.PageWindow) => Promise<string[]>,
+  ): Promise<Paged<ActivityCardDto>> {
+    const now = clock.now();
+    const ids = await findIds({ limit: pageSize + 1, offset: (page - 1) * pageSize });
+    const rows = await repo.findActivitiesInOrder(db, ids.slice(0, pageSize));
+    return {
+      items: rows.map((row) => toActivityCardDto(row, now)),
+      page,
+      pageSize,
+      hasMore: ids.length > pageSize,
+    };
+  }
+
   return {
     getDetail,
+
+    /** FR16–FR17: every given criterion applies; with none, every activity FR17 allows. */
+    search(viewerId: string, { page, pageSize, ...criteria }: ActivitySearchInput) {
+      return pageOfCards({ page, pageSize }, (window) =>
+        repo.searchActivityIds(db, viewerId, criteria, clock.now(), window),
+      );
+    },
+
+    /** FR14–FR15: the viewer's Recommended list, soonest first. */
+    recommended(viewerId: string, paging: PaginationInput) {
+      return pageOfCards(paging, (window) =>
+        repo.recommendedActivityIds(db, viewerId, clock.now(), window),
+      );
+    },
 
     /** FR26–FR28: create an Open activity with the organizer as its first participant. */
     async create(organizerId: string, input: ActivityCreateInput): Promise<ActivityDetailDto> {

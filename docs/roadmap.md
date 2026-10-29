@@ -223,18 +223,18 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can find activities through the Recommended list and search.
 **Features included:** FR14–FR17.
 **Dependencies:** M4. Decisions Q1, Q9, Q10.
-**Expected files/modules:** `activities.repository` (search, recommended); `activity.service`; `packages/shared/src/schemas/activitySearch.ts`; `apps/web/src/features/discover/{DiscoverPage,SearchPage,SearchFilters,api}.tsx`.
+**Expected files/modules:** `activities.repository` (search, recommended); `activity.service`; `packages/shared/src/schemas/activitySearch.ts`; `apps/web/src/features/discover/{DiscoverPage,SearchPage,SearchFilters,ActivityList,api}.tsx`; `apps/web/src/features/activities/ActivityCard.tsx`; `apps/api/test/findActivities.test.ts`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 69 | Team decisions: Q1 Discover meaning, Q9 search box behavior, Q10 Featured vs Recommended | 2 | Not started |
-| 70 | Shared: `activitySearchSchema` (type, date range, start-time range, location) | 54 | Not started |
-| 71 | `activities.repository.search`: combined filters, Open + future, block exclusion, soonest first, paging (FR16–FR17) | 57, 43 | Not started |
-| 72 | `activities.repository.recommended`: raw SQL with the six FR14 conditions (timezone-aware availability) | 57, 43 | Not started |
-| 73 | `activity.service.search` / `recommended`; routes `GET /activities`, `GET /activities/recommended` | 71, 72 | Not started |
-| 74 | Web: `ActivityCard` (moved from task 63) and `DiscoverPage` (mockup p.2): greeting, Create button, type chips, Recommended list, "No matching activities found." | 73, 69 | Not started |
-| 75 | Web: `SearchPage` with FR16 filters stored in URL params, clearable criteria, "No activities found." | 73, 69 | Not started |
-| 76 | Automated tests (key cases): one integration test per FR14 condition; combined search filters | 73 | Not started |
+| 69 | Team decisions: Q1 Discover meaning, Q9 search box behavior, Q10 Featured vs Recommended | 2 | Not started (M5 is built on the documented working assumptions until the team decides) |
+| 70 | Shared: `activitySearchSchema` (type, date range, start-time range, location) | 54 | In review (implemented, not merged) |
+| 71 | `activities.repository.search`: combined filters, Open + future, block exclusion, soonest first, paging (FR16–FR17) | 57, 43 | In review (implemented, not merged) |
+| 72 | `activities.repository.recommended`: raw SQL with the six FR14 conditions (timezone-aware availability) | 57, 43 | In review (implemented, not merged) |
+| 73 | `activity.service.search` / `recommended`; routes `GET /activities`, `GET /activities/recommended` | 71, 72 | In review (implemented, not merged) |
+| 74 | Web: `ActivityCard` (moved from task 63) and `DiscoverPage` (mockup p.2): greeting, Create button, type chips, Recommended list, "No matching activities found." | 73, 69 | In review (implemented, not merged) |
+| 75 | Web: `SearchPage` with FR16 filters stored in URL params, clearable criteria, "No activities found." | 73, 69 | In review (implemented, not merged) |
+| 76 | Automated tests (key cases): one integration test per FR14 condition; combined search filters | 73 | In review (implemented, not merged) |
 
 **Completion criteria:** Recommended shows only activities that meet all six FR14 conditions, soonest first, and reflects a profile edit on the next load. Search applies all entered criteria together, clearing one broadens the results, and empty criteria return everything allowed by FR17. Selecting a result opens its detail view.
 

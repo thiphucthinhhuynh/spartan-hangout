@@ -1,10 +1,19 @@
+import { ACTIVITY_TYPE_LABELS, ACTIVITY_TYPES, MESSAGES } from '@sh/shared';
+import { Link } from 'react-router';
 import { PageHeader } from '../../app/layouts/PageHeader.js';
 import { LinkButton } from '../../components/Button.js';
-import { EmptyState } from '../../components/EmptyState.js';
-import { CompassIcon, PlusIcon } from '../../components/icons.js';
+import { PlusIcon, SearchIcon } from '../../components/icons.js';
+import { ActivityList } from './ActivityList.js';
+import { useRecommended } from './api.js';
+import styles from './discover.module.css';
 
-// Recommended activities and search arrive in Milestone 5 (FR14–FR17).
+/**
+ * Discover home (mockup p.2). Working assumptions until the team decides: the search box opens
+ * /search and the category chips search by type (Q9); the list is FR14's Recommended list (Q10).
+ */
 export function DiscoverPage() {
+  const recommended = useRecommended();
+
   return (
     <>
       <PageHeader
@@ -16,11 +25,33 @@ export function DiscoverPage() {
           </LinkButton>
         }
       />
-      <EmptyState
-        icon={<CompassIcon />}
-        title="Activities are on the way"
-        description="Recommended activities and search arrive in Milestone 5. You can already create one."
-      />
+
+      <Link to="/search" className={styles.searchEntry}>
+        <SearchIcon width={20} height={20} aria-hidden="true" />
+        <span>What do you want to do?</span>
+      </Link>
+
+      <nav className={styles.typeLinks} aria-label="Search by category">
+        {ACTIVITY_TYPES.map((type) => (
+          <Link key={type} to={`/search?type=${type}`} className={styles.typeLink}>
+            {ACTIVITY_TYPE_LABELS[type]}
+          </Link>
+        ))}
+      </nav>
+
+      <section aria-labelledby="recommended-heading">
+        <h2 id="recommended-heading" className={styles.sectionTitle}>
+          Recommended for you
+        </h2>
+        <p className={styles.sectionHint}>
+          Open activities that match your interests and fit your availability.
+        </p>
+        <ActivityList
+          query={recommended}
+          emptyTitle={MESSAGES.noMatchingActivities}
+          emptyDescription="Try adding interests or availability to your profile, or search all activities."
+        />
+      </section>
     </>
   );
 }

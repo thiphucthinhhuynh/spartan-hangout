@@ -1,4 +1,9 @@
-import { activityCreateSchema, activityUpdateSchema } from '@sh/shared';
+import {
+  activityCreateSchema,
+  activitySearchSchema,
+  activityUpdateSchema,
+  paginationSchema,
+} from '@sh/shared';
 import { Router } from 'express';
 import { requireAuth } from '../../common/auth.js';
 import { validate } from '../../common/validate.js';
@@ -12,7 +17,9 @@ export function createActivitiesRouter(deps: AppDeps) {
   const router = Router();
   router.use(requireAuth);
 
-  // Search (GET /), /recommended (M5) and /mine (M6) are registered here before /:id.
+  // Fixed paths (/recommended, and /mine in M6) are registered before /:id.
+  router.get('/', validate({ query: activitySearchSchema }), controller.search);
+  router.get('/recommended', validate({ query: paginationSchema }), controller.recommended);
   router.post('/', validate({ body: activityCreateSchema }), controller.create);
   router.get('/:id', controller.getById);
   router.patch('/:id', validate({ body: activityUpdateSchema }), controller.update);

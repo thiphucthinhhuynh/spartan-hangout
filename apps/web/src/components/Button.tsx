@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from 'react';
 import { Link, type LinkProps } from 'react-router';
 import styles from './Button.module.css';
 
-type Variant = 'primary' | 'secondary' | 'ghost';
+type Variant = 'primary' | 'accent' | 'secondary' | 'ghost';
 
 interface StyleProps {
   variant?: Variant;

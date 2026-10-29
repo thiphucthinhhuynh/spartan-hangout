@@ -6,7 +6,9 @@ Spartan Hangout is a web application for San José State University students to 
 
 It is a **responsive, mobile-first full-stack web app**, not a native mobile app. It's designed for phones first, following the UI mockups, with layouts made for tablets and desktop browsers too.
 
-CMPE 131 – Software Engineering, Group 5:
+This project is an independent implementation inspired by a team software-engineering project originally designed for SJSU CMPE 131. The original requirements and design were developed collaboratively by Team 5. This repository contains my own implementation and subsequent extensions
+
+CMPE 131 – Software Engineering, Team 5:
 Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 
 ---
@@ -23,26 +25,27 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 | Responsive layout | **Implemented, awaiting review.** Phone layout from the mockups; tablet icon rail and desktop sidebar ([Q25](docs/open-questions.md#q25-target-devices)) |
 | [Milestone 3 – Profiles & relationship policy](docs/roadmap.md#m3--profiles--relationship-policy) | **Committed to `main`.** Own profile with private email (FR12), edit profile (FR05–FR06), other students' profiles with shared interests and no email (FR13) |
 | [Milestone 4 – Activities: create, view, edit, lifecycle](docs/roadmap.md#m4--activities-create-view-edit-lifecycle) | **Implemented, awaiting review.** Create an activity (FR26–FR28), its detail page (FR18), organizer edits with participant notifications stored (FR29–FR30, FR40a), automatic Completed status (FR20), demo seed data |
-| Other product features | **Not started.** Finding activities (Recommended and search) is next |
-| Next step | [Milestone 5 – Finding activities](docs/roadmap.md#m5--finding-activities) |
+| [Milestone 5 – Finding activities](docs/roadmap.md#m5--finding-activities) | **Implemented, awaiting review.** Recommended list on Discover (FR14–FR15) and search by category, date range, start-time range and location (FR16–FR17), using the working assumptions for [Q1](docs/open-questions.md#q1-what-discover-means), [Q9](docs/open-questions.md#q9-search-ui-vs-fr16-criteria) and [Q10](docs/open-questions.md#q10-featured-activities-vs-recommended-activities) |
+| Other product features | **Not started.** Joining and leaving activities is next |
+| Next step | [Milestone 6 – Joining, leaving & participants](docs/roadmap.md#m6--joining-leaving--participants) |
 
-The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, and creating, viewing and editing activities exist so far; the rest is **planned**.
+The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, and finding them (Recommended and search) exist so far; the rest is **planned**.
 
 ---
 
 ## Main features (planned)
 
-| Area | What students will be able to do | Requirements |
-|---|---|---|
-| Accounts | Register with an `@sjsu.edu` email, verify it by email, log in and out; repeated failed logins lock the account | US01, US04 · FR01–FR04, FR09–FR11 |
-| Profiles | Keep interests and weekly availability; edit the profile; view other students' profiles (email stays private); delete the account | US02, US03, US05 · FR05–FR08, FR12–FR13 |
-| Find activities | See a Recommended list that matches their interests and availability; search by type, date, time and location; open activity details | US06, US07 · FR14–FR20 |
-| Join and leave | Join an open activity (only one person can win the last spot); leave before it starts | US08, US09 · FR21–FR25 |
-| Organize | Create, edit and cancel activities; remove participants; post updates | US10–US13, US15 · FR26–FR34, FR38–FR39 |
-| Group chat | Message the other participants of an activity | US14 · FR35–FR37 |
-| Notifications | Get in-app notifications about changes, cancellations, updates, joins and leaves | US16 · FR40–FR42 |
-| Connections | Discover students with shared interests, connect with them, and send direct messages | US17–US19 · FR43–FR49 |
-| Safety | Report students or activities (an administrator reviews reports); block students | US20, US21 · FR50–FR57 |
+| Area | What students will be able to do |
+|---|---|
+| Accounts | Register with an `@sjsu.edu` email, verify it by email, log in and out; repeated failed logins lock the account |
+| Profiles | Keep interests and weekly availability; edit the profile; view other students' profiles (email stays private); delete the account |
+| Find activities | See a Recommended list that matches their interests and availability; search by type, date, time and location; open activity details |
+| Join and leave | Join an open activity (only one person can win the last spot); leave before it starts |
+| Organize | Create, edit and cancel activities; remove participants; post updates |
+| Group chat | Message the other participants of an activity |
+| Notifications | Get in-app notifications about changes, cancellations, updates, joins and leaves |
+| Connections | Discover students with shared interests, connect with them, and send direct messages |
+| Safety | Report students or activities (an administrator reviews reports); block students |
 
 User-story numbers follow the **Functional Level Requirements** document. See [traceability.md](docs/traceability.md) for how each requirement maps to the design.
 
@@ -136,7 +139,8 @@ cp apps/api/.env.example apps/api/.env
 
 docker compose up -d        # PostgreSQL with dev + test databases
 npm run db:migrate          # create the tables
-npm run db:seed             # optional: demo students and activities (password: goSpartans1)
+npm run db:seed             # optional: demo students and activities (password: goSpartans1);
+                            #   also enables "Continue as Demo User" on the login page
 
 npm run dev                 # API on :3000, web on :5173 (Vite proxies /api to the API)
 ```

@@ -1,4 +1,9 @@
-import type { ActivityCreateInput, ActivityUpdateInput } from '@sh/shared';
+import type {
+  ActivityCreateInput,
+  ActivitySearchInput,
+  ActivityUpdateInput,
+  PaginationInput,
+} from '@sh/shared';
 import type { RequestHandler } from 'express';
 import { z } from 'zod';
 import { currentUser } from '../../common/auth.js';
@@ -14,7 +19,19 @@ function activityId(raw: unknown): string {
   return id.data;
 }
 
+// Queries are already parsed by validate() in activities.routes.ts.
 export function createActivitiesController(service: ActivityService) {
+  const search: RequestHandler = async (req, res) => {
+    res.json(
+      await service.search(currentUser(req).id, req.query as unknown as ActivitySearchInput),
+    );
+  };
+
+  const recommended: RequestHandler = async (req, res) => {
+    const paging = req.query as unknown as PaginationInput;
+    res.json(await service.recommended(currentUser(req).id, paging));
+  };
+
   const create: RequestHandler = async (req, res) => {
     res
       .status(201)
@@ -30,5 +47,5 @@ export function createActivitiesController(service: ActivityService) {
     res.json(await service.update(currentUser(req).id, activityId(req.params.id), patch));
   };
 
-  return { create, getById, update };
+  return { search, recommended, create, getById, update };
 }

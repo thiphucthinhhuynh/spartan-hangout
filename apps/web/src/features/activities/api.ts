@@ -15,7 +15,10 @@ export function useCreateActivity() {
   return useMutation({
     mutationFn: (input: ActivityCreateInput) =>
       apiFetch<ActivityDetailDto>('/activities', { method: 'POST', body: input }),
-    onSuccess: (activity) => queryClient.setQueryData(queryKeys.activity(activity.id), activity),
+    onSuccess: (activity) => {
+      queryClient.setQueryData(queryKeys.activity(activity.id), activity);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.activities });
+    },
   });
 }
 
@@ -27,6 +30,9 @@ export function useUpdateActivity(id: string) {
         method: 'PATCH',
         body: input,
       }),
-    onSuccess: (activity) => queryClient.setQueryData(queryKeys.activity(id), activity),
+    onSuccess: (activity) => {
+      queryClient.setQueryData(queryKeys.activity(id), activity);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.activities });
+    },
   });
 }

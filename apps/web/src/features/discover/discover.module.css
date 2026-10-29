@@ -1,0 +1,196 @@
+/* Discover and search: phones first, then tablet (768px) and desktop (1024px). See architecture §12.3. */
+
+/* ─── Discover home (mockup p.2) ─── */
+
+.searchEntry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.searchEntry:hover {
+  border-color: var(--color-primary);
+}
+
+.typeLinks {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.typeLink {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.typeLink:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sectionHint {
+  margin: var(--space-1) 0 var(--space-4);
+  color: var(--color-muted);
+}
+
+/* ─── Lists ─── */
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.more {
+  display: flex;
+  margin: var(--space-4) auto 0;
+}
+
+/* ─── Search (FR16) ─── */
+
+.searchLayout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.legend {
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* Native date and time inputs need room; stack them on very narrow phones. */
+@media (max-width: 359.98px) {
+  .pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filterActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldError {
+  margin-top: var(--space-2);
+  color: var(--color-danger);
+  font-size: 0.875rem;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.activeCriteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.criterionPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ─── Tablet ─── */
+
+@media (min-width: 768px) {
+  .list {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  }
+
+  .filterActions {
+    flex-direction: row;
+  }
+}
+
+/* ─── Desktop: filters in a column beside the results ─── */
+
+@media (min-width: 1024px) {
+  .searchLayout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-6);
+  }
+
+  .filters {
+    position: sticky;
+    top: var(--space-5);
+  }
+
+  .filterActions {
+    flex-direction: column;
+  }
+}

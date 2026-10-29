@@ -35,6 +35,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q25 | [Target devices](#q25-target-devices) | Architecture / UX | Decided 2026-10-27 |
 | Q26 | [Password hashing algorithm](#q26-password-hashing-algorithm) | Architecture | Decided 2026-10-27 |
 | Q27 | [Background polling and the 30-minute idle timeout](#q27-background-polling-and-the-30-minute-idle-timeout) | Architecture | Open (needed by M7) |
+| Q28 | [Demo user sign-in](#q28-demo-user-sign-in) | UI without FR | Decided 2026-10-28 (production part open) |
 
 ---
 
@@ -46,6 +47,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
   (b) The Discover tab shows activities, and student discovery gets another name (for example "People") reached from Profile or Inbox.
   (c) Rename one of them in the FR document.
 - **Working assumption:** activities at `/`, students at `/people`, both reachable from the Discover tab.
+- **Built so far (M5, 2026-10-28):** implemented with this working assumption; the status stays Open until the team decides.
 - **Affects:** architecture §12.2, roadmap M5 and M9.
 
 ### Q2. Create screen lacks description and end time
@@ -104,11 +106,13 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 - **Source:** p.2 shows one free-text box ("What do you want to do?") and category chips. FR16 specifies structured criteria: type, date range, start-time range and location text. There is **no keyword or title search** in the FRs.
 - **Decision needed:** what the text box searches. Options: location only (as in FR16); title as well, which is a new requirement; or replace it with a filter panel.
 - **Working assumption:** the chips set `type`. The box opens `/search`, which has the FR16 fields. No title search.
+- **Built so far (M5, 2026-10-28):** implemented with this working assumption; the status stays Open until the team decides.
 
 ### Q10. Featured activities vs Recommended Activities
 
 - **Source:** p.2 shows "Featured activities · 3 near you · Today". FR14–FR15 define a **Recommended Activities** list (interests + availability, soonest first) and an empty-state message.
 - **Working assumption:** the Discover home shows the FR14 Recommended list, labeled "Recommended for you".
+- **Built so far (M5, 2026-10-28):** implemented with this working assumption; the status stays Open until the team decides.
 
 ### Q11. No unblock and no disconnect
 
@@ -213,3 +217,9 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
   (c) Accept it: an open tab counts as an active session.
 - **Working assumption:** none yet; decide before M7 (task 93). Option (a) is the smallest change.
 
+### Q28. Demo user sign-in
+
+- **Source:** user request (2026-10-28): a yellow "Continue as Demo User" button under "Continue with SJSU email" on the login page, so a guest can explore the app in one click. No FR covers it.
+- **Decision (2026-10-28):** the button logs in to the seeded `sammy.spartan@sjsu.edu` account through the normal `POST /auth/login` (no new endpoint). The demo credentials are public on purpose. The button uses the logo's SJSU gold (`--color-accent`) with dark text for contrast. If the account doesn't exist (database not seeded), the page says the demo account isn't set up.
+- **Known limits:** everyone shares one account, so a guest's changes are seen by the next guest, and five wrong passwords for that email lock it for everyone (FR11).
+- **Still open (by M14):** the seed refuses to run in production, so the deployed app has no demo account. Decide whether production gets one (and is reset periodically) or the button is hidden there.

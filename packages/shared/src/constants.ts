@@ -18,4 +18,5 @@ export const LIMITS = {
   verificationLinkHours: 24, // FR03
   sessionIdleMinutes: 30, // FR10
   lockout: { attempts: 5, windowMinutes: 15, lockMinutes: 15 }, // FR11
+  pageSize: { default: 20, max: 50 }, // docs/api.md: lists
 } as const;

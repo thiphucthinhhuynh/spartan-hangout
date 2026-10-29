@@ -159,3 +159,10 @@ export const GamepadIcon = (props: IconProps) => (
     <path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.6 5.42A3 3 0 0 0 5.08 17.3l.42.03a3 3 0 0 0 2.53-1.43L9 14h6l.97 1.9a3 3 0 0 0 2.53 1.43l.42-.03a3 3 0 0 0 2.98-3.29l-.6-5.42A4 4 0 0 0 17.32 5z" />
   </Icon>
 );
+
+export const SearchIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </Icon>
+);

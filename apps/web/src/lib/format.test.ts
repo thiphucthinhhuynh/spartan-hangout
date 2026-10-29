@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   formatActivityDay,
   formatActivityTimes,
+  formatCardWhen,
   formatDateTime,
   formatDuration,
   formatOpenSpots,
+  formatShortDate,
   formatTimeOfDay,
   initials,
 } from './format.js';
@@ -42,5 +44,12 @@ describe('activity formatting (mockup p.4)', () => {
     expect(formatOpenSpots(3)).toBe('3 spots left');
     expect(formatOpenSpots(1)).toBe('1 spot left');
     expect(formatOpenSpots(0)).toBe('No spots left');
+  });
+
+  it('formats activity cards and search dates', () => {
+    expect(formatCardWhen('2026-10-21T23:00:00Z', '2026-10-22T01:00:00Z')).toBe(
+      'Wed, Oct 21 · 4:00 PM – 6:00 PM',
+    );
+    expect(formatShortDate('2026-10-22')).toBe('Oct 22');
   });
 });
