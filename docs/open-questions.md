@@ -48,6 +48,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
   (c) Rename one of them in the FR document.
 - **Working assumption:** activities at `/`, students at `/people`, both reachable from the Discover tab.
 - **Built so far (M5, 2026-10-28):** implemented with this working assumption; the status stays Open until the team decides.
+- **Built so far (M9, 2026-10-29):** Discover students is at `/people` (linked from the Discover tab) and requests and connections at `/people/requests`.
 - **Affects:** architecture §12.2, roadmap M5 and M9.
 
 ### Q2. Create screen lacks description and end time
@@ -163,6 +164,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** FR42 says each notification stores "the title of the related activity" and "a link to the related activity". Connection-request notifications (FR45) and DM notifications (FR49) aren't about an activity. FR49 does say DM notifications link to the conversation.
 - **Working assumption:** activity fields are nullable. Connection notifications link to the other student's profile or the requests page, and DM notifications link to the conversation.
+- **Built so far (M9, 2026-10-29):** request notifications open `/people/requests`; acceptance notifications open the other student's profile (via `actorId`). The status stays Open until the team decides.
 
 ### Q18. Whitespace-only messages and fields
 

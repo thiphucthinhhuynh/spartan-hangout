@@ -85,6 +85,8 @@ model User {
   participations      Participation[]
   activityRemovals    ActivityRemoval[]
   activityMessages    ActivityMessage[]
+  requestsSent        ConnectionRequest[]      @relation("requestSender")
+  requestsReceived    ConnectionRequest[]      @relation("requestRecipient")
   notifications       Notification[]           @relation("recipient")
   notificationsCaused Notification[]           @relation("actor")
 
@@ -287,4 +289,22 @@ model ActivityMessage {
 
   @@index([activityId, seq])
   @@map("activity_message")
+}
+
+// ─── M9: connection requests ────────────────────────────────────────────────
+// Hand-written in the migration: CHECK (sender_id <> recipient_id), and a unique index on
+// (LEAST(sender_id, recipient_id), GREATEST(...)) so a pair has at most one pending request.
+
+/// A pending connection request (FR45). Accepting or declining deletes it (FR46).
+model ConnectionRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  senderId    String   @map("sender_id") @db.Uuid
+  recipientId String   @map("recipient_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  sender    User @relation("requestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User @relation("requestRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId])
+  @@map("connection_request")
 }

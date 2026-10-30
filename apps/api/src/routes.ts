@@ -3,6 +3,7 @@ import type { AppDeps } from './deps.js';
 import { healthHandler } from './health.js';
 import { createActivitiesRouter } from './modules/activities/activities.routes.js';
 import { createAuthModule } from './modules/auth/auth.routes.js';
+import { createConnectionsRouter } from './modules/connections/connections.routes.js';
 import { createActivityChatRouter } from './modules/messages/messages.routes.js';
 import { createNotificationsRouter } from './modules/notifications/notifications.routes.js';
 import { createUsersRouter } from './modules/users/users.routes.js';
@@ -21,6 +22,7 @@ export function createApiRouter(deps: AppDeps) {
   router.use('/activities/:id', createActivityChatRouter(deps));
   router.use('/activities', createActivitiesRouter(deps));
   router.use('/notifications', createNotificationsRouter(deps));
+  router.use('/connections', createConnectionsRouter(deps));
 
   return router;
 }

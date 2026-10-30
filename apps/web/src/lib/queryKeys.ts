@@ -24,6 +24,14 @@ export const queryKeys = {
   activitySearch: (criteria: object) => ['activities', 'search', criteria] as const,
   /** My plans (GET /activities/mine). */
   myActivities: (role: string, when: string) => ['activities', 'mine', role, when] as const,
+  /** Every people query (discover, requests, connections); invalidate after any request change. */
+  people: ['people'] as const,
+  /** Students who share interests (GET /connections/discover). */
+  discoverStudents: ['people', 'discover'] as const,
+  /** My connections (GET /connections). */
+  connections: ['people', 'connections'] as const,
+  /** Pending requests (GET /connections/requests). */
+  connectionRequests: (direction: string) => ['people', 'requests', direction] as const,
   /** Every notification query; invalidate after marking one read. */
   notifications: ['notifications'] as const,
   /** The bell's badge (GET /notifications/unread-count). */

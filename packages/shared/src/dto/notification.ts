@@ -8,6 +8,8 @@ export interface NotificationDto {
   activityId: string | null;
   /** The activity's title when the notification was created (FR42). */
   activityTitle: string | null;
+  /** The student who caused it; connection notifications link to them (open question Q17). */
+  actorId: string | null;
   /** Direct messages link to the conversation with this student (FR49, from Milestone 10). */
   conversationUserId: string | null;
   /** Extra text: who joined or left, what changed, or the organizer's reason. */

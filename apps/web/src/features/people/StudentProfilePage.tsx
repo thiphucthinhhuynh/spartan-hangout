@@ -11,10 +11,11 @@ import { useStudentProfile } from '../profile/api.js';
 import { AvailabilityList } from '../profile/AvailabilityList.js';
 import { InterestTags } from '../profile/InterestTags.js';
 import styles from '../profile/profile.module.css';
+import { ConnectButton } from './ConnectButton.js';
 
 /**
  * Another student's profile (FR13): name, interests (shared ones highlighted) and availability.
- * Never their email. Connect, Report and Block actions arrive in Milestones 9, 11 and 12.
+ * Never their email. Connect (FR45); Report and Block arrive in Milestones 11 and 12.
  */
 export function StudentProfilePage() {
   const { id = '' } = useParams();
@@ -54,17 +55,12 @@ export function StudentProfilePage() {
         <Card className={styles.summary}>
           <Avatar name={profile.displayName} seed={profile.id} size="lg" />
           <h2 className={styles.name}>{profile.displayName}</h2>
-          {profile.connectionState === 'connected' && (
-            <span className={styles.badge}>Connected</span>
-          )}
           <p className={styles.muted}>
             {sharedCount === 0
               ? 'No interests in common yet.'
               : `${sharedCount} interest${sharedCount === 1 ? '' : 's'} in common`}
           </p>
-          <p className={styles.muted}>
-            Connecting, reporting and blocking arrive in later milestones.
-          </p>
+          <ConnectButton studentId={profile.id} state={profile.connectionState} fullWidth />
         </Card>
 
         <div className={styles.details}>

@@ -7,6 +7,7 @@ const base: NotificationDto = {
   type: 'ACTIVITY_CANCELLED',
   activityId: 'a1',
   activityTitle: 'Midterm Study Group',
+  actorId: 'u1',
   conversationUserId: null,
   body: 'Library closed',
   createdAt: '2026-10-21T16:00:00Z',
@@ -39,5 +40,20 @@ describe('describeNotification', () => {
   it('shows who joined', () => {
     const joined = { ...base, type: 'PARTICIPANT_JOINED' as const, body: 'Sammy Spartan joined.' };
     expect(describeNotification(joined).title).toBe('Sammy Spartan joined.');
+  });
+
+  it('links connection notifications to the requests page or the student (Q17)', () => {
+    const asked = {
+      ...base,
+      type: 'CONNECTION_REQUEST' as const,
+      activityId: null,
+      body: 'Sammy wants to connect.',
+    };
+    expect(describeNotification(asked)).toMatchObject({
+      title: 'Sammy wants to connect.',
+      link: '/people/requests',
+    });
+    const accepted = { ...asked, type: 'CONNECTION_ACCEPTED' as const };
+    expect(describeNotification(accepted).link).toBe('/users/u1');
   });
 });

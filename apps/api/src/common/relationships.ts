@@ -1,3 +1,4 @@
+import type { ConnectionState } from '@sh/shared';
 import type { DbClient } from '../db.js';
 
 // The one place that answers "has either student blocked the other?" and "are they connected?"
@@ -46,4 +47,24 @@ export async function areConnected(client: DbClient, a: string, b: string): Prom
     select: { userAId: true },
   });
   return connection !== null;
+}
+
+/** How `viewerId` is related to `otherId`: connected, a pending request either way, or none. */
+export async function connectionStateBetween(
+  client: DbClient,
+  viewerId: string,
+  otherId: string,
+): Promise<ConnectionState> {
+  if (await areConnected(client, viewerId, otherId)) return 'connected';
+  const request = await client.connectionRequest.findFirst({
+    where: {
+      OR: [
+        { senderId: viewerId, recipientId: otherId },
+        { senderId: otherId, recipientId: viewerId },
+      ],
+    },
+    select: { senderId: true },
+  });
+  if (!request) return 'none';
+  return request.senderId === viewerId ? 'pending_outgoing' : 'pending_incoming';
 }

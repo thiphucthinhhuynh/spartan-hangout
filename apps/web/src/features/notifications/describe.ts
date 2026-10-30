@@ -38,8 +38,20 @@ export function describeNotification(n: NotificationDto): NotificationView {
         detail: n.body,
         link: n.conversationUserId ? `/inbox/${n.conversationUserId}` : null,
       };
+    // Open question Q17: requests open the Connections page, acceptances the student's profile.
+    case NotificationType.CONNECTION_REQUEST:
+      return {
+        title: n.body ?? 'New connection request',
+        detail: null,
+        link: '/people/requests',
+      };
+    case NotificationType.CONNECTION_ACCEPTED:
+      return {
+        title: n.body ?? 'Your connection request was accepted',
+        detail: null,
+        link: n.actorId ? `/users/${n.actorId}` : null,
+      };
     default:
-      // Connection notifications arrive in Milestone 9 (open question Q17).
       return { title: n.body ?? 'New notification', detail: null, link: activityLink };
   }
 }

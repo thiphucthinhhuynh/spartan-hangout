@@ -314,17 +314,17 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students find others with shared interests and connect with them.
 **Features included:** FR43–FR46 (and the Connect action on profiles, FR13).
 **Dependencies:** M3, M7. Decision Q1 (where the page lives).
-**Expected files/modules:** Prisma migration (`connection_request`); `apps/api/src/modules/connections/*`; `apps/web/src/features/people/{DiscoverStudentsPage,ConnectionRequestsPage,api}.tsx`.
+**Expected files/modules:** Prisma migration (`connection_request`); `apps/api/src/modules/connections/*`; `apps/api/test/connections.test.ts`; `apps/web/src/features/people/{DiscoverStudentsPage,ConnectionRequestsPage,ConnectButton,StudentCard,StudentList,api}.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 104 | Prisma migration: `connection_request` with the pair unique index | 42 | Not started |
-| 105 | `connections.repository`: discover query (shared-interest count, exclusions, ordering); pair helpers | 104, 43 | Not started |
-| 106 | `connections.service`: discover; send request (FR45 rules, notify); accept (create connection, notify sender); decline (delete silently); list connections | 105, 56 | Not started |
-| 107 | Routes: `/connections/discover`, `/connections/requests` (+ accept/decline), `/connections` | 106 | Not started |
-| 108 | Web: `DiscoverStudentsPage` (shared interests, "No students found.") | 107 | Not started |
-| 109 | Web: Connect button with `connectionState` on profile and discover; `ConnectionRequestsPage` with Accept/Decline | 107 | Not started |
-| 110 | Automated tests (key cases): FR45 rejection rules; requests in opposite directions | 107 | Not started |
+| 104 | Prisma migration: `connection_request` with the pair unique index | 42 | In review (implemented, not merged) |
+| 105 | `connections.repository`: discover query (shared-interest count, exclusions, ordering); pair helpers | 104, 43 | In review (implemented, not merged) |
+| 106 | `connections.service`: discover; send request (FR45 rules, notify); accept (create connection, notify sender); decline (delete silently); list connections | 105, 56 | In review (implemented, not merged) |
+| 107 | Routes: `/connections/discover`, `/connections/requests` (+ accept/decline), `/connections` | 106 | In review (implemented, not merged) |
+| 108 | Web: `DiscoverStudentsPage` (shared interests, "No students found.") | 107 | In review (implemented, not merged) |
+| 109 | Web: Connect button with `connectionState` on profile and discover; `ConnectionRequestsPage` with Accept/Decline | 107 | In review (implemented, not merged) |
+| 110 | Automated tests (key cases): FR45 rejection rules; requests in opposite directions | 107 | In review (implemented, not merged) |
 
 **Completion criteria:** the discover list excludes self, blocked and connected students, and is ordered by shared interests then name. Requests follow every FR45 rule. Accepting notifies the sender; declining doesn't.
 
