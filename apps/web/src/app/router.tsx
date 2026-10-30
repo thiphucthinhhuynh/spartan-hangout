@@ -12,6 +12,7 @@ import { DiscoverPage } from '../features/discover/DiscoverPage.js';
 import { SearchPage } from '../features/discover/SearchPage.js';
 import { InboxPage } from '../features/inbox/InboxPage.js';
 import { StudentProfilePage } from '../features/people/StudentProfilePage.js';
+import { NotificationsPage } from '../features/notifications/NotificationsPage.js';
 import { MyPlansPage } from '../features/plans/MyPlansPage.js';
 import { EditProfilePage } from '../features/profile/EditProfilePage.js';
 import { MyProfilePage } from '../features/profile/MyProfilePage.js';
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
           { path: 'search', element: <SearchPage /> },
           { path: 'plans', element: <MyPlansPage /> },
           { path: 'inbox', element: <InboxPage /> },
+          { path: 'notifications', element: <NotificationsPage /> },
           { path: 'profile', element: <MyProfilePage /> },
           { path: 'profile/edit', element: <EditProfilePage /> },
           { path: 'users/:id', element: <StudentProfilePage /> },

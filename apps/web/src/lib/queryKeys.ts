@@ -22,4 +22,10 @@ export const queryKeys = {
   activitySearch: (criteria: object) => ['activities', 'search', criteria] as const,
   /** My plans (GET /activities/mine). */
   myActivities: (role: string, when: string) => ['activities', 'mine', role, when] as const,
+  /** Every notification query; invalidate after marking one read. */
+  notifications: ['notifications'] as const,
+  /** The bell's badge (GET /notifications/unread-count). */
+  unreadCount: ['notifications', 'unread-count'] as const,
+  /** The notification list (GET /notifications). */
+  notificationList: ['notifications', 'list'] as const,
 };

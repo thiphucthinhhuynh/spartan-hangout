@@ -461,6 +461,10 @@
   font-weight: 700;
 }
 
+.dangerButton {
+  color: var(--color-danger);
+}
+
 .removeButton {
   min-height: 36px;
   padding: 0 var(--space-3);

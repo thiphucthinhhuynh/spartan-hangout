@@ -88,8 +88,9 @@ export function toActivityDetailDto(
     joinBlockedReason: problem && viewerRole === 'none' && live ? problem.message : null,
     // FR24: the organizer can't leave.
     canLeave: viewerRole === 'participant' && live && notStarted,
-    // Turned on by later milestones: cancel (M7), report (M11).
-    canCancel: false,
+    // FR31: same conditions as editing.
+    canCancel: viewerRole === 'organizer' && live && notStarted,
+    // Turned on by a later milestone: report (M11).
     canReport: false,
     createdAt: activity.createdAt.toISOString(),
     updatedAt: activity.updatedAt.toISOString(),

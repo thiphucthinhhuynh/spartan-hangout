@@ -3,6 +3,7 @@ import type { AppDeps } from './deps.js';
 import { healthHandler } from './health.js';
 import { createActivitiesRouter } from './modules/activities/activities.routes.js';
 import { createAuthModule } from './modules/auth/auth.routes.js';
+import { createNotificationsRouter } from './modules/notifications/notifications.routes.js';
 import { createUsersRouter } from './modules/users/users.routes.js';
 
 /** Every route under /api/v1. Feature modules register their routers here as they are built. */
@@ -17,6 +18,7 @@ export function createApiRouter(deps: AppDeps) {
   router.use('/auth', auth.router);
   router.use('/users', createUsersRouter(deps));
   router.use('/activities', createActivitiesRouter(deps));
+  router.use('/notifications', createNotificationsRouter(deps));
 
   return router;
 }

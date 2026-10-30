@@ -34,7 +34,7 @@ Status values: **Open** · **Decided** (record the decision and date) · **Withd
 | Q24 | [Frontend component testing](#q24-frontend-component-testing) | Architecture | Open |
 | Q25 | [Target devices](#q25-target-devices) | Architecture / UX | Decided 2026-10-27 |
 | Q26 | [Password hashing algorithm](#q26-password-hashing-algorithm) | Architecture | Decided 2026-10-27 |
-| Q27 | [Background polling and the 30-minute idle timeout](#q27-background-polling-and-the-30-minute-idle-timeout) | Architecture | Open (needed by M7) |
+| Q27 | [Background polling and the 30-minute idle timeout](#q27-background-polling-and-the-30-minute-idle-timeout) | Architecture | Open (working assumption built in M7) |
 | Q28 | [Demo user sign-in](#q28-demo-user-sign-in) | UI without FR | Decided 2026-10-28 (production part open) |
 
 ---
@@ -183,6 +183,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** The mockups have an **Inbox** tab and a **bell** icon in the header. The FRs define notifications (FR42) and DM conversations (FR49) but not where they appear.
 - **Working assumption:** the bell opens `/notifications` and shows the unread badge. Inbox lists DM conversations (and connection requests).
+- **Built so far (M7, 2026-10-29):** the header bell with the unread badge and `/notifications` are implemented with this assumption; the status stays Open until the team decides.
 
 ### Q22. Organizer updates after an activity starts
 
@@ -216,7 +217,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
   (a) Polling requests send a header (e.g. `X-Background-Refresh: 1`) and the session middleware doesn't count them as activity.
   (b) Only count requests that change something (non-GET) as activity.
   (c) Accept it: an open tab counts as an active session.
-- **Working assumption:** none yet; decide before M7 (task 93). Option (a) is the smallest change.
+- **Working assumption (M7, 2026-10-29):** option (a). The web app sends `X-Background-Refresh: 1` when polling the unread count, and the session middleware checks the idle timeout without extending it. The status stays Open until the team decides.
 
 ### Q28. Demo user sign-in
 

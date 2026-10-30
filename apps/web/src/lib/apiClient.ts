@@ -1,4 +1,4 @@
-import { API_PREFIX, ErrorCode, type ApiErrorBody } from '@sh/shared';
+import { API_PREFIX, BACKGROUND_REFRESH_HEADER, ErrorCode, type ApiErrorBody } from '@sh/shared';
 
 /** A non-2xx API response, parsed from the standard error envelope (docs/api.md#errors). */
 export class ApiError extends Error {
@@ -17,15 +17,19 @@ interface ApiFetchOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
   signal?: AbortSignal;
+  /** A request the app makes on its own (polling): it doesn't keep the session alive (Q27). */
+  background?: boolean;
 }
 
 /** The only place the app calls fetch. Paths are relative to /api/v1, e.g. `/health`. */
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
-  const { method = 'GET', body, signal } = options;
-  const init: RequestInit = { method, credentials: 'include' };
+  const { method = 'GET', body, signal, background = false } = options;
+  const headers: Record<string, string> = {};
+  const init: RequestInit = { method, credentials: 'include', headers };
   if (signal) init.signal = signal;
+  if (background) headers[BACKGROUND_REFRESH_HEADER] = '1';
   if (body !== undefined) {
-    init.headers = { 'Content-Type': 'application/json' };
+    headers['Content-Type'] = 'application/json';
     init.body = JSON.stringify(body);
   }
 

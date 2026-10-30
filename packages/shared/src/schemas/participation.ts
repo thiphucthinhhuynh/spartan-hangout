@@ -2,8 +2,11 @@ import { z } from 'zod';
 import { LIMITS } from '../constants.js';
 import { paginationSchema } from './activitySearch.js';
 
-/** DELETE /activities/:id/participants/:userId (FR33): an optional reason for the student. */
-export const removeParticipantSchema = z.preprocess(
+/**
+ * An optional reason of up to 200 characters, shown to the affected students: removals (FR33)
+ * and cancellations (FR31). The body may be missing.
+ */
+export const optionalReasonSchema = z.preprocess(
   // A DELETE request may have no body at all.
   (body) => body ?? {},
   z.object({
@@ -15,7 +18,15 @@ export const removeParticipantSchema = z.preprocess(
       .optional(),
   }),
 );
-export type RemoveParticipantInput = z.infer<typeof removeParticipantSchema>;
+export type OptionalReasonInput = z.infer<typeof optionalReasonSchema>;
+
+/** DELETE /activities/:id/participants/:userId (FR33). */
+export const removeParticipantSchema = optionalReasonSchema;
+export type RemoveParticipantInput = OptionalReasonInput;
+
+/** POST /activities/:id/cancel (FR31). */
+export const cancelActivitySchema = optionalReasonSchema;
+export type CancelActivityInput = OptionalReasonInput;
 
 export const MY_ACTIVITY_ROLES = ['joined', 'organizing'] as const;
 export const MY_ACTIVITY_TIMES = ['upcoming', 'past'] as const;

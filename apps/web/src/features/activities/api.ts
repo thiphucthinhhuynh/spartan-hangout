@@ -94,6 +94,19 @@ export function useJoinActivity(id: string) {
   });
 }
 
+/** FR31–FR32 (organizer only). Can't be undone. */
+export function useCancelActivity(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (reason: string) =>
+      apiFetch<ActivityDetailDto>(`${activityPath(id)}/cancel`, {
+        method: 'POST',
+        body: { reason },
+      }),
+    onSuccess: (activity) => activityChanged(queryClient, activity),
+  });
+}
+
 /** FR24–FR25 */
 export function useLeaveActivity(id: string) {
   const queryClient = useQueryClient();

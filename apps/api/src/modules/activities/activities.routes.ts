@@ -1,6 +1,7 @@
 import {
   activityCreateSchema,
   activitySearchSchema,
+  cancelActivitySchema,
   activityUpdateSchema,
   myActivitiesSchema,
   paginationSchema,
@@ -31,6 +32,7 @@ export function createActivitiesRouter(deps: AppDeps) {
   router.post('/', validate({ body: activityCreateSchema }), controller.create);
   router.get('/:id', controller.getById);
   router.patch('/:id', validate({ body: activityUpdateSchema }), controller.update);
+  router.post('/:id/cancel', validate({ body: cancelActivitySchema }), controller.cancel);
 
   // Participation (FR19, FR21–FR25, FR33–FR34).
   router.get('/:id/participants', controller.participants);

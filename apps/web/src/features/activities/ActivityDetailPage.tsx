@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Avatar } from '../../components/Avatar.js';
 import { Button, LinkButton } from '../../components/Button.js';
 import { ConfirmDialog } from '../../components/ConfirmDialog.js';
+import { CancelDialog } from './CancelDialog.js';
 import { EmptyState } from '../../components/EmptyState.js';
 import {
   ArrowLeftIcon,
@@ -27,7 +28,7 @@ const STATUS_LABELS: Partial<Record<ActivityStatus, string>> = {
   COMPLETED: 'Completed',
 };
 
-/** Activity details (mockup p.4 · FR18–FR19, FR21, FR24). Cancelling arrives in M7. */
+/** Activity details (mockup p.4 · FR18–FR19, FR21, FR24, FR31–FR32). */
 export function ActivityDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export function ActivityDetailPage() {
   const join = useJoinActivity(id);
   const leave = useLeaveActivity(id);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   if (query.isPending) return <EmptyState title="Loading activity…" />;
   if (query.isError) {
@@ -95,8 +97,11 @@ export function ActivityDetailPage() {
           <TypeChip type={activity.type} />
           {statusLabel && <span className={styles.statusBadge}>{statusLabel}</span>}
         </div>
-        {activity.status === ActivityStatus.CANCELLED && activity.cancellationReason && (
-          <p className={styles.notice}>Cancelled: {activity.cancellationReason}</p>
+        {activity.status === ActivityStatus.CANCELLED && (
+          <p className={styles.notice}>
+            The organizer cancelled this activity.
+            {activity.cancellationReason && <> Reason: {activity.cancellationReason}</>}
+          </p>
         )}
       </div>
 
@@ -162,6 +167,16 @@ export function ActivityDetailPage() {
               Leave activity
             </Button>
           )}
+          {activity.canCancel && (
+            <Button
+              variant="ghost"
+              fullWidth
+              className={styles.dangerButton}
+              onClick={() => setConfirmCancel(true)}
+            >
+              Cancel activity
+            </Button>
+          )}
         </div>
       </aside>
 
@@ -179,6 +194,12 @@ export function ActivityDetailPage() {
         {/* FR33: canEdit holds exactly when the organizer may remove participants. */}
         <ParticipantList activityId={activity.id} canRemove={activity.canEdit} />
       </section>
+
+      <CancelDialog
+        activityId={activity.id}
+        open={confirmCancel}
+        onClose={() => setConfirmCancel(false)}
+      />
 
       <ConfirmDialog
         open={confirmLeave}

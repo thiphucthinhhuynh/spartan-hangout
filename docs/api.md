@@ -14,6 +14,7 @@
 | Lists | `?page=1&pageSize=20` (max 50) → `{ items, page, pageSize, hasMore }`. Chat and DM threads return the full history and accept `?after=<messageId>` for polling |
 | Block-hidden | Resources hidden by a block (FR57) return `404 NOT_FOUND` |
 | CSRF | A non-GET request whose `Origin` header is not the web app's origin gets `403 FORBIDDEN` (architecture §13) |
+| Background requests | Requests the app makes on its own (polling the unread count) send `X-Background-Refresh: 1`. They are still checked against the idle timeout but don't extend it (FR10, [Q27](open-questions.md#q27-background-polling-and-the-30-minute-idle-timeout)) |
 | Common errors | Every `Student`/`Admin` endpoint can also return `401 UNAUTHENTICATED` (no session or session expired, FR10) and `422 VALIDATION_FAILED`. These aren't repeated in the tables below |
 
 ## Errors
@@ -84,7 +85,7 @@
 | `GET /activities/mine` | The student's own joined and organized activities ("My plans", the FR18 entry point). Upcoming: Open or Full and not ended, soonest first. Past: ended, Completed or Cancelled, most recent first | Student | `myActivitiesSchema`: `role=joined\|organizing` (default `joined`), `when=upcoming\|past` (default `upcoming`), `page?, pageSize?` | `200 { items: ActivityCardDto[] … }` | `422` |
 | `GET /activities/:id` | Activity detail view (FR18) | Student | – | `200 ActivityDetailDto` (includes `viewerRole`: `organizer` / `participant` / `none`, and the `can*` flags; `canJoin`, `canLeave`, `canCancel` and `canReport` stay `false` until Milestones 6, 7 and 11) | `404` (missing or malformed id; or Cancelled/Completed and the viewer isn't a participant or the organizer, FR20/FR32) |
 | `PATCH /activities/:id` | Organizer edits (FR29–FR30). The given fields are merged into the activity and the result is validated with the creation rules. Participants are notified when the title, type, date, times or location change (FR40a), not the description or limit | Student (organizer) | `activityUpdateSchema`: one or more create fields | `200 ActivityDetailDto` (status recomputed: `FULL` when count = limit, otherwise `OPEN`) | `403 FORBIDDEN` (not the organizer), `409 ACTIVITY_NOT_OPEN`, `409 ACTIVITY_STARTED`, `409 LIMIT_BELOW_COUNT` (also in `fields.participantLimit`), `422 VALIDATION_FAILED` |
-| `POST /activities/:id/cancel` | Organizer cancels (FR31–FR32); notifies participants | Student (organizer) | `{ reason?: string ≤ 200 }` | `200 ActivityDetailDto (status CANCELLED)` | `403`, `409 ACTIVITY_NOT_OPEN`, `409 ACTIVITY_STARTED` |
+| `POST /activities/:id/cancel` | Organizer cancels (FR31–FR32); notifies participants (`ACTIVITY_CANCELLED`, the reason as its body). Can't be undone | Student (organizer) | `cancelActivitySchema`: `{ reason?: string ≤ 200 }` (the body may be omitted) | `200 ActivityDetailDto (status CANCELLED)` | `403`, `409 ACTIVITY_NOT_OPEN`, `409 ACTIVITY_STARTED` |
 
 ## Activities module: participation (FR19, FR21–FR25, FR33–FR34)
 
@@ -118,8 +119,8 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /notifications` | List, newest first (FR42) | Student | `page?, pageSize?` | `200 { items: NotificationDto[] … }`. `NotificationDto { id, type, activityId, activityTitle, conversationUserId, body, createdAt, read }` | – |
-| `GET /notifications/unread-count` | Badge count (FR42) | Student | – | `200 { count }` | – |
+| `GET /notifications` | The student's own notifications, newest first (FR42). `activityTitle` is the title when the notification was created; `conversationUserId` is set only for direct messages | Student | `page?, pageSize?` | `200 { items: NotificationDto[] … }`. `NotificationDto { id, type, activityId, activityTitle, conversationUserId, body, createdAt, read }` | – |
+| `GET /notifications/unread-count` | Badge count (FR42). The web app polls it every 30 s with `X-Background-Refresh: 1` | Student | – | `200 { count }` | – |
 | `POST /notifications/:id/read` | Mark read when opened (FR42) | Student (recipient) | – | `204` | `404` |
 
 ## Connections module: FR43–FR46

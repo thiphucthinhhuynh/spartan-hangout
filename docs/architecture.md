@@ -574,7 +574,7 @@ Rules for every new screen:
 | URL state | React Router search params | search criteria (so results can be shared and survive a refresh) |
 
 - **Mutations invalidate queries.** For example, `useJoinActivity` invalidates `['activity', id]`, `['activities','mine']` and `['activities','recommended']`.
-- **Polling:** chat and DM threads use `refetchInterval: 5000` while the page is open, and the unread notification count uses `30000`. Polling pauses when the tab is hidden (the TanStack Query default).
+- **Polling:** chat and DM threads use `refetchInterval: 5000` while the page is open, and the unread notification count uses `30000`. Polling pauses when the tab is hidden (the TanStack Query default). Polled requests send `X-Background-Refresh: 1` so they don't keep an idle session alive ([Q27](open-questions.md#q27-background-polling-and-the-30-minute-idle-timeout)).
 - There is no global client-state library. Auth state is simply the `['me']` query.
 
 ---

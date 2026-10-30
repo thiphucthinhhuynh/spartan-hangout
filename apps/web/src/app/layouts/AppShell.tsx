@@ -2,6 +2,7 @@ import type { ComponentType, SVGProps } from 'react';
 import { NavLink, Outlet, ScrollRestoration } from 'react-router';
 import { CalendarIcon, CompassIcon, MessageIcon, UserIcon } from '../../components/icons.js';
 import { Logo } from '../../components/Logo.js';
+import { NotificationBell } from '../../features/notifications/NotificationBell.js';
 import styles from './AppShell.module.css';
 
 const tabs: { to: string; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
@@ -27,6 +28,7 @@ export function AppShell() {
         <div className={styles.sidebarSticky}>
           <header className={styles.header}>
             <Logo collapsible />
+            <NotificationBell />
           </header>
 
           <nav className={styles.nav} aria-label="Main">

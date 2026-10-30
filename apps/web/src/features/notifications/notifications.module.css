@@ -1,0 +1,99 @@
+/* ─── Header bell ─── */
+
+.bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--color-ink);
+}
+
+.bellActive {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+@media (hover: hover) {
+  .bell:not(.bellActive):hover {
+    background: var(--color-surface);
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid var(--color-card);
+  border-radius: var(--radius-pill);
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ─── List (FR42) ─── */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  border-color: var(--color-primary);
+}
+
+.unread {
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.itemTitle {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.unread .itemTitle {
+  font-weight: 700;
+}
+
+.itemDetail {
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.itemTime {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.more {
+  display: flex;
+  margin: var(--space-4) auto 0;
+}

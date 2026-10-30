@@ -82,9 +82,14 @@ export function createParticipationService(
         activityId,
         actor.id,
       );
+      const status = effectiveStatus(activity, now);
+      // FR20, FR32: outsiders can't see Cancelled or Completed activities at all.
+      if (viewerRole === 'none' && (status === 'CANCELLED' || status === 'COMPLETED')) {
+        throw new NotFoundError('We couldn’t find that activity.');
+      }
       const problem = joinProblem(
         {
-          status: effectiveStatus(activity, now),
+          status,
           startAt: activity.startAt,
           viewerRole,
           ...joinContext,

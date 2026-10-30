@@ -27,8 +27,12 @@ export function createSessionService({ db, clock }: Pick<AppDeps, 'db' | 'clock'
     /**
      * The user behind a cookie token, or null if the session is unknown or has been idle for
      * 30 minutes (FR10). `refreshed` says the idle window was extended, so the cookie should be too.
+     * `touch: false` checks the session without counting the request as activity (Q27).
      */
-    async resolve(token: string): Promise<{ user: AuthUser; refreshed: boolean } | null> {
+    async resolve(
+      token: string,
+      { touch = true } = {},
+    ): Promise<{ user: AuthUser; refreshed: boolean } | null> {
       const session = await repo.findSession(db, hashToken(token));
       if (!session) return null;
 
@@ -40,7 +44,7 @@ export function createSessionService({ db, clock }: Pick<AppDeps, 'db' | 'clock'
       }
       if (session.user.status !== UserStatus.ACTIVE) return null;
 
-      const refreshed = idleMs >= TOUCH_INTERVAL_MS;
+      const refreshed = touch && idleMs >= TOUCH_INTERVAL_MS;
       if (refreshed) await repo.touchSession(db, session.id, now);
 
       const { id, displayName, role } = session.user;

@@ -2,6 +2,7 @@ export * from './constants.js';
 export * from './dto/activity.js';
 export * from './dto/auth.js';
 export * from './dto/common.js';
+export * from './dto/notification.js';
 export * from './dto/profile.js';
 export * from './enums.js';
 export * from './errors.js';

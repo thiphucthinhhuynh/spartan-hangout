@@ -29,6 +29,7 @@ import type { AppDeps } from '../../deps.js';
 import { createNotifications } from '../notifications/notifications.service.js';
 import * as repo from './activities.repository.js';
 import { effectiveStatus, toActivityCardDto, toActivityDetailDto } from './activities.mappers.js';
+import { changeProblem } from './participation.rules.js';
 
 const ACTIVITY_NOT_FOUND = 'We couldn’t find that activity.';
 
@@ -150,6 +151,56 @@ export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock
 
       const { id } = await repo.insertActivity(db, organizerId, values, now);
       return getDetail(organizerId, id);
+    },
+
+    /**
+     * FR31–FR32, FR40b: the organizer cancels an Open or Full activity before it starts. It can't
+     * be undone; every other participant is notified, with the reason if one was given.
+     */
+    async cancel(
+      viewerId: string,
+      activityId: string,
+      reason: string | undefined,
+    ): Promise<ActivityDetailDto> {
+      const now = clock.now();
+      const { activity, viewerRole } = await loadForViewer(activityId, viewerId);
+      if (viewerRole !== 'organizer') {
+        throw new ForbiddenError('Only the organizer can cancel this activity.');
+      }
+      const problem = changeProblem(
+        { status: effectiveStatus(activity, now), startAt: activity.startAt },
+        now,
+      );
+      if (problem) throw new ConflictError(problem.code, problem.message);
+
+      await db.$transaction(async (tx) => {
+        if (!(await repo.cancelActivityGuarded(tx, activityId, reason ?? null, now))) {
+          // It started or was cancelled a moment ago: report that.
+          const current = await repo.findActivityForViewer(tx, activityId, viewerId);
+          if (!current) throw new NotFoundError(ACTIVITY_NOT_FOUND);
+          const late = changeProblem(
+            { status: effectiveStatus(current, now), startAt: current.startAt },
+            now,
+          );
+          throw new ConflictError(
+            late?.code ?? ErrorCode.ACTIVITY_NOT_OPEN,
+            late?.message ?? 'This activity can’t be cancelled.',
+          );
+        }
+        const recipients = await repo.participantIds(tx, activityId, viewerId);
+        await createNotifications(
+          tx,
+          recipients.map((recipientId) => ({
+            recipientId,
+            type: NotificationType.ACTIVITY_CANCELLED,
+            activityId,
+            activityTitle: activity.title,
+            actorId: viewerId,
+            ...(reason ? { body: reason } : {}),
+          })),
+        );
+      });
+      return getDetail(viewerId, activityId);
     },
 
     /**

@@ -271,16 +271,16 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** organizers can cancel, and students can see and read their notifications.
 **Features included:** FR31–FR32, FR40b, FR42 (and the UI for every notification created so far).
 **Dependencies:** M6. Decision Q21 (bell vs Inbox).
-**Expected files/modules:** `activity.service.cancel`; `apps/api/src/modules/notifications/{notifications.routes,notifications.controller,notifications.service}.ts`; `apps/web/src/features/activities/CancelDialog.tsx`; `apps/web/src/features/inbox/NotificationsPage.tsx`; header bell in `AppShell.tsx`.
+**Expected files/modules:** `activity.service.cancel`; `apps/api/src/modules/notifications/{notifications.routes,notifications.controller,notifications.service}.ts`; `apps/web/src/features/activities/CancelDialog.tsx`; `apps/web/src/features/notifications/{NotificationsPage,NotificationBell,describe,api}.ts(x)`; header bell in `AppShell.tsx`; `apps/api/test/notifications.test.ts`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 89 | `activity.service.cancel`: organizer only, Open/Full and not started, reason ≤ 200, status Cancelled, notify all other participants; route `POST /activities/:id/cancel` (FR31–FR32) | 79 | Not started |
-| 90 | Verify that Cancelled activities are excluded from search and recommendations, read-only, and visible only to their members (FR20, FR32) | 89 | Not started |
-| 91 | `notifications.service`: list (newest first, paged), unread count, mark read; routes under `/notifications` (FR42) | 56 | Not started |
-| 92 | Web: `CancelDialog` (confirmation + optional reason); "Cancelled" label on the detail page | 89 | Not started |
-| 93 | Team decisions Q21 (bell vs Inbox) and Q27 (polling must not keep sessions alive); web: header bell with unread badge (30 s polling) and `NotificationsPage`; opening one marks it read and follows its link | 91 | Not started |
-| 94 | Automated tests (key cases): who receives notifications on edit, cancel, join, leave and removal | 91 | Not started |
+| 89 | `activity.service.cancel`: organizer only, Open/Full and not started, reason ≤ 200, status Cancelled, notify all other participants; route `POST /activities/:id/cancel` (FR31–FR32) | 79 | In review (implemented, not merged) |
+| 90 | Verify that Cancelled activities are excluded from search and recommendations, read-only, and visible only to their members (FR20, FR32) | 89 | In review (implemented, not merged) |
+| 91 | `notifications.service`: list (newest first, paged), unread count, mark read; routes under `/notifications` (FR42) | 56 | In review (implemented, not merged) |
+| 92 | Web: `CancelDialog` (confirmation + optional reason); "Cancelled" label on the detail page | 89 | In review (implemented, not merged) |
+| 93 | Team decisions Q21 (bell vs Inbox) and Q27 (polling must not keep sessions alive); web: header bell with unread badge (30 s polling) and `NotificationsPage`; opening one marks it read and follows its link | 91 | In review (implemented, not merged; built on the working assumptions for Q21 and Q27 option (a) until the team decides) |
+| 94 | Automated tests (key cases): who receives notifications on edit, cancel, join, leave and removal | 91 | In review (implemented, not merged) |
 
 **Completion criteria:** cancelling notifies every other participant and is irreversible. The notification list is newest first with an unread count. Opening a notification marks it read and opens the related activity.
 

@@ -94,6 +94,28 @@ export async function updateActivityGuarded(
   return rows.length === 1;
 }
 
+/**
+ * FR31–FR32: Cancelled for good, only while Open or Full and not started. Returns false when a
+ * guard fails (e.g. it started, or was cancelled, a moment ago).
+ */
+export async function cancelActivityGuarded(
+  client: DbClient,
+  activityId: string,
+  reason: string | null,
+  now: Date,
+): Promise<boolean> {
+  const rows = await client.$queryRaw<{ id: string }[]>`
+    UPDATE "activity" SET
+      status = 'CANCELLED'::"ActivityStatus",
+      cancellation_reason = ${reason},
+      updated_at = ${now}
+    WHERE id = ${activityId}::uuid
+      AND status IN ('OPEN', 'FULL')
+      AND start_at > ${now}
+    RETURNING id`;
+  return rows.length === 1;
+}
+
 /** Everyone in the activity except `excludeUserId`, for notifications. */
 export async function participantIds(client: DbClient, activityId: string, excludeUserId: string) {
   const rows = await client.participation.findMany({

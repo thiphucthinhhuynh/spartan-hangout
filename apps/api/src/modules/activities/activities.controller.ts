@@ -1,6 +1,7 @@
 import type {
   ActivityCreateInput,
   ActivitySearchInput,
+  CancelActivityInput,
   ActivityUpdateInput,
   MyActivitiesInput,
   PaginationInput,
@@ -59,6 +60,11 @@ export function createActivitiesController(
     res.json(await service.update(currentUser(req).id, activityId(req.params.id), patch));
   };
 
+  const cancel: RequestHandler = async (req, res) => {
+    const { reason } = req.body as CancelActivityInput;
+    res.json(await service.cancel(currentUser(req).id, activityId(req.params.id), reason));
+  };
+
   const mine: RequestHandler = async (req, res) => {
     res.json(await service.mine(currentUser(req).id, req.query as unknown as MyActivitiesInput));
   };
@@ -93,6 +99,7 @@ export function createActivitiesController(
     create,
     getById,
     update,
+    cancel,
     participants,
     join,
     leave,
