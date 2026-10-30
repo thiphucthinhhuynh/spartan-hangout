@@ -12,6 +12,8 @@ import { VerifyEmailPage } from '../features/auth/VerifyEmailPage.js';
 import { DiscoverPage } from '../features/discover/DiscoverPage.js';
 import { SearchPage } from '../features/discover/SearchPage.js';
 import { InboxPage } from '../features/inbox/InboxPage.js';
+import { ConnectionRequestsPage } from '../features/people/ConnectionRequestsPage.js';
+import { DiscoverStudentsPage } from '../features/people/DiscoverStudentsPage.js';
 import { StudentProfilePage } from '../features/people/StudentProfilePage.js';
 import { NotificationsPage } from '../features/notifications/NotificationsPage.js';
 import { MyPlansPage } from '../features/plans/MyPlansPage.js';
@@ -49,6 +51,8 @@ export const router = createBrowserRouter([
           { path: 'profile', element: <MyProfilePage /> },
           { path: 'profile/edit', element: <EditProfilePage /> },
           { path: 'users/:id', element: <StudentProfilePage /> },
+          { path: 'people', element: <DiscoverStudentsPage /> },
+          { path: 'people/requests', element: <ConnectionRequestsPage /> },
           { path: 'activities/new', element: <CreateActivityPage /> },
           { path: 'activities/:id', element: <ActivityDetailPage /> },
           { path: 'activities/:id/edit', element: <EditActivityPage /> },

@@ -1,6 +1,6 @@
 import { timeToMinutes, type ProfileUpdateInput } from '@sh/shared';
 import { NotFoundError } from '../../common/errors.js';
-import { areConnected, isBlockedEitherWay } from '../../common/relationships.js';
+import { connectionStateBetween, isBlockedEitherWay } from '../../common/relationships.js';
 import type { AppDeps } from '../../deps.js';
 import { UserStatus } from '../../generated/prisma/client.js';
 import { toOwnProfileDto, toPublicProfileDto } from './users.mappers.js';
@@ -80,8 +80,8 @@ export function createUsersService({ db, clock }: Pick<AppDeps, 'db' | 'clock'>)
       if (await isBlockedEitherWay(db, viewerId, userId))
         throw new NotFoundError(STUDENT_NOT_FOUND);
 
-      const connected = await areConnected(db, viewerId, userId);
-      return toPublicProfileDto(user, viewer.interests, connected ? 'connected' : 'none');
+      const state = await connectionStateBetween(db, viewerId, userId);
+      return toPublicProfileDto(user, viewer.interests, state);
     },
   };
 }

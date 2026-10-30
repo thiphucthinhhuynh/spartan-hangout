@@ -119,7 +119,7 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /notifications` | The student's own notifications, newest first (FR42). `activityTitle` is the title when the notification was created; `conversationUserId` is set only for direct messages | Student | `page?, pageSize?` | `200 { items: NotificationDto[] … }`. `NotificationDto { id, type, activityId, activityTitle, conversationUserId, body, createdAt, read }` | – |
+| `GET /notifications` | The student's own notifications, newest first (FR42). `activityTitle` is the title when the notification was created; `conversationUserId` is set only for direct messages | Student | `page?, pageSize?` | `200 { items: NotificationDto[] … }`. `NotificationDto { id, type, activityId, activityTitle, actorId, conversationUserId, body, createdAt, read }` | – |
 | `GET /notifications/unread-count` | Badge count (FR42). The web app polls it every 30 s with `X-Background-Refresh: 1` | Student | – | `200 { count }` | – |
 | `POST /notifications/:id/read` | Mark read when opened (FR42) | Student (recipient) | – | `204` | `404` |
 
@@ -127,12 +127,12 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /connections/discover` | Students sharing ≥ 1 interest, ordered by shared count then name (FR43–FR44); empty → "No students found." | Student | `page?, pageSize?` | `200 { items: StudentCardDto[] { id, displayName, sharedInterests } … }` | – |
-| `POST /connections/requests` | Send a request; notifies the recipient (FR45) | Student | `{ recipientId }` | `201 { id }` | `409 CONNECTION_NOT_ALLOWED` (self, already connected, pending either way, blocked), `404` |
-| `GET /connections/requests` | Pending requests | Student | `direction=incoming\|outgoing` | `200 ConnectionRequestDto[]` | – |
+| `GET /connections/discover` | Active students sharing ≥ 1 interest, excluding self, connected and blocked either way; ordered by shared count, then name (FR43–FR44); empty → "No students found." | Student | `page?, pageSize?` | `200 { items: StudentCardDto[] { id, displayName, sharedInterests, connectionState } … }` | – |
+| `POST /connections/requests` | Send a request; notifies the recipient (`CONNECTION_REQUEST`) (FR45) | Student | `connectionRequestSchema`: `{ recipientId }` | `201 { id }` | `409 CONNECTION_NOT_ALLOWED` (self, already connected, pending either way, blocked; the blocked case uses generic wording), `404` (unknown or unverified student) |
+| `GET /connections/requests` | Pending requests, newest first | Student | `connectionRequestListSchema`: `direction=incoming\|outgoing` (default `incoming`) | `200 ConnectionRequestDto[] { id, student: { id, displayName }, createdAt }` | – |
 | `POST /connections/requests/:id/accept` | Accept; creates the connection and notifies the sender (FR46) | Student (recipient) | – | `204` | `404` |
 | `POST /connections/requests/:id/decline` | Decline; deletes the request, sender not notified (FR46) | Student (recipient) | – | `204` | `404` |
-| `GET /connections` | The student's connections (the "connection list" in FR13) | Student | – | `200 StudentCardDto[]` | – |
+| `GET /connections` | The student's connections (the "connection list" in FR13) | Student | `page?, pageSize?` | `200 { items: StudentCardDto[] … }` | – |
 
 ## Moderation module: FR50–FR57
 

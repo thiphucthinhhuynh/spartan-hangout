@@ -2,7 +2,7 @@ import { ACTIVITY_TYPE_LABELS, ACTIVITY_TYPES, MESSAGES } from '@sh/shared';
 import { Link } from 'react-router';
 import { PageHeader } from '../../app/layouts/PageHeader.js';
 import { LinkButton } from '../../components/Button.js';
-import { PlusIcon, SearchIcon } from '../../components/icons.js';
+import { PlusIcon, SearchIcon, UsersIcon } from '../../components/icons.js';
 import { ActivityList } from '../activities/ActivityList.js';
 import { useRecommended } from './api.js';
 import styles from './discover.module.css';
@@ -38,6 +38,12 @@ export function DiscoverPage() {
           </Link>
         ))}
       </nav>
+
+      {/* Open question Q1: student discovery lives at /people, reached from here. */}
+      <Link to="/people" className={styles.peopleLink}>
+        <UsersIcon width={20} height={20} aria-hidden="true" />
+        <span>Meet Spartans who share your interests</span>
+      </Link>
 
       <section aria-labelledby="recommended-heading">
         <h2 id="recommended-heading" className={styles.sectionTitle}>

@@ -18,10 +18,7 @@ export interface OwnProfileDto {
   updatedAt: string;
 }
 
-/**
- * How the viewer is related to a student. Pending request states are added with connection
- * requests in Milestone 9.
- */
+/** How the viewer is related to a student: connected, a pending request either way, or none. */
 export type ConnectionState = 'none' | 'pending_outgoing' | 'pending_incoming' | 'connected';
 
 /** GET /users/:id — another student's profile. Never contains an email (FR04, FR13). */

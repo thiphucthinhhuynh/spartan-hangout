@@ -44,6 +44,7 @@ function toNotificationDto(row: NotificationRow): NotificationDto {
     type: row.type,
     activityId: row.activityId,
     activityTitle: row.activityTitle,
+    actorId: row.actorId,
     conversationUserId: row.type === NotificationType.DIRECT_MESSAGE ? row.actorId : null,
     body: row.body,
     createdAt: row.createdAt.toISOString(),
