@@ -1,5 +1,6 @@
 import type { ActivityStatus, ActivityType } from '../enums.js';
 
+/** A student shown by name on an activity (organizer, message sender). */
 export interface ActivityOrganizerDto {
   /** Null when the organizer deleted their account. */
   id: string | null;

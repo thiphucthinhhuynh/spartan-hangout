@@ -103,9 +103,9 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /activities/:id/messages` | Read the group chat, oldest first (FR35–FR36). Messages from students the viewer blocked are left out (FR55c) | Student (current participant) | `after?` (message id, for polling) | `200 ActivityMessageDto[] { id, kind, body, createdAt, sender: { id|null, displayName } }` | `403` (not a participant), `404` |
-| `POST /activities/:id/messages` | Send a chat message (FR36) | Student (current participant) | `messageSchema`: `{ body }` 1–500 | `201 ActivityMessageDto` | `403`, `409 CHAT_READ_ONLY`, `422` |
-| `POST /activities/:id/updates` | Organizer posts an "Update" and notifies participants (FR38–FR39) | Student (organizer) | `messageSchema`: `{ body }` 1–500 | `201 ActivityMessageDto (kind UPDATE)` | `403`, `409 ACTIVITY_NOT_OPEN`, `422` |
+| `GET /activities/:id/messages` | Read the group chat, oldest first (FR35–FR36). Messages from students the viewer blocked are left out (FR55c). Still readable by members after the activity ends | Student (current participant) | `messageListSchema`: `after?` (message id; only newer messages are returned, for polling) | `200 ActivityMessageDto[] { id, kind, body, createdAt, sender: { id|null, displayName } }` | `403` (not a participant), `404` (also for outsiders of a Cancelled or Completed activity) |
+| `POST /activities/:id/messages` | Send a chat message (FR36). `409 CHAT_READ_ONLY` once Cancelled or Completed (FR37) | Student (current participant) | `messageSchema`: `{ body }` 1–500 | `201 ActivityMessageDto` | `403`, `409 CHAT_READ_ONLY`, `422` |
+| `POST /activities/:id/updates` | Organizer posts an "Update" while Open or Full, also after the start ([Q22](open-questions.md#q22-organizer-updates-after-an-activity-starts)), and every other participant gets `ACTIVITY_UPDATE` (FR38–FR39, FR40c) | Student (organizer) | `messageSchema`: `{ body }` 1–500 | `201 ActivityMessageDto (kind UPDATE)` | `403`, `409 ACTIVITY_NOT_OPEN`, `422` |
 
 ## Messages module: direct messages (FR47–FR49)
 

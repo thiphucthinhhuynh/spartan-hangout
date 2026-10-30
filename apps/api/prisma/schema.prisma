@@ -84,6 +84,7 @@ model User {
   organizedActivities Activity[]               @relation("organizer")
   participations      Participation[]
   activityRemovals    ActivityRemoval[]
+  activityMessages    ActivityMessage[]
   notifications       Notification[]           @relation("recipient")
   notificationsCaused Notification[]           @relation("actor")
 
@@ -199,6 +200,7 @@ model Activity {
   organizer      User?             @relation("organizer", fields: [organizerId], references: [id], onDelete: SetNull)
   participations Participation[]
   removals       ActivityRemoval[]
+  messages       ActivityMessage[]
   notifications  Notification[]
 
   @@index([status, startAt])
@@ -258,4 +260,31 @@ model Notification {
 
   @@index([recipientId, createdAt(sort: Desc)])
   @@map("notification")
+}
+
+// ─── M8: activity group chat ────────────────────────────────────────────────
+
+enum ActivityMessageKind {
+  MESSAGE
+  /// An organizer update, labeled "Update" (FR39).
+  UPDATE
+}
+
+/// A message in an activity's group chat (FR35–FR39). Read access is the participation row.
+model ActivityMessage {
+  id         String              @id @default(uuid()) @db.Uuid
+  /// Insertion order: the chat's order and the polling cursor, even when timestamps tie (FR36).
+  seq        BigInt              @default(autoincrement())
+  activityId String              @map("activity_id") @db.Uuid
+  /// Null after the sender deletes their account (shown as "Deleted Student", FR08).
+  senderId   String?             @map("sender_id") @db.Uuid
+  kind       ActivityMessageKind @default(MESSAGE)
+  body       String              @db.VarChar(500)
+  createdAt  DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  sender   User?    @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([activityId, seq])
+  @@map("activity_message")
 }

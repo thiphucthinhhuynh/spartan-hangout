@@ -5,6 +5,7 @@ import { CreateActivityPage } from '../features/activities/CreateActivityPage.js
 import { EditActivityPage } from '../features/activities/EditActivityPage.js';
 import { JoinSuccessPage } from '../features/activities/JoinSuccessPage.js';
 import { CheckEmailPage } from '../features/auth/CheckEmailPage.js';
+import { ActivityChatPage } from '../features/chat/ActivityChatPage.js';
 import { LoginPage } from '../features/auth/LoginPage.js';
 import { RegisterPage } from '../features/auth/RegisterPage.js';
 import { VerifyEmailPage } from '../features/auth/VerifyEmailPage.js';
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
           { path: 'activities/:id/edit', element: <EditActivityPage /> },
           { path: 'activities/:id/joined', element: <JoinSuccessPage /> },
           { path: 'activities/:id/full', element: <ActivityFullPage /> },
+          { path: 'activities/:id/chat', element: <ActivityChatPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

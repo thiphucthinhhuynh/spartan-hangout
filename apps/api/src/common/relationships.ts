@@ -30,6 +30,15 @@ export async function blockedIdsFor(client: DbClient, userId: string): Promise<S
   return new Set(rows.map((row) => (row.blockerId === userId ? row.blockedId : row.blockerId)));
 }
 
+/** Students `userId` has blocked (one direction only), e.g. to hide their chat messages (FR55c). */
+export async function idsBlockedBy(client: DbClient, userId: string): Promise<string[]> {
+  const rows = await client.block.findMany({
+    where: { blockerId: userId },
+    select: { blockedId: true },
+  });
+  return rows.map((row) => row.blockedId);
+}
+
 export async function areConnected(client: DbClient, a: string, b: string): Promise<boolean> {
   if (a === b) return false;
   const connection = await client.connection.findUnique({

@@ -176,11 +176,12 @@ PK `(activity_id, user_id)`. If a row exists, that student cannot join that acti
 | Column | Type | Constraints / notes | FR |
 |---|---|---|---|
 | `id` | uuid | PK | |
+| `seq` | bigserial | Insertion order. The chat is ordered by it (oldest → newest) and the `?after=` polling cursor uses it, so messages with the same timestamp keep their order | FR36 |
 | `activity_id` | uuid | FK → activity, CASCADE | FR35 |
 | `sender_id` | uuid null | FK → user, **SET NULL**. Null is shown as "Deleted Student" | FR08d |
 | `kind` | ActivityMessageKind | `UPDATE` is labeled "Update" | FR39 |
-| `body` | varchar(500) | 1–500 | FR36, FR38 |
-| `created_at` | timestamptz | ordered oldest → newest | FR36 |
+| `body` | varchar(500) | 1–500; `CHECK (char_length(btrim(body)) >= 1)` (Q18) | FR36, FR38 |
+| `created_at` | timestamptz | shown as the message time | FR36 |
 
 ### `connection_request` [M9]
 
@@ -252,7 +253,7 @@ Partial unique indexes prevent a second pending report on the same target (FR51)
 | `participation (user_id)` | My plans; excluding joined activities from recommendations |
 | `notification (recipient_id, created_at DESC)` | Notification list (FR42) |
 | `notification (recipient_id) WHERE read_at IS NULL` | Unread count (FR42). Added in M7 with the unread-count endpoint (a partial index Prisma doesn't model, so check for migration drift then) |
-| `activity_message (activity_id, created_at)` | Chat history (FR36) |
+| `activity_message (activity_id, seq)` | Chat history and polling (FR36) |
 | `direct_message (conversation_id, created_at)` | DM history (FR47) |
 | `block (blocked_id)` | Reverse block lookups (FR57) |
 | Pair unique indexes on `connection_request`, `conversation` | FR45, FR47 |

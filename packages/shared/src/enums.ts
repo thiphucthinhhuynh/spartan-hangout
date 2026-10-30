@@ -34,6 +34,12 @@ export const ActivityStatus = {
 } as const; // FR18
 export type ActivityStatus = (typeof ActivityStatus)[keyof typeof ActivityStatus];
 
+export const ActivityMessageKind = {
+  MESSAGE: 'MESSAGE',
+  UPDATE: 'UPDATE',
+} as const; // FR36, FR39
+export type ActivityMessageKind = (typeof ActivityMessageKind)[keyof typeof ActivityMessageKind];
+
 export const NotificationType = {
   ACTIVITY_CHANGED: 'ACTIVITY_CHANGED',
   ACTIVITY_CANCELLED: 'ACTIVITY_CANCELLED',

@@ -14,6 +14,8 @@ export const queryKeys = {
   activity: (id: string) => ['activity', id] as const,
   /** One activity's participants (GET /activities/:id/participants); refreshed with the activity. */
   participants: (id: string) => ['activity', id, 'participants'] as const,
+  /** One activity's group chat (GET /activities/:id/messages). */
+  chat: (id: string) => ['activity', id, 'chat'] as const,
   /** Every activity list; invalidate this after creating or editing an activity. */
   activities: ['activities'] as const,
   /** The Recommended list (GET /activities/recommended). */

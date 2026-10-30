@@ -25,6 +25,7 @@ import {
   ValidationError,
 } from '../../common/errors.js';
 import { isBlockedEitherWay } from '../../common/relationships.js';
+import type { DbClient } from '../../db.js';
 import type { AppDeps } from '../../deps.js';
 import { createNotifications } from '../notifications/notifications.service.js';
 import * as repo from './activities.repository.js';
@@ -120,6 +121,11 @@ export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock
   return {
     getDetail,
     loadForViewer,
+
+    /** Everyone in the activity except `excludeUserId`, for notifications from other modules. */
+    otherParticipantIds(client: DbClient, activityId: string, excludeUserId: string) {
+      return repo.participantIds(client, activityId, excludeUserId);
+    },
 
     /** "My plans" (FR18 entry point): joined or organizing, upcoming or past. */
     mine(viewerId: string, { page, pageSize, role, when }: MyActivitiesInput) {

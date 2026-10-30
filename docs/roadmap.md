@@ -291,19 +291,19 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** participants can chat, and organizers can post labeled updates.
 **Features included:** FR35–FR39, FR40c.
 **Dependencies:** M7. Decisions Q18 (whitespace), Q22 (updates after start).
-**Expected files/modules:** Prisma migration (`activity_message`); `packages/shared/src/schemas/message.ts`; `apps/api/src/modules/messages/{messages.routes,messages.controller,messages.service}.ts`; `apps/web/src/features/chat/ActivityChatPage.tsx`.
+**Expected files/modules:** Prisma migration (`activity_message`); `packages/shared/src/schemas/message.ts`; `apps/api/src/modules/messages/{messages.routes,messages.controller,messages.service}.ts`; `apps/api/test/chat.test.ts`; `apps/web/src/features/chat/{ActivityChatPage,api}.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 95 | Team decisions: Q18 whitespace-only text, Q22 updates after start | 2 | Not started |
-| 96 | Prisma migration: `activity_message` | 53 | Not started |
-| 97 | Shared: `messageSchema` (1–500, trimmed), `ActivityMessageDto` | 95 | Not started |
-| 98 | `messages.service`: list activity messages (current participants only, `after` cursor, hide blocked senders from the blocker); send (rejected when Cancelled/Completed) (FR35–FR37, FR55c) | 96, 97, 43 | Not started |
-| 99 | `messages.service.postUpdate`: organizer only, Open/Full, kind UPDATE, notify the other participants (FR38–FR39, FR40c) | 98, 56 | Not started |
-| 100 | Routes: `GET/POST /activities/:id/messages`, `POST /activities/:id/updates` | 98, 99 | Not started |
-| 101 | Web: `ActivityChatPage` with 5 s polling, oldest first, sender name and time, "Update" label, "Deleted Student", read-only state | 100 | Not started |
-| 102 | Web: organizer "Post update" composer; "Open group chat" on the detail page and on `JoinSuccessPage` | 101 | Not started |
-| 103 | Automated tests (key cases): access lost after leaving or removal; read-only after cancel; update notifications | 100 | Not started |
+| 95 | Team decisions: Q18 whitespace-only text, Q22 updates after start | 2 | Not started (M8 is built on the working assumptions for Q18 and Q22 until the team decides) |
+| 96 | Prisma migration: `activity_message` | 53 | In review (implemented, not merged) |
+| 97 | Shared: `messageSchema` (1–500, trimmed), `ActivityMessageDto` | 95 | In review (implemented, not merged) |
+| 98 | `messages.service`: list activity messages (current participants only, `after` cursor, hide blocked senders from the blocker); send (rejected when Cancelled/Completed) (FR35–FR37, FR55c) | 96, 97, 43 | In review (implemented, not merged) |
+| 99 | `messages.service.postUpdate`: organizer only, Open/Full, kind UPDATE, notify the other participants (FR38–FR39, FR40c) | 98, 56 | In review (implemented, not merged) |
+| 100 | Routes: `GET/POST /activities/:id/messages`, `POST /activities/:id/updates` | 98, 99 | In review (implemented, not merged) |
+| 101 | Web: `ActivityChatPage` with 5 s polling, oldest first, sender name and time, "Update" label, "Deleted Student", read-only state | 100 | In review (implemented, not merged) |
+| 102 | Web: organizer "Post update" composer; "Open group chat" on the detail page and on `JoinSuccessPage` | 101 | In review (implemented, not merged) |
+| 103 | Automated tests (key cases): access lost after leaving or removal; read-only after cancel; update notifications | 100 | In review (implemented, not merged) |
 
 **Completion criteria:** only current participants can read or send. Messages are 1–500 characters and listed oldest first. Updates are labeled and notify participants. The chat is read-only once the activity is Cancelled or Completed.
 

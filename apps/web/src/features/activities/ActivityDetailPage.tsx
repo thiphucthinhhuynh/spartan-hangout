@@ -11,6 +11,7 @@ import {
   CalendarIcon,
   CheckIcon,
   MapPinIcon,
+  MessageIcon,
   PencilIcon,
 } from '../../components/icons.js';
 import { ApiError } from '../../lib/apiClient.js';
@@ -161,6 +162,12 @@ export function ActivityDetailPage() {
             <p className={styles.going}>
               <CheckIcon width={18} height={18} aria-hidden="true" /> You're going
             </p>
+          )}
+          {/* FR35: the participation is the chat access. */}
+          {activity.viewerRole !== 'none' && (
+            <LinkButton to={`/activities/${activity.id}/chat`} fullWidth>
+              <MessageIcon width={18} height={18} aria-hidden="true" /> Open group chat
+            </LinkButton>
           )}
           {activity.canLeave && (
             <Button variant="secondary" fullWidth onClick={() => setConfirmLeave(true)}>

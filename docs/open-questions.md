@@ -168,6 +168,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** FR36 and FR38 reject "empty" messages. Is `"   "` empty? The same question applies to title, display name and location.
 - **Working assumption:** all text inputs are trimmed before validation, so whitespace-only text counts as empty.
+- **Built so far (M8, 2026-10-29):** chat messages and updates follow this assumption; the status stays Open until the team decides.
 
 ### Q19. Requirement numbering across documents
 
@@ -189,6 +190,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** FR38 lets the organizer post updates to an "Open or Full" activity. Unlike FR24, FR29, FR31 and FR33, it does **not** say "that has not started". FR37 makes the chat read-only only once the activity is Cancelled or Completed.
 - **Working assumption:** follow the FR literally. Updates and chat are allowed until the activity is Completed or Cancelled.
+- **Built so far (M8, 2026-10-29):** chat messages and updates follow this assumption; the status stays Open until the team decides.
 
 ### Q23. Hosting and email provider
 

@@ -1,12 +1,12 @@
 import { Link, useParams } from 'react-router';
 import { Button, LinkButton } from '../../components/Button.js';
 import { EmptyState } from '../../components/EmptyState.js';
-import { CalendarIcon, CheckIcon, MapPinIcon } from '../../components/icons.js';
+import { CalendarIcon, CheckIcon, MapPinIcon, MessageIcon } from '../../components/icons.js';
 import { formatActivityDay, formatActivityTimes } from '../../lib/format.js';
 import styles from './activities.module.css';
 import { useActivity } from './api.js';
 
-/** "You're in, Spartan!" after a successful join (mockup p.6 · FR22). Group chat arrives in M8. */
+/** "You're in, Spartan!" after a successful join (mockup p.6 · FR22). */
 export function JoinSuccessPage() {
   const { id = '' } = useParams();
   const query = useActivity(id);
@@ -53,10 +53,13 @@ export function JoinSuccessPage() {
       </div>
 
       <div className={styles.resultActions}>
-        <LinkButton to={`/activities/${activity.id}`} fullWidth>
+        <LinkButton to={`/activities/${activity.id}/chat`} fullWidth>
+          <MessageIcon width={18} height={18} aria-hidden="true" /> Open group chat
+        </LinkButton>
+        <LinkButton to={`/activities/${activity.id}`} variant="secondary" fullWidth>
           View activity
         </LinkButton>
-        <LinkButton to="/plans" variant="secondary" fullWidth>
+        <LinkButton to="/plans" variant="ghost" fullWidth>
           See my plans
         </LinkButton>
       </div>
