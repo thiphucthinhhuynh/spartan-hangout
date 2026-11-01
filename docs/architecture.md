@@ -78,7 +78,7 @@ flowchart TB
 | Actor | Role |
 |---|---|
 | **Student** | Any verified `@sjsu.edu` account. A student is the **organizer** of the activities they create (and also counts as their first participant, FR28) and a **participant** in activities they join. |
-| **Administrator** | Only views reports and marks them Reviewed (FR53). Admins are not part of the normal app flow. How admin accounts get created is an open question ([Q14](open-questions.md#q14-administrator-accounts)). |
+| **Administrator** | Only views reports and marks them Reviewed (FR53). Admins are not part of the normal app flow. How admin accounts get created is an open question; the working assumption is built: a demo seed account and the `admin:promote` script ([Q14](open-questions.md#q14-administrator-accounts)). |
 
 ---
 
@@ -137,7 +137,7 @@ flowchart LR
 
 - One module uses another only by calling that module's **service**. It never imports another module's repository or controller.
 - `notifications` and `common/*` depend on no feature module.
-- `users → activities/connections` exists only for account deletion (FR08). `moderation → activities/connections` exists only for blocking (FR55–FR56).
+- `users → activities/connections` exists only for account deletion (FR08). `moderation → activities` also checks that a reported activity is visible and not the reporter's own (FR50); otherwise `moderation → activities/connections` exists only for blocking (FR55–FR56).
 
 ### 4.4 Backend folder layout
 

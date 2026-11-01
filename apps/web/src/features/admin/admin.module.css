@@ -1,0 +1,87 @@
+/* Report review (FR53): phones first. */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.reason {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.pending,
+.reviewed {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.pending {
+  background: var(--color-accent-soft);
+}
+
+.reviewed {
+  background: var(--type-sports-bg);
+  color: var(--type-sports-fg);
+}
+
+.target,
+.description {
+  overflow-wrap: anywhere;
+}
+
+.description {
+  color: var(--color-muted);
+  white-space: pre-wrap;
+}
+
+.meta {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.action {
+  align-self: flex-start;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: 0.875rem;
+}
+
+.more {
+  display: flex;
+  margin: var(--space-4) auto 0;
+}

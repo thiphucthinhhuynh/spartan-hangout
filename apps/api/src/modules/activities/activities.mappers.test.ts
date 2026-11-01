@@ -37,6 +37,12 @@ describe('activity mappers', () => {
     );
   });
 
+  it('offers Report on every activity except your own (FR50)', () => {
+    expect(toActivityDetailDto(row, 'none', now).canReport).toBe(true);
+    expect(toActivityDetailDto(row, 'participant', now).canReport).toBe(true);
+    expect(toActivityDetailDto(row, 'organizer', now).canReport).toBe(false);
+  });
+
   it('counts open spots and names a deleted organizer "Deleted Student" (FR08, FR15)', () => {
     const dto = toActivityDetailDto({ ...row, organizer: null }, 'none', now);
     expect(dto.openSpots).toBe(3);

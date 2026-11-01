@@ -61,3 +61,19 @@ export const ReportReason = {
   OTHER: 'OTHER',
 } as const; // FR51
 export type ReportReason = (typeof ReportReason)[keyof typeof ReportReason];
+
+export const REPORT_REASONS = Object.values(ReportReason);
+
+export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
+  HARASSMENT: 'Harassment',
+  SPAM: 'Spam',
+  INAPPROPRIATE_CONTENT: 'Inappropriate content',
+  SAFETY_CONCERN: 'Safety concern',
+  OTHER: 'Other',
+};
+
+export const ReportStatus = {
+  PENDING: 'PENDING',
+  REVIEWED: 'REVIEWED',
+} as const; // FR52–FR53
+export type ReportStatus = (typeof ReportStatus)[keyof typeof ReportStatus];

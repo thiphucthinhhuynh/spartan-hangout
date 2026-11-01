@@ -90,6 +90,9 @@ model User {
   conversationsAsA    Conversation[]           @relation("conversationA")
   conversationsAsB    Conversation[]           @relation("conversationB")
   directMessages      DirectMessage[]
+  reportsMade         Report[]                 @relation("reporter")
+  reportsReceived     Report[]                 @relation("reportTargetUser")
+  reportsReviewed     Report[]                 @relation("reportReviewer")
   notifications       Notification[]           @relation("recipient")
   notificationsCaused Notification[]           @relation("actor")
 
@@ -206,6 +209,7 @@ model Activity {
   participations Participation[]
   removals       ActivityRemoval[]
   messages       ActivityMessage[]
+  reports        Report[]
   notifications  Notification[]
 
   @@index([status, startAt])
@@ -353,4 +357,44 @@ model DirectMessage {
 
   @@index([conversationId, seq])
   @@map("direct_message")
+}
+
+// ─── M11: reports ───────────────────────────────────────────────────────────
+// Hand-written in the migration: partial unique indexes allowing one Pending report per reporter
+// and target (FR51). The service requires exactly one target; it can't be a CHECK, because a
+// target becomes null when its account or activity is deleted.
+
+enum ReportReason {
+  HARASSMENT
+  SPAM
+  INAPPROPRIATE_CONTENT
+  SAFETY_CONCERN
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+}
+
+/// A report of a student or an activity (FR50–FR53). The reported party is never told.
+model Report {
+  id               String       @id @default(uuid()) @db.Uuid
+  reporterId       String?      @map("reporter_id") @db.Uuid
+  targetUserId     String?      @map("target_user_id") @db.Uuid
+  targetActivityId String?      @map("target_activity_id") @db.Uuid
+  reason           ReportReason
+  description      String?      @db.VarChar(500)
+  status           ReportStatus @default(PENDING)
+  reviewedById     String?      @map("reviewed_by_id") @db.Uuid
+  reviewedAt       DateTime?    @map("reviewed_at") @db.Timestamptz(3)
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  reporter       User?     @relation("reporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  targetUser     User?     @relation("reportTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
+  targetActivity Activity? @relation(fields: [targetActivityId], references: [id], onDelete: SetNull)
+  reviewedBy     User?     @relation("reportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@map("report")
 }

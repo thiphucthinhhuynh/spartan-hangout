@@ -31,10 +31,11 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 | [Milestone 8 – Activity chat & organizer updates](docs/roadmap.md#m8--activity-chat--organizer-updates) | **Implemented, awaiting review.** Group chat for current participants with 5-second polling (FR35–FR37), organizer updates labeled "Update" that notify participants (FR38–FR39, FR40c), read-only once cancelled or completed, using the working assumptions for [Q18](docs/open-questions.md#q18-whitespace-only-messages-and-fields) and [Q22](docs/open-questions.md#q22-organizer-updates-after-an-activity-starts) |
 | [Milestone 9 – Student discovery & connections](docs/roadmap.md#m9--student-discovery--connections) | **Implemented, awaiting review.** Meet Spartans who share interests (FR43–FR44), connection requests with the FR45 rules, accept/decline (FR46), Connect on profiles, using the working assumptions for [Q1](docs/open-questions.md#q1-what-discover-means) and [Q17](docs/open-questions.md#q17-links-for-notifications-that-are-not-about-an-activity) |
 | [Milestone 10 – Direct messages](docs/roadmap.md#m10--direct-messages) | **Implemented, awaiting review.** One-to-one messages between connected students with 5-second polling (FR47–FR48), recipient notified with a link and conversations ordered by most recent (FR49), Message button on connected profiles |
-| Other product features | **Not started.** Reporting and administrator review are next |
-| Next step | [Milestone 11 – Reporting & administrator review](docs/roadmap.md#m11--reporting--administrator-review) |
+| [Milestone 11 – Reporting & administrator review](docs/roadmap.md#m11--reporting--administrator-review) | **Implemented, awaiting review.** Report students and activities with a required reason (FR50–FR52), administrators review reports and mark them Reviewed (FR53), using the working assumption for [Q14](docs/open-questions.md#q14-administrator-accounts) |
+| Other product features | **Not started.** Blocking is next |
+| Next step | [Milestone 12 – Blocking](docs/roadmap.md#m12--blocking) |
 
-The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, finding them (Recommended and search), joining, leaving and removing participants, cancelling, notifications, the activity group chat, student discovery and connections, and direct messages exist so far; the rest is **planned**.
+The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, finding them (Recommended and search), joining, leaving and removing participants, cancelling, notifications, the activity group chat, student discovery and connections, direct messages, and reporting exist so far; the rest is **planned**.
 
 ---
 
@@ -164,7 +165,8 @@ Run `npm run db:migrate` again whenever you pull new migrations. Open <http://lo
 | `npm test` | Vitest in every workspace; API tests use `DATABASE_URL_TEST` (needs `docker compose up -d`) |
 | `npm run codegen` | Build `@sh/shared` and generate the Prisma client. Runs automatically before `dev`, `build`, `typecheck` and `test` |
 | `npm run check-node` | Stop with a clear message unless this terminal uses the Node version in `.nvmrc`. Runs automatically before `dev`, `build`, `typecheck` and `test` |
-| `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle (Prisma). `db:seed` adds demo students (e.g. `sammy.spartan@sjsu.edu`, password `goSpartans1`) and activities; see [data-model.md](docs/data-model.md#seed-data-m4) |
+| `npm run db:migrate` / `db:seed` / `db:reset` | Database lifecycle (Prisma). `db:seed` adds demo students (e.g. `sammy.spartan@sjsu.edu`, password `goSpartans1`), the demo administrator `admin@sjsu.edu` (same password) and activities; see [data-model.md](docs/data-model.md#seed-data-m4) |
+| `npm run admin:promote -- someone@sjsu.edu` | Makes an existing verified account an administrator |
 
 ### Troubleshooting
 

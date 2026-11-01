@@ -354,19 +354,19 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can report profiles and activities, and administrators review the reports.
 **Features included:** FR50–FR53.
 **Dependencies:** M3, M4. Decision Q14 (admin accounts).
-**Expected files/modules:** Prisma migration (`report`); `packages/shared/src/schemas/report.ts`; `apps/api/src/modules/moderation/{moderation.routes,moderation.controller,reports.service}.ts`; `apps/web/src/features/moderation/ReportDialog.tsx`; `apps/web/src/features/admin/ReportsPage.tsx`.
+**Expected files/modules:** Prisma migration (`report`); `packages/shared/src/schemas/report.ts`; `apps/api/src/modules/moderation/{moderation.routes,moderation.controller,reports.service}.ts`; `apps/api/prisma/make-admin.ts`; `apps/api/test/reports.test.ts`; `apps/web/src/features/moderation/ReportDialog.tsx`; `apps/web/src/features/admin/ReportsPage.tsx`; `apps/web/src/app/RequireAdmin.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 116 | Team decision Q14: how admin accounts are created | 2 | Not started |
-| 117 | Prisma migration: `report` with partial unique indexes for pending reports | 53 | Not started |
-| 118 | Shared: `ReportReason` enum, `reportSchema` | 6 | Not started |
-| 119 | `reports.service.submit`: not own profile or activity, exactly one target, no duplicate pending, no notification to the target; `POST /reports` (FR50–FR52) | 117, 118 | Not started |
-| 120 | `reports.service` admin list and mark Reviewed (records the admin and time); `/admin/reports` routes behind `requireAdmin` (FR53) | 117, 36 | Not started |
-| 121 | Admin provisioning according to Q14 (seed or CLI script) | 116 | Not started |
-| 122 | Web: `ReportDialog` on student profiles and activity details (hidden on your own) | 119 | Not started |
-| 123 | Web: admin `ReportsPage` (filter by status, mark Reviewed) with an admin-only route guard | 120 | Not started |
-| 124 | Automated tests (key cases): non-admins get 403; a duplicate pending report is rejected | 120 | Not started |
+| 116 | Team decision Q14: how admin accounts are created | 2 | Not started (M11 is built on the Q14 working assumption until the team decides) |
+| 117 | Prisma migration: `report` with partial unique indexes for pending reports | 53 | In review (implemented, not merged) |
+| 118 | Shared: `ReportReason` enum, `reportSchema` | 6 | In review (implemented, not merged) |
+| 119 | `reports.service.submit`: not own profile or activity, exactly one target, no duplicate pending, no notification to the target; `POST /reports` (FR50–FR52) | 117, 118 | In review (implemented, not merged) |
+| 120 | `reports.service` admin list and mark Reviewed (records the admin and time); `/admin/reports` routes behind `requireAdmin` (FR53) | 117, 36 | In review (implemented, not merged) |
+| 121 | Admin provisioning according to Q14 (seed or CLI script) | 116 | In review (implemented, not merged) |
+| 122 | Web: `ReportDialog` on student profiles and activity details (hidden on your own) | 119 | In review (implemented, not merged) |
+| 123 | Web: admin `ReportsPage` (filter by status, mark Reviewed) with an admin-only route guard | 120 | In review (implemented, not merged) |
+| 124 | Automated tests (key cases): non-admins get 403; a duplicate pending report is rejected | 120 | In review (implemented, not merged) |
 
 **Completion criteria:** a report needs a reason and is stored as Pending with all FR52 fields. The reporter gets a confirmation and nobody else is notified. Only administrators can view reports and mark them Reviewed.
 

@@ -8,12 +8,14 @@ import {
   createActivityChatRouter,
   createConversationsRouter,
 } from './modules/messages/messages.routes.js';
+import { createModerationRouters } from './modules/moderation/moderation.routes.js';
 import { createNotificationsRouter } from './modules/notifications/notifications.routes.js';
 import { createUsersRouter } from './modules/users/users.routes.js';
 
 /** Every route under /api/v1. Feature modules register their routers here as they are built. */
 export function createApiRouter(deps: AppDeps) {
   const auth = createAuthModule(deps);
+  const moderation = createModerationRouters(deps);
   const router = Router();
 
   // Sets req.user for every route below; routes opt in to requiring it with requireAuth.
@@ -27,6 +29,8 @@ export function createApiRouter(deps: AppDeps) {
   router.use('/notifications', createNotificationsRouter(deps));
   router.use('/connections', createConnectionsRouter(deps));
   router.use('/conversations', createConversationsRouter(deps));
+  router.use('/reports', moderation.reports);
+  router.use('/admin', moderation.admin);
 
   return router;
 }

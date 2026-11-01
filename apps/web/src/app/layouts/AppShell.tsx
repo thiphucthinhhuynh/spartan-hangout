@@ -1,7 +1,15 @@
+import { Role } from '@sh/shared';
 import type { ComponentType, SVGProps } from 'react';
 import { NavLink, Outlet, ScrollRestoration } from 'react-router';
-import { CalendarIcon, CompassIcon, MessageIcon, UserIcon } from '../../components/icons.js';
+import {
+  CalendarIcon,
+  CompassIcon,
+  MessageIcon,
+  ShieldCheckIcon,
+  UserIcon,
+} from '../../components/icons.js';
 import { Logo } from '../../components/Logo.js';
+import { useCurrentUser } from '../../features/auth/api.js';
 import { NotificationBell } from '../../features/notifications/NotificationBell.js';
 import styles from './AppShell.module.css';
 
@@ -17,6 +25,13 @@ const tabs: { to: string; label: string; Icon: ComponentType<SVGProps<SVGSVGElem
  * mockups. Tablets: left icon rail. Desktop: full left sidebar. Same links at every size.
  */
 export function AppShell() {
+  const me = useCurrentUser();
+  // FR53: the report review page is only offered to administrators.
+  const links =
+    me.role === Role.ADMIN
+      ? [...tabs, { to: '/admin/reports', label: 'Reports', Icon: ShieldCheckIcon }]
+      : tabs;
+
   return (
     <div className={styles.shell}>
       <a href="#main" className={styles.skipLink}>
@@ -32,7 +47,7 @@ export function AppShell() {
           </header>
 
           <nav className={styles.nav} aria-label="Main">
-            {tabs.map(({ to, label, Icon }) => (
+            {links.map(({ to, label, Icon }) => (
               <NavLink
                 key={to}
                 to={to}

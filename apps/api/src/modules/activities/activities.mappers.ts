@@ -90,8 +90,8 @@ export function toActivityDetailDto(
     canLeave: viewerRole === 'participant' && live && notStarted,
     // FR31: same conditions as editing.
     canCancel: viewerRole === 'organizer' && live && notStarted,
-    // Turned on by a later milestone: report (M11).
-    canReport: false,
+    // FR50: every activity the viewer can see, except their own.
+    canReport: viewerRole !== 'organizer',
     createdAt: activity.createdAt.toISOString(),
     updatedAt: activity.updatedAt.toISOString(),
   };

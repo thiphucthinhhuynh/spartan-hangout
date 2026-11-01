@@ -20,7 +20,7 @@ export interface PageWindow {
 /**
  * Active students other than the viewer, with the interests they share with the viewer and any
  * pending request between them, ordered by shared count, then name.
- * `discover` (FR43): at least one shared interest, not connected, no block either way.
+ * `discover` (FR43): students only, at least one shared interest, not connected, no block either way.
  * `connected` (FR13's connection list): the viewer's connections.
  */
 export function studentCards(
@@ -35,7 +35,7 @@ export function studentCards(
       AND c.user_b_id = GREATEST(u.id, ${viewerId}::uuid))`;
   const filter =
     mode === 'discover'
-      ? Prisma.sql`u.interests && me.interests AND NOT ${isConnected}`
+      ? Prisma.sql`u.role = 'STUDENT' AND u.interests && me.interests AND NOT ${isConnected}`
       : isConnected;
 
   return client.$queryRaw<StudentRow[]>`

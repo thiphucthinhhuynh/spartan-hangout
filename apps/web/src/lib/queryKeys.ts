@@ -36,6 +36,10 @@ export const queryKeys = {
   conversations: ['conversations'] as const,
   /** A DM thread (GET /conversations/:userId/messages). */
   conversationThread: (userId: string) => ['conversation', userId] as const,
+  /** Every report list (administrators); invalidate after marking one Reviewed. */
+  allAdminReports: ['admin', 'reports'] as const,
+  /** Reports with one status, or all of them (GET /admin/reports). */
+  adminReports: (status: string | undefined) => ['admin', 'reports', status ?? 'ALL'] as const,
   /** Every notification query; invalidate after marking one read. */
   notifications: ['notifications'] as const,
   /** The bell's badge (GET /notifications/unread-count). */

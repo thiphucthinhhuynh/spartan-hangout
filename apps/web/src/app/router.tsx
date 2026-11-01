@@ -4,6 +4,7 @@ import { ActivityFullPage } from '../features/activities/ActivityFullPage.js';
 import { CreateActivityPage } from '../features/activities/CreateActivityPage.js';
 import { EditActivityPage } from '../features/activities/EditActivityPage.js';
 import { JoinSuccessPage } from '../features/activities/JoinSuccessPage.js';
+import { ReportsPage } from '../features/admin/ReportsPage.js';
 import { CheckEmailPage } from '../features/auth/CheckEmailPage.js';
 import { ActivityChatPage } from '../features/chat/ActivityChatPage.js';
 import { LoginPage } from '../features/auth/LoginPage.js';
@@ -23,6 +24,7 @@ import { MyProfilePage } from '../features/profile/MyProfilePage.js';
 import { AppShell } from './layouts/AppShell.js';
 import { AuthLayout } from './layouts/AuthLayout.js';
 import { NotFoundPage } from './NotFoundPage.js';
+import { RequireAdmin } from './RequireAdmin.js';
 import { RequireAuth } from './RequireAuth.js';
 
 // Route table (docs/architecture.md §12.2).
@@ -61,6 +63,10 @@ export const router = createBrowserRouter([
           { path: 'activities/:id/joined', element: <JoinSuccessPage /> },
           { path: 'activities/:id/full', element: <ActivityFullPage /> },
           { path: 'activities/:id/chat', element: <ActivityChatPage /> },
+          {
+            element: <RequireAdmin />,
+            children: [{ path: 'admin/reports', element: <ReportsPage /> }],
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

@@ -42,6 +42,7 @@
 | 409 | `CONNECTION_NOT_ALLOWED` | FR45 conditions |
 | 409 | `NOT_CONNECTED` | DM without an active connection (FR48) |
 | 409 | `DUPLICATE_PENDING_REPORT` | FR51 |
+| 409 | `REPORT_ALREADY_REVIEWED` | FR53 |
 | 410 | `TOKEN_EXPIRED` | Verification link older than 24 h (FR03) |
 | 422 | `VALIDATION_FAILED` | One or more invalid fields, listed in `fields` (FR02, FR06, FR27, FR36…) |
 | 423 | `ACCOUNT_LOCKED` | FR11 |
@@ -83,7 +84,7 @@
 | `GET /activities` | Search (FR16–FR17): Open, not started, organizer not blocked either way, plus every given criterion. The viewer's own activities are included | Student | query `activitySearchSchema`: `type?, fromDate?, toDate?` (`YYYY-MM-DD`), `earliestStart?, latestStart?` (`HH:mm`), `location?` (any part, case-insensitive), `page?, pageSize?`. Campus time; both ends of each range included; an empty value means no criterion | `200 { items: ActivityCardDto[] … }`, soonest first; empty `items` → UI shows "No activities found." | `422` (each invalid field; `fields.toDate` / `fields.latestStart` when a range is reversed) |
 | `GET /activities/recommended` | Recommended list (FR14–FR15) | Student | `page?, pageSize?` | `200 { items: ActivityCardDto[] … }`, soonest first; empty → "No matching activities found." | – |
 | `GET /activities/mine` | The student's own joined and organized activities ("My plans", the FR18 entry point). Upcoming: Open or Full and not ended, soonest first. Past: ended, Completed or Cancelled, most recent first | Student | `myActivitiesSchema`: `role=joined\|organizing` (default `joined`), `when=upcoming\|past` (default `upcoming`), `page?, pageSize?` | `200 { items: ActivityCardDto[] … }` | `422` |
-| `GET /activities/:id` | Activity detail view (FR18) | Student | – | `200 ActivityDetailDto` (includes `viewerRole`: `organizer` / `participant` / `none`, and the `can*` flags; `canJoin`, `canLeave`, `canCancel` and `canReport` stay `false` until Milestones 6, 7 and 11) | `404` (missing or malformed id; or Cancelled/Completed and the viewer isn't a participant or the organizer, FR20/FR32) |
+| `GET /activities/:id` | Activity detail view (FR18) | Student | – | `200 ActivityDetailDto` (includes `viewerRole`: `organizer` / `participant` / `none`, and the `can*` flags; `canReport` is `true` except for the organizer (FR50)) | `404` (missing or malformed id; or Cancelled/Completed and the viewer isn't a participant or the organizer, FR20/FR32) |
 | `PATCH /activities/:id` | Organizer edits (FR29–FR30). The given fields are merged into the activity and the result is validated with the creation rules. Participants are notified when the title, type, date, times or location change (FR40a), not the description or limit | Student (organizer) | `activityUpdateSchema`: one or more create fields | `200 ActivityDetailDto` (status recomputed: `FULL` when count = limit, otherwise `OPEN`) | `403 FORBIDDEN` (not the organizer), `409 ACTIVITY_NOT_OPEN`, `409 ACTIVITY_STARTED`, `409 LIMIT_BELOW_COUNT` (also in `fields.participantLimit`), `422 VALIDATION_FAILED` |
 | `POST /activities/:id/cancel` | Organizer cancels (FR31–FR32); notifies participants (`ACTIVITY_CANCELLED`, the reason as its body). Can't be undone | Student (organizer) | `cancelActivitySchema`: `{ reason?: string ≤ 200 }` (the body may be omitted) | `200 ActivityDetailDto (status CANCELLED)` | `403`, `409 ACTIVITY_NOT_OPEN`, `409 ACTIVITY_STARTED` |
 
@@ -127,7 +128,7 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /connections/discover` | Active students sharing ≥ 1 interest, excluding self, connected and blocked either way; ordered by shared count, then name (FR43–FR44); empty → "No students found." | Student | `page?, pageSize?` | `200 { items: StudentCardDto[] { id, displayName, sharedInterests, connectionState } … }` | – |
+| `GET /connections/discover` | Active students (not administrators) sharing ≥ 1 interest, excluding self, connected and blocked either way; ordered by shared count, then name (FR43–FR44); empty → "No students found." | Student | `page?, pageSize?` | `200 { items: StudentCardDto[] { id, displayName, sharedInterests, connectionState } … }` | – |
 | `POST /connections/requests` | Send a request; notifies the recipient (`CONNECTION_REQUEST`) (FR45) | Student | `connectionRequestSchema`: `{ recipientId }` | `201 { id }` | `409 CONNECTION_NOT_ALLOWED` (self, already connected, pending either way, blocked; the blocked case uses generic wording), `404` (unknown or unverified student) |
 | `GET /connections/requests` | Pending requests, newest first | Student | `connectionRequestListSchema`: `direction=incoming\|outgoing` (default `incoming`) | `200 ConnectionRequestDto[] { id, student: { id, displayName }, createdAt }` | – |
 | `POST /connections/requests/:id/accept` | Accept; creates the connection and notifies the sender (FR46) | Student (recipient) | – | `204` | `404` |
@@ -138,10 +139,10 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `POST /reports` | Report a student or an activity (FR50–FR52) | Student | `reportSchema`: `{ targetUserId?` **or** `targetActivityId?, reason, description? ≤ 500 }` | `201 { message }` confirmation | `403` (own profile or own activity), `404`, `409 DUPLICATE_PENDING_REPORT`, `422` (no reason) |
+| `POST /reports` | Report a student or an activity (FR50–FR52). Stored as Pending; nobody but the reporter is told. A new report on the same target is allowed once the earlier one is Reviewed | Student | `reportSchema`: `{ targetUserId?` **or** `targetActivityId?, reason, description? ≤ 500 }` | `201 { message }` confirmation | `403` (own profile or own activity), `404` (a student or activity the reporter can't see), `409 DUPLICATE_PENDING_REPORT`, `422` (no reason, or not exactly one target) |
 | `POST /blocks` | Block a student after confirming in the UI (FR54–FR56) | Student | `{ userId }` | `204` | `403` (self), `404` |
-| `GET /admin/reports` | View all reports with details (FR53) | Admin | `status?=PENDING\|REVIEWED`, `page?, pageSize?` | `200 { items: ReportDto[] … }` | `403` |
-| `POST /admin/reports/:id/review` | Mark a Pending report Reviewed; records the admin and time (FR53) | Admin | – | `200 ReportDto` | `403`, `404`, `409` (already reviewed) |
+| `GET /admin/reports` | View all reports with details, newest first (FR53). `ReportDto` never contains an email | Admin | `reportListSchema`: `status?=PENDING\|REVIEWED`, `page?, pageSize?` | `200 { items: ReportDto[] { id, reporter, targetUser, targetActivity, reason, description, status, createdAt, reviewedBy, reviewedAt } … }` | `403` |
+| `POST /admin/reports/:id/review` | Mark a Pending report Reviewed; records the admin and time (FR53) | Admin | – | `200 ReportDto` | `403`, `404`, `409 REPORT_ALREADY_REVIEWED` |
 
 ---
 

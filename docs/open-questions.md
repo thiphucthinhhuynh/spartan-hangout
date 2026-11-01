@@ -141,6 +141,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** FR53 defines what Administrators do, but not how they're created or how they log in.
 - **Working assumption:** admins are normal accounts with `role = ADMIN`, set by a seed or a command-line script. They log in through the same login page. The admin UI is limited to listing reports and marking them Reviewed (FR53), with no enforcement actions.
+- **Built so far (M11, 2026-10-31):** the seed adds `admin@sjsu.edu` in development, and `npm run admin:promote -- someone@sjsu.edu` promotes an existing verified account anywhere. Administrators get a Reports link in the navigation and are left out of Discover students. The status stays Open until the team decides.
 
 ### Q15. Registering again with an unverified email
 

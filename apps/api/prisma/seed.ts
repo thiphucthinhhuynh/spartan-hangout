@@ -171,7 +171,26 @@ const activities: {
   },
 ];
 
+/** The demo administrator (open question Q14). Added even if the demo students already exist. */
+async function ensureDemoAdmin() {
+  const email = 'admin@sjsu.edu';
+  const existing = await db.user.findUnique({ where: { email }, select: { id: true } });
+  if (existing) return;
+  await db.user.create({
+    data: {
+      email,
+      passwordHash: await hashPassword(PASSWORD),
+      displayName: 'Campus Admin',
+      interests: ['SOCIAL'],
+      role: 'ADMIN',
+      status: 'ACTIVE',
+    },
+  });
+  console.log(`Added the demo administrator ${email} with password "${PASSWORD}".`);
+}
+
 async function main() {
+  await ensureDemoAdmin();
   const emails = students.map((s) => `${s.key}@sjsu.edu`);
   const existing = await db.user.findMany({
     where: { email: { in: emails } },

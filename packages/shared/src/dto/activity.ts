@@ -27,7 +27,7 @@ export type ViewerRole = 'organizer' | 'participant' | 'none';
 
 /**
  * GET /activities/:id (FR18). The `can*` flags tell the UI which actions to offer; the server still
- * checks every action. Cancel and report turn on in Milestones 7 and 11.
+ * checks every action.
  */
 export interface ActivityDetailDto extends ActivityCardDto {
   description: string;

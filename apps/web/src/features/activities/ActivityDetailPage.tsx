@@ -15,6 +15,7 @@ import {
   PencilIcon,
 } from '../../components/icons.js';
 import { ApiError } from '../../lib/apiClient.js';
+import { ReportAction } from '../moderation/ReportDialog.js';
 import { formatActivityDay, formatActivityTimes } from '../../lib/format.js';
 import { useCurrentUser } from '../auth/api.js';
 import styles from './activities.module.css';
@@ -183,6 +184,13 @@ export function ActivityDetailPage() {
             >
               Cancel activity
             </Button>
+          )}
+          {activity.canReport && (
+            <ReportAction
+              key={activity.id}
+              target={{ targetActivityId: activity.id }}
+              noun="activity"
+            />
           )}
         </div>
       </aside>

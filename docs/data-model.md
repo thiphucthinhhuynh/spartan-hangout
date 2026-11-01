@@ -230,7 +230,8 @@ The conversation row is kept if the connection ends, but nobody can read or send
 
 On insert, the service requires exactly one target. That can't be a plain `CHECK`, because a target may later be set to null when its account or activity is deleted.
 Partial unique indexes prevent a second pending report on the same target (FR51):
-`UNIQUE (reporter_id, target_user_id) WHERE status = 'PENDING'` and `UNIQUE (reporter_id, target_activity_id) WHERE status = 'PENDING'`.
+`UNIQUE (reporter_id, target_user_id) WHERE status = 'PENDING' AND target_user_id IS NOT NULL`, and the same for `target_activity_id`.
+An index on `(status, created_at DESC)` serves the administrators' list.
 
 ## Delete behavior summary (FR08)
 
@@ -282,4 +283,4 @@ Location search (FR16) uses `ILIKE '%text%'` in the search query, with `%`, `_` 
 - 7 active students (`maya.chen`, `alex.rivera`, `jordan.lee`, `priya.nair`, `sam.kim`, `lena.tran`, `sammy.spartan` `@sjsu.edu`), all with the password `goSpartans1`, with different interests and availability
 - 5 activities dated relative to today: Midterm Study Group (5/8, like mockup p.4), Pickup Soccer, Coffee & Meet New Friends, a Full game night, and a Completed lunch from yesterday
 
-It runs in one transaction, does nothing if the demo accounts already exist, refuses if only some of them exist, and refuses when `NODE_ENV=production`. Administrator accounts are not seeded until Q14 is decided (task 121). This is **demo data**, not test data: the product test data belongs to the team's testing assignment.
+It runs in one transaction, does nothing if the demo accounts already exist, refuses if only some of them exist, and refuses when `NODE_ENV=production`. It also adds the demo administrator `admin@sjsu.edu` (same password) if missing, even when the demo students already exist. In other environments, `npm run admin:promote -- someone@sjsu.edu` makes an existing verified account an administrator ([Q14](open-questions.md#q14-administrator-accounts)). This is **demo data**, not test data: the product test data belongs to the team's testing assignment.
