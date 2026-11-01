@@ -11,7 +11,8 @@ import { RegisterPage } from '../features/auth/RegisterPage.js';
 import { VerifyEmailPage } from '../features/auth/VerifyEmailPage.js';
 import { DiscoverPage } from '../features/discover/DiscoverPage.js';
 import { SearchPage } from '../features/discover/SearchPage.js';
-import { InboxPage } from '../features/inbox/InboxPage.js';
+import { ConversationPage } from '../features/inbox/ConversationPage.js';
+import { ConversationsPage } from '../features/inbox/ConversationsPage.js';
 import { ConnectionRequestsPage } from '../features/people/ConnectionRequestsPage.js';
 import { DiscoverStudentsPage } from '../features/people/DiscoverStudentsPage.js';
 import { StudentProfilePage } from '../features/people/StudentProfilePage.js';
@@ -46,7 +47,8 @@ export const router = createBrowserRouter([
           { index: true, element: <DiscoverPage /> },
           { path: 'search', element: <SearchPage /> },
           { path: 'plans', element: <MyPlansPage /> },
-          { path: 'inbox', element: <InboxPage /> },
+          { path: 'inbox', element: <ConversationsPage /> },
+          { path: 'inbox/:userId', element: <ConversationPage /> },
           { path: 'notifications', element: <NotificationsPage /> },
           { path: 'profile', element: <MyProfilePage /> },
           { path: 'profile/edit', element: <EditProfilePage /> },

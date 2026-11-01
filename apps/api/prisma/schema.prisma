@@ -87,6 +87,9 @@ model User {
   activityMessages    ActivityMessage[]
   requestsSent        ConnectionRequest[]      @relation("requestSender")
   requestsReceived    ConnectionRequest[]      @relation("requestRecipient")
+  conversationsAsA    Conversation[]           @relation("conversationA")
+  conversationsAsB    Conversation[]           @relation("conversationB")
+  directMessages      DirectMessage[]
   notifications       Notification[]           @relation("recipient")
   notificationsCaused Notification[]           @relation("actor")
 
@@ -245,20 +248,23 @@ model ActivityRemoval {
 
 /// In-app notification (FR40–FR42). Created inside the transaction of the change that caused it.
 model Notification {
-  id            String           @id @default(uuid()) @db.Uuid
-  recipientId   String           @map("recipient_id") @db.Uuid
-  type          NotificationType
-  activityId    String?          @map("activity_id") @db.Uuid
+  id             String           @id @default(uuid()) @db.Uuid
+  recipientId    String           @map("recipient_id") @db.Uuid
+  type           NotificationType
+  activityId     String?          @map("activity_id") @db.Uuid
   /// Title at the time of the notification, so it still reads correctly after a rename (FR42).
-  activityTitle String?          @map("activity_title") @db.VarChar(100)
-  actorId       String?          @map("actor_id") @db.Uuid
-  body          String?          @db.VarChar(500)
-  readAt        DateTime?        @map("read_at") @db.Timestamptz(3)
-  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  activityTitle  String?          @map("activity_title") @db.VarChar(100)
+  /// The conversation a direct-message notification opens (FR49).
+  conversationId String?          @map("conversation_id") @db.Uuid
+  actorId        String?          @map("actor_id") @db.Uuid
+  body           String?          @db.VarChar(500)
+  readAt         DateTime?        @map("read_at") @db.Timestamptz(3)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  recipient User      @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
-  actor     User?     @relation("actor", fields: [actorId], references: [id], onDelete: SetNull)
-  activity  Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  recipient    User          @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor        User?         @relation("actor", fields: [actorId], references: [id], onDelete: SetNull)
+  activity     Activity?     @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([recipientId, createdAt(sort: Desc)])
   @@map("notification")
@@ -307,4 +313,44 @@ model ConnectionRequest {
 
   @@index([recipientId])
   @@map("connection_request")
+}
+
+// ─── M10: direct messages ───────────────────────────────────────────────────
+// CHECK constraints in the migration SQL: each pair stored once, smaller id first; message body
+// not only whitespace.
+
+/// A one-to-one conversation (FR47). Kept if the connection ends, but nobody can read or send
+/// without an active connection (FR48).
+model Conversation {
+  id            String    @id @default(uuid()) @db.Uuid
+  userAId       String    @map("user_a_id") @db.Uuid
+  userBId       String    @map("user_b_id") @db.Uuid
+  /// Orders the conversation list, most recent first (FR49).
+  lastMessageAt DateTime? @map("last_message_at") @db.Timestamptz(3)
+
+  userA         User            @relation("conversationA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB         User            @relation("conversationB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages      DirectMessage[]
+  notifications Notification[]
+
+  @@unique([userAId, userBId])
+  @@index([userBId])
+  @@map("conversation")
+}
+
+/// A direct message (FR47).
+model DirectMessage {
+  id             String   @id @default(uuid()) @db.Uuid
+  /// Insertion order: the thread's order and the polling cursor, even when timestamps tie.
+  seq            BigInt   @default(autoincrement())
+  conversationId String   @map("conversation_id") @db.Uuid
+  senderId       String?  @map("sender_id") @db.Uuid
+  body           String   @db.VarChar(500)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User?        @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, seq])
+  @@map("direct_message")
 }

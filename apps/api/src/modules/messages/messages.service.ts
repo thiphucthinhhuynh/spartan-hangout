@@ -27,15 +27,20 @@ const messageSelect = {
 
 type MessageRow = Prisma.ActivityMessageGetPayload<{ select: typeof messageSelect }>;
 
+/** FR08: a sender whose account is gone is shown as "Deleted Student". */
+export function toSenderDto(sender: { id: string; displayName: string } | null) {
+  return sender
+    ? { id: sender.id, displayName: sender.displayName }
+    : { id: null, displayName: MESSAGES.deletedStudent };
+}
+
 function toMessageDto(row: MessageRow): ActivityMessageDto {
   return {
     id: row.id,
     kind: row.kind,
     body: row.body,
     createdAt: row.createdAt.toISOString(),
-    sender: row.sender
-      ? { id: row.sender.id, displayName: row.sender.displayName }
-      : { id: null, displayName: MESSAGES.deletedStudent },
+    sender: toSenderDto(row.sender),
   };
 }
 

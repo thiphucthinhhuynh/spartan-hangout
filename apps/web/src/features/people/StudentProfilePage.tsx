@@ -4,7 +4,7 @@ import { Avatar } from '../../components/Avatar.js';
 import { Button, LinkButton } from '../../components/Button.js';
 import { Card } from '../../components/Card.js';
 import { EmptyState } from '../../components/EmptyState.js';
-import { UserIcon } from '../../components/icons.js';
+import { MessageIcon, UserIcon } from '../../components/icons.js';
 import { ApiError } from '../../lib/apiClient.js';
 import { useCurrentUser } from '../auth/api.js';
 import { useStudentProfile } from '../profile/api.js';
@@ -61,6 +61,12 @@ export function StudentProfilePage() {
               : `${sharedCount} interest${sharedCount === 1 ? '' : 's'} in common`}
           </p>
           <ConnectButton studentId={profile.id} state={profile.connectionState} fullWidth />
+          {/* FR48: only connected students can message each other. */}
+          {profile.connectionState === 'connected' && (
+            <LinkButton to={`/inbox/${profile.id}`} fullWidth>
+              <MessageIcon width={18} height={18} aria-hidden="true" /> Message
+            </LinkButton>
+          )}
         </Card>
 
         <div className={styles.details}>

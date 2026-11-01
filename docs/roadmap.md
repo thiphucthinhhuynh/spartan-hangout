@@ -335,15 +335,15 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** connected students can message each other one-to-one.
 **Features included:** FR47–FR49.
 **Dependencies:** M9.
-**Expected files/modules:** Prisma migration (`conversation`, `direct_message`, `notification.conversation_id`); `messages.service` (DM functions); `apps/web/src/features/inbox/{ConversationsPage,ConversationPage}.tsx`.
+**Expected files/modules:** Prisma migration (`conversation`, `direct_message`, `notification.conversation_id`); `apps/api/src/modules/messages/{conversations.service,conversations.controller}.ts`; `apps/api/test/conversations.test.ts`; `apps/web/src/features/inbox/{ConversationsPage,ConversationPage,api}.tsx`; `apps/web/src/features/chat/{MessageBubble,MessageComposer}.tsx` (shared with the group chat).
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 111 | Prisma migration: `conversation`, `direct_message`; add `notification.conversation_id` | 104 | Not started |
-| 112 | `messages.service`: list conversations (most recent first); get thread and send (active connection required; create conversation if missing; update `last_message_at`; notify the recipient) | 111, 43, 56 | Not started |
-| 113 | Routes: `GET /conversations`, `GET/POST /conversations/:userId/messages` | 112 | Not started |
-| 114 | Web: Inbox tab → `ConversationsPage`; `ConversationPage` with polling; Message button on connected profiles | 113 | Not started |
-| 115 | Automated tests (key cases): students who aren't connected can't read or send | 113 | Not started |
+| 111 | Prisma migration: `conversation`, `direct_message`; add `notification.conversation_id` | 104 | In review (implemented, not merged) |
+| 112 | `messages.service`: list conversations (most recent first); get thread and send (active connection required; create conversation if missing; update `last_message_at`; notify the recipient) | 111, 43, 56 | In review (implemented, not merged) |
+| 113 | Routes: `GET /conversations`, `GET/POST /conversations/:userId/messages` | 112 | In review (implemented, not merged) |
+| 114 | Web: Inbox tab → `ConversationsPage`; `ConversationPage` with polling; Message button on connected profiles | 113 | In review (implemented, not merged) |
+| 115 | Automated tests (key cases): students who aren't connected can't read or send | 113 | In review (implemented, not merged) |
 
 **Completion criteria:** only connected pairs can message. Messages are 1–500 characters with sender and time. The recipient is notified with a link to the conversation, and conversations are ordered by most recent message.
 

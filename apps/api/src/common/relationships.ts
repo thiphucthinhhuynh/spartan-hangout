@@ -40,6 +40,15 @@ export async function idsBlockedBy(client: DbClient, userId: string): Promise<st
   return rows.map((row) => row.blockedId);
 }
 
+/** Everyone `userId` is connected to (FR48). */
+export async function connectedIdsFor(client: DbClient, userId: string): Promise<string[]> {
+  const rows = await client.connection.findMany({
+    where: { OR: [{ userAId: userId }, { userBId: userId }] },
+    select: { userAId: true, userBId: true },
+  });
+  return rows.map((row) => (row.userAId === userId ? row.userBId : row.userAId));
+}
+
 export async function areConnected(client: DbClient, a: string, b: string): Promise<boolean> {
   if (a === b) return false;
   const connection = await client.connection.findUnique({

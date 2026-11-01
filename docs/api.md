@@ -111,15 +111,15 @@
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /conversations` | List conversations, most recent first (FR49) | Student | – | `200 ConversationSummaryDto[] { otherUser, lastMessage, lastMessageAt }` | – |
-| `GET /conversations/:userId/messages` | Read a DM thread (FR47–FR48) | Student (connected) | `after?` | `200 DirectMessageDto[] { id, body, createdAt, sender }` | `409 NOT_CONNECTED`, `404` |
-| `POST /conversations/:userId/messages` | Send a DM; notifies the recipient (FR47, FR49) | Student (connected) | `messageSchema`: `{ body }` | `201 DirectMessageDto` | `409 NOT_CONNECTED`, `404`, `422` |
+| `GET /conversations` | List conversations, most recent first (FR49). Only students the viewer is still connected to (FR48) | Student | – | `200 ConversationSummaryDto[] { otherUser: { id, displayName }, lastMessage: { body, senderId }, lastMessageAt }` | – |
+| `GET /conversations/:userId/messages` | Read a DM thread, oldest first (FR47–FR48). Empty until the first message | Student (connected) | `messageListSchema`: `after?` (message id; only newer messages are returned, for polling) | `200 DirectMessageDto[] { id, body, createdAt, sender }` | `409 NOT_CONNECTED`, `404` (missing, unverified or blocked student, yourself, or a malformed id) |
+| `POST /conversations/:userId/messages` | Send a DM; creates the conversation if needed. The recipient gets `DIRECT_MESSAGE`, which names the sender but not the text (FR47, FR49) | Student (connected) | `messageSchema`: `{ body }` | `201 DirectMessageDto` | `409 NOT_CONNECTED`, `404`, `422` |
 
 ## Notifications module: FR40–FR42
 
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
-| `GET /notifications` | The student's own notifications, newest first (FR42). `activityTitle` is the title when the notification was created; `conversationUserId` is set only for direct messages | Student | `page?, pageSize?` | `200 { items: NotificationDto[] … }`. `NotificationDto { id, type, activityId, activityTitle, actorId, conversationUserId, body, createdAt, read }` | – |
+| `GET /notifications` | The student's own notifications, newest first (FR42). `activityTitle` is the title when the notification was created; `conversationUserId` is the other student in the conversation, set only for direct messages | Student | `page?, pageSize?` | `200 { items: NotificationDto[] … }`. `NotificationDto { id, type, activityId, activityTitle, actorId, conversationUserId, body, createdAt, read }` | – |
 | `GET /notifications/unread-count` | Badge count (FR42). The web app polls it every 30 s with `X-Background-Refresh: 1` | Student | – | `200 { count }` | – |
 | `POST /notifications/:id/read` | Mark read when opened (FR42) | Student (recipient) | – | `204` | `404` |
 

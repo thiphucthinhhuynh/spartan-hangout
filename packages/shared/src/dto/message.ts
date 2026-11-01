@@ -11,3 +11,18 @@ export interface ActivityMessageDto {
   /** "Deleted Student" with a null id when the sender deleted their account (FR08). */
   sender: ActivityOrganizerDto;
 }
+
+/** A direct message (FR47). */
+export interface DirectMessageDto {
+  id: string;
+  body: string;
+  createdAt: string;
+  sender: ActivityOrganizerDto;
+}
+
+/** GET /conversations: one conversation, most recent first (FR49). */
+export interface ConversationSummaryDto {
+  otherUser: { id: string; displayName: string };
+  lastMessage: { body: string; senderId: string | null };
+  lastMessageAt: string;
+}

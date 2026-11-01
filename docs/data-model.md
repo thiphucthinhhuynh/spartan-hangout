@@ -205,12 +205,13 @@ A unique index on `(LEAST(sender_id, recipient_id), GREATEST(sender_id, recipien
 | `direct_message` column | Type | Constraints / notes | FR |
 |---|---|---|---|
 | `id` | uuid | PK | |
+| `seq` | bigserial | Insertion order. The thread is ordered by it and the `?after=` polling cursor uses it, as in `activity_message` | FR47 |
 | `conversation_id` | uuid | FK → conversation, CASCADE | |
 | `sender_id` | uuid null | FK → user, SET NULL | FR08d |
-| `body` | varchar(500) | 1–500 | FR47 |
+| `body` | varchar(500) | 1–500; `CHECK (char_length(btrim(body)) >= 1)` (Q18) | FR47 |
 | `created_at` | timestamptz | | FR47 |
 
-The conversation row is kept if the connection ends, but nobody can read or send messages without an **active** `connection` (FR48).
+The conversation row is kept if the connection ends, but nobody can read or send messages without an **active** `connection` (FR48). It also leaves the conversation list, because a preview of the last message counts as reading it.
 
 ### `report` [M11]
 
@@ -254,7 +255,7 @@ Partial unique indexes prevent a second pending report on the same target (FR51)
 | `notification (recipient_id, created_at DESC)` | Notification list (FR42) |
 | `notification (recipient_id) WHERE read_at IS NULL` | Unread count (FR42). Added in M7 with the unread-count endpoint (a partial index Prisma doesn't model, so check for migration drift then) |
 | `activity_message (activity_id, seq)` | Chat history and polling (FR36) |
-| `direct_message (conversation_id, created_at)` | DM history (FR47) |
+| `direct_message (conversation_id, seq)` | DM history and polling (FR47) |
 | `block (blocked_id)` | Reverse block lookups (FR57) |
 | Pair unique indexes on `connection_request`, `conversation` | FR45, FR47 |
 

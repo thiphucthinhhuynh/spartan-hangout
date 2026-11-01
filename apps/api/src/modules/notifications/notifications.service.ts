@@ -1,9 +1,4 @@
-import {
-  NotificationType,
-  type NotificationDto,
-  type Paged,
-  type PaginationInput,
-} from '@sh/shared';
+import type { NotificationDto, NotificationType, Paged, PaginationInput } from '@sh/shared';
 import { NotFoundError } from '../../common/errors.js';
 import type { DbClient } from '../../db.js';
 import type { AppDeps } from '../../deps.js';
@@ -17,6 +12,8 @@ export interface NewNotification {
   activityId?: string;
   /** Snapshot of the activity title (FR42). */
   activityTitle?: string;
+  /** The conversation a direct-message notification opens (FR49). */
+  conversationId?: string;
   /** Who caused it (organizer, joining student, …). */
   actorId?: string;
   body?: string;
@@ -29,6 +26,7 @@ export async function createNotifications(client: DbClient, notifications: NewNo
 
 interface NotificationRow {
   id: string;
+  recipientId: string;
   type: NotificationType;
   activityId: string | null;
   activityTitle: string | null;
@@ -36,16 +34,22 @@ interface NotificationRow {
   body: string | null;
   readAt: Date | null;
   createdAt: Date;
+  conversation: { userAId: string; userBId: string } | null;
 }
 
 function toNotificationDto(row: NotificationRow): NotificationDto {
+  const { conversation, recipientId } = row;
   return {
     id: row.id,
     type: row.type,
     activityId: row.activityId,
     activityTitle: row.activityTitle,
     actorId: row.actorId,
-    conversationUserId: row.type === NotificationType.DIRECT_MESSAGE ? row.actorId : null,
+    conversationUserId: conversation
+      ? conversation.userAId === recipientId
+        ? conversation.userBId
+        : conversation.userAId
+      : null,
     body: row.body,
     createdAt: row.createdAt.toISOString(),
     read: row.readAt !== null,
@@ -62,6 +66,7 @@ export function createNotificationsService({ db, clock }: Pick<AppDeps, 'db' | '
     ): Promise<Paged<NotificationDto>> {
       const rows = await db.notification.findMany({
         where: { recipientId: userId },
+        include: { conversation: { select: { userAId: true, userBId: true } } },
         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
         skip: (page - 1) * pageSize,
         take: pageSize + 1,

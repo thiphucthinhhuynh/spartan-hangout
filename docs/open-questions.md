@@ -187,6 +187,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 - **Source:** The mockups have an **Inbox** tab and a **bell** icon in the header. The FRs define notifications (FR42) and DM conversations (FR49) but not where they appear.
 - **Working assumption:** the bell opens `/notifications` and shows the unread badge. Inbox lists DM conversations (and connection requests).
 - **Built so far (M7, 2026-10-29):** the header bell with the unread badge and `/notifications` are implemented with this assumption; the status stays Open until the team decides.
+- **Built so far (M10, 2026-10-31):** Inbox lists DM conversations and links to `/people/requests` for connection requests.
 
 ### Q22. Organizer updates after an activity starts
 

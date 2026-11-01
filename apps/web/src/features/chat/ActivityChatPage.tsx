@@ -1,25 +1,16 @@
-import {
-  ActivityMessageKind,
-  ActivityStatus,
-  LIMITS,
-  MESSAGES,
-  messageSchema,
-  type ActivityMessageDto,
-} from '@sh/shared';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { ActivityMessageKind, ActivityStatus, MESSAGES } from '@sh/shared';
+import { useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router';
-import { Avatar } from '../../components/Avatar.js';
 import { Button, LinkButton } from '../../components/Button.js';
 import { EmptyState } from '../../components/EmptyState.js';
 import { ArrowLeftIcon, MessageIcon } from '../../components/icons.js';
-import { TextArea } from '../../components/TextArea.js';
 import { ApiError } from '../../lib/apiClient.js';
-import { formatDateTime } from '../../lib/format.js';
-import { validateForm } from '../../lib/zodForm.js';
 import { useActivity } from '../activities/api.js';
 import { useCurrentUser } from '../auth/api.js';
 import { useActivityMessages, useSendMessage } from './api.js';
 import styles from './chat.module.css';
+import { MessageBubble } from './MessageBubble.js';
+import { MessageComposer } from './MessageComposer.js';
 
 /**
  * An activity's group chat (FR35–FR39): oldest first, polled every 5 s. Organizers can also post
@@ -111,7 +102,12 @@ function MessageList({ query }: { query: ReturnType<typeof useActivityMessages> 
     <>
       <ol className={styles.messages} aria-label="Messages" aria-live="polite">
         {query.data.map((message) => (
-          <Message key={message.id} message={message} mine={message.sender.id === me.id} />
+          <MessageBubble
+            key={message.id}
+            message={message}
+            mine={message.sender.id === me.id}
+            label={message.kind === ActivityMessageKind.UPDATE ? MESSAGES.updateLabel : undefined}
+          />
         ))}
       </ol>
       <div ref={endRef} />
@@ -119,79 +115,8 @@ function MessageList({ query }: { query: ReturnType<typeof useActivityMessages> 
   );
 }
 
-function Message({ message, mine }: { message: ActivityMessageDto; mine: boolean }) {
-  const isUpdate = message.kind === ActivityMessageKind.UPDATE;
-  return (
-    <li
-      className={[styles.message, mine && styles.mine, isUpdate && styles.update]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      <Avatar name={message.sender.displayName} seed={message.sender.id ?? ''} size="sm" />
-      <div className={styles.bubble}>
-        <p className={styles.meta}>
-          {isUpdate && <span className={styles.updateLabel}>{MESSAGES.updateLabel}</span>}
-          <span className={styles.sender}>{mine ? 'You' : message.sender.displayName}</span>
-          <time dateTime={message.createdAt}>{formatDateTime(message.createdAt)}</time>
-        </p>
-        <p className={styles.body}>{message.body}</p>
-      </div>
-    </li>
-  );
-}
-
 function Composer({ activityId, isOrganizer }: { activityId: string; isOrganizer: boolean }) {
-  const [body, setBody] = useState('');
-  const [error, setError] = useState<string | undefined>();
   const send = useSendMessage(activityId);
   const update = useSendMessage(activityId, { asUpdate: true });
-  const busy = send.isPending || update.isPending;
-
-  function submit(asUpdate: boolean) {
-    const validation = validateForm(messageSchema, { body });
-    if (!validation.success) return setError(validation.errors.body);
-    (asUpdate ? update : send).mutate(validation.data, {
-      onSuccess: () => {
-        setBody('');
-        setError(undefined);
-      },
-      onError: (err) => setError(err.message),
-    });
-  }
-
-  return (
-    <form
-      className={styles.composer}
-      onSubmit={(event: FormEvent) => {
-        event.preventDefault();
-        submit(false);
-      }}
-      noValidate
-    >
-      <TextArea
-        label="Message"
-        rows={2}
-        maxLength={LIMITS.messageBody.max}
-        value={body}
-        error={error}
-        onChange={(e) => {
-          setBody(e.target.value);
-          setError(undefined);
-        }}
-      />
-      <div className={styles.actions}>
-        {isOrganizer && (
-          <Button variant="secondary" disabled={busy} onClick={() => submit(true)}>
-            Post as update
-          </Button>
-        )}
-        <Button type="submit" disabled={busy}>
-          {send.isPending ? 'Sending…' : 'Send'}
-        </Button>
-      </div>
-      {isOrganizer && (
-        <p className={styles.hint}>Updates are labeled “Update” and notify everyone who's going.</p>
-      )}
-    </form>
-  );
+  return <MessageComposer send={send} update={isOrganizer ? update : undefined} />;
 }

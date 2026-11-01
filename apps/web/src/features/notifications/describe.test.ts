@@ -56,4 +56,19 @@ describe('describeNotification', () => {
     const accepted = { ...asked, type: 'CONNECTION_ACCEPTED' as const };
     expect(describeNotification(accepted).link).toBe('/users/u1');
   });
+
+  it('opens the conversation for a direct message (FR49)', () => {
+    const dm = {
+      ...base,
+      type: 'DIRECT_MESSAGE' as const,
+      activityId: null,
+      conversationUserId: 'u1',
+      body: 'Sammy Spartan sent you a message.',
+    };
+    expect(describeNotification(dm)).toEqual({
+      title: 'Sammy Spartan sent you a message.',
+      detail: null,
+      link: '/inbox/u1',
+    });
+  });
 });

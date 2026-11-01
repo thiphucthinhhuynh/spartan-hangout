@@ -16,7 +16,7 @@ export const messageSchema = z.object({
 });
 export type MessageInput = z.infer<typeof messageSchema>;
 
-/** GET /activities/:id/messages: `after` returns only messages newer than that one (polling). */
+/** Reading a chat or DM thread: `after` returns only messages newer than that one (polling). */
 export const messageListSchema = z.object({
   after: z.preprocess((value) => (value === '' ? undefined : value), z.uuid().optional()),
 });

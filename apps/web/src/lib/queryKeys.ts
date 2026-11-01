@@ -32,6 +32,10 @@ export const queryKeys = {
   connections: ['people', 'connections'] as const,
   /** Pending requests (GET /connections/requests). */
   connectionRequests: (direction: string) => ['people', 'requests', direction] as const,
+  /** My conversations (GET /conversations). */
+  conversations: ['conversations'] as const,
+  /** A DM thread (GET /conversations/:userId/messages). */
+  conversationThread: (userId: string) => ['conversation', userId] as const,
   /** Every notification query; invalidate after marking one read. */
   notifications: ['notifications'] as const,
   /** The bell's badge (GET /notifications/unread-count). */

@@ -34,8 +34,9 @@ export function describeNotification(n: NotificationDto): NotificationView {
       };
     case NotificationType.DIRECT_MESSAGE:
       return {
-        title: 'New message',
-        detail: n.body,
+        // The body names the sender; the message text stays in the conversation (FR48).
+        title: n.body ?? 'New message',
+        detail: null,
         link: n.conversationUserId ? `/inbox/${n.conversationUserId}` : null,
       };
     // Open question Q17: requests open the Connections page, acceptances the student's profile.
