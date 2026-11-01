@@ -119,6 +119,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** FR54–FR57 define blocking but not unblocking. FR48 mentions a connection that "has ended", but the only way a connection ends is through a block (FR55a).
 - **Working assumption:** neither unblock nor disconnect is built. If wanted, they are new requirements.
+- **Built so far (M12, 2026-10-31):** blocking is permanent, and there is no list of blocked students. The confirmation dialog says it can't be undone. The status stays Open until the team decides.
 
 ### Q12. Reason shown when a block prevents joining
 

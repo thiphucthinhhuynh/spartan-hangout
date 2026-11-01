@@ -10,6 +10,8 @@ export const queryKeys = {
   myProfile: ['profile', 'me'] as const,
   /** Another student's public profile (GET /users/:id). */
   student: (id: string) => ['profile', 'student', id] as const,
+  /** Every activity's detail, participants and chat. */
+  allActivityDetails: ['activity'] as const,
   /** One activity's detail (GET /activities/:id). */
   activity: (id: string) => ['activity', id] as const,
   /** One activity's participants (GET /activities/:id/participants); refreshed with the activity. */

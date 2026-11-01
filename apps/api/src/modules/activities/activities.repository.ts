@@ -352,3 +352,21 @@ export function findMyActivities(
     skip: window.offset,
   });
 }
+
+/** FR56: the organizer's Open or Full activities, not yet started, that the student takes part in. */
+export function findUpcomingActivitiesWith(
+  client: DbClient,
+  organizerId: string,
+  userId: string,
+  now: Date,
+) {
+  return client.activity.findMany({
+    where: {
+      organizerId,
+      status: { in: [ActivityStatus.OPEN, ActivityStatus.FULL] },
+      startAt: { gt: now },
+      participations: { some: { userId, isOrganizer: false } },
+    },
+    select: { id: true, title: true },
+  });
+}

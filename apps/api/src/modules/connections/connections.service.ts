@@ -8,6 +8,7 @@ import {
 } from '@sh/shared';
 import { ConflictError, NotFoundError } from '../../common/errors.js';
 import { connectionStateBetween, isBlockedEitherWay } from '../../common/relationships.js';
+import type { DbClient } from '../../db.js';
 import type { AppDeps } from '../../deps.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { createNotifications } from '../notifications/notifications.service.js';
@@ -35,6 +36,12 @@ export function createConnectionsService({ db, clock }: Pick<AppDeps, 'db' | 'cl
   }
 
   return {
+    /** FR55a: ends any connection and pending request, inside the caller's transaction. */
+    async removeBetween(client: DbClient, a: string, b: string) {
+      await repo.deleteConnection(client, a, b);
+      await repo.deleteRequestsBetween(client, a, b);
+    },
+
     /** FR43–FR44: students sharing at least one interest, most shared first, then by name. */
     discover(viewerId: string, paging: PaginationInput) {
       return pageOfStudents(viewerId, 'discover', paging);

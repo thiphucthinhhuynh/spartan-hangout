@@ -36,3 +36,17 @@
   color: var(--color-danger);
   font-size: 0.875rem;
 }
+
+.blockButton {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.effects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-5);
+  margin: 0;
+  color: var(--color-muted);
+}

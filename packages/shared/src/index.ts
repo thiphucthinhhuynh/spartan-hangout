@@ -13,6 +13,7 @@ export * from './messages.js';
 export * from './schemas/activity.js';
 export * from './schemas/activitySearch.js';
 export * from './schemas/auth.js';
+export * from './schemas/block.js';
 export * from './schemas/connection.js';
 export * from './schemas/message.js';
 export * from './schemas/participation.js';

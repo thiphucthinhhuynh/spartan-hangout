@@ -7,6 +7,7 @@ import { EmptyState } from '../../components/EmptyState.js';
 import { MessageIcon, UserIcon } from '../../components/icons.js';
 import { ApiError } from '../../lib/apiClient.js';
 import { useCurrentUser } from '../auth/api.js';
+import { BlockAction } from '../moderation/BlockDialog.js';
 import { ReportAction } from '../moderation/ReportDialog.js';
 import { useStudentProfile } from '../profile/api.js';
 import { AvailabilityList } from '../profile/AvailabilityList.js';
@@ -16,7 +17,7 @@ import { ConnectButton } from './ConnectButton.js';
 
 /**
  * Another student's profile (FR13): name, interests (shared ones highlighted) and availability.
- * Never their email. Connect (FR45), Report (FR50); Block arrives in Milestone 12.
+ * Never their email. Connect (FR45), Report (FR50) and Block (FR54).
  */
 export function StudentProfilePage() {
   const { id = '' } = useParams();
@@ -69,6 +70,7 @@ export function StudentProfilePage() {
             </LinkButton>
           )}
           <ReportAction key={profile.id} target={{ targetUserId: profile.id }} noun="student" />
+          <BlockAction studentId={profile.id} displayName={profile.displayName} />
         </Card>
 
         <div className={styles.details}>

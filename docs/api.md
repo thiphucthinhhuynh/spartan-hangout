@@ -140,7 +140,7 @@
 | Method & route | Purpose | Auth | Request | Response | Important errors |
 |---|---|---|---|---|---|
 | `POST /reports` | Report a student or an activity (FR50–FR52). Stored as Pending; nobody but the reporter is told. A new report on the same target is allowed once the earlier one is Reviewed | Student | `reportSchema`: `{ targetUserId?` **or** `targetActivityId?, reason, description? ≤ 500 }` | `201 { message }` confirmation | `403` (own profile or own activity), `404` (a student or activity the reporter can't see), `409 DUPLICATE_PENDING_REPORT`, `422` (no reason, or not exactly one target) |
-| `POST /blocks` | Block a student after confirming in the UI (FR54–FR56) | Student | `{ userId }` | `204` | `403` (self), `404` |
+| `POST /blocks` | Block a student after confirming in the UI (FR54–FR56). In one transaction: records the block, ends the connection and pending requests, and removes the student from the blocker's Open or Full activities that haven't started. That removal notifies them like any removal with no reason; nothing mentions the block. Repeating it changes nothing further | Student | `blockSchema`: `{ userId }` | `204` | `403` (self), `404` (unknown or unverified student) |
 | `GET /admin/reports` | View all reports with details, newest first (FR53). `ReportDto` never contains an email | Admin | `reportListSchema`: `status?=PENDING\|REVIEWED`, `page?, pageSize?` | `200 { items: ReportDto[] { id, reporter, targetUser, targetActivity, reason, description, status, createdAt, reviewedBy, reviewedAt } … }` | `403` |
 | `POST /admin/reports/:id/review` | Mark a Pending report Reviewed; records the admin and time (FR53) | Admin | – | `200 ReportDto` | `403`, `404`, `409 REPORT_ALREADY_REVIEWED` |
 

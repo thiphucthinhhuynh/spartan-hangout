@@ -7,6 +7,7 @@ import {
   type ParticipantDto,
 } from '@sh/shared';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../common/errors.js';
+import type { DbClient } from '../../db.js';
 import type { AppDeps } from '../../deps.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { createNotifications } from '../notifications/notifications.service.js';
@@ -162,6 +163,33 @@ export function createParticipationService(
         }
       });
       return activities.getDetail(actor.id, activityId);
+    },
+
+    /**
+     * FR56: when an organizer blocks a student, removes them from the organizer's upcoming
+     * activities, inside the blocker's transaction. It looks like an ordinary removal with no
+     * reason, so the notification says only that they were removed.
+     */
+    async removeForBlock(client: DbClient, organizerId: string, userId: string) {
+      const now = clock.now();
+      const upcoming = await repo.findUpcomingActivitiesWith(client, organizerId, userId, now);
+      for (const activity of upcoming) {
+        // Started or cancelled a moment ago: it's no longer upcoming, so nothing changes.
+        if (!(await repo.releaseSpot(client, activity.id, now))) continue;
+        if (!(await repo.deleteParticipation(client, activity.id, userId))) {
+          throw new NotFoundError('That student isn’t in this activity.');
+        }
+        await repo.insertRemoval(client, activity.id, userId, null, now);
+        await createNotifications(client, [
+          {
+            recipientId: userId,
+            type: NotificationType.REMOVED_FROM_ACTIVITY,
+            activityId: activity.id,
+            activityTitle: activity.title,
+            actorId: organizerId,
+          },
+        ]);
+      }
     },
 
     /**

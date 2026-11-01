@@ -30,6 +30,7 @@ export function createApiRouter(deps: AppDeps) {
   router.use('/connections', createConnectionsRouter(deps));
   router.use('/conversations', createConversationsRouter(deps));
   router.use('/reports', moderation.reports);
+  router.use('/blocks', moderation.blocks);
   router.use('/admin', moderation.admin);
 
   return router;

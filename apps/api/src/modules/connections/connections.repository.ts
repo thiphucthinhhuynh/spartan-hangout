@@ -120,3 +120,20 @@ export function insertConnection(client: DbClient, a: string, b: string, now: Da
     skipDuplicates: true,
   });
 }
+
+/** FR55a: ends the connection, if any. */
+export function deleteConnection(client: DbClient, a: string, b: string) {
+  return client.connection.deleteMany({ where: orderedPair(a, b) });
+}
+
+/** FR55a: deletes a pending request in either direction, if any. */
+export function deleteRequestsBetween(client: DbClient, a: string, b: string) {
+  return client.connectionRequest.deleteMany({
+    where: {
+      OR: [
+        { senderId: a, recipientId: b },
+        { senderId: b, recipientId: a },
+      ],
+    },
+  });
+}

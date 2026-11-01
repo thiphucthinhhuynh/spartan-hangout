@@ -377,17 +377,17 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can block others, and the block applies everywhere.
 **Features included:** FR54–FR57.
 **Dependencies:** M6, M8, M9, M10. Decisions Q11 (unblock), Q12 (join message).
-**Expected files/modules:** `apps/api/src/modules/moderation/blocks.service.ts`; `participation.service.removeForBlock`; `connections.service.removeBetween`; `apps/web/src/features/moderation/BlockDialog.tsx`.
+**Expected files/modules:** `apps/api/src/modules/moderation/blocks.service.ts`; `participation.service.removeForBlock`; `connections.service.removeBetween`; `apps/api/test/blocks.test.ts`; `apps/web/src/features/moderation/BlockDialog.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 125 | Team decisions: Q11 unblock/disconnect, Q12 join-failure message | 2 | Not started |
-| 126 | `connections.service.removeBetween` (end the connection, delete pending requests) | 106 | Not started |
-| 127 | `participation.service.removeForBlock` (reuses removal; no reason in the notification) | 81 | Not started |
-| 128 | `blocks.service.block`: no self-blocks; one transaction that inserts the block, ends the connection and requests, and removes the blocked student from the blocker's upcoming activities; no notification about the block; `POST /blocks` (FR54–FR56) | 126, 127 | Not started |
-| 129 | Audit every read and write path against FR57 and FR55 using `common/relationships` (search, recommended, discover, profile 404, join, requests, DMs, chat filter); fix any gaps | 128 | Not started |
-| 130 | Web: `BlockDialog` with confirmation on profiles; navigate away afterwards | 128 | Not started |
-| 131 | Automated tests (key cases): each block side effect | 128 | Not started |
+| 125 | Team decisions: Q11 unblock/disconnect, Q12 join-failure message | 2 | Not started (M12 is built on the working assumptions for Q11 and Q12 until the team decides) |
+| 126 | `connections.service.removeBetween` (end the connection, delete pending requests) | 106 | In review (implemented, not merged) |
+| 127 | `participation.service.removeForBlock` (reuses removal; no reason in the notification) | 81 | In review (implemented, not merged) |
+| 128 | `blocks.service.block`: no self-blocks; one transaction that inserts the block, ends the connection and requests, and removes the blocked student from the blocker's upcoming activities; no notification about the block; `POST /blocks` (FR54–FR56) | 126, 127 | In review (implemented, not merged) |
+| 129 | Audit every read and write path against FR57 and FR55 using `common/relationships` (search, recommended, discover, profile 404, join, requests, DMs, chat filter); fix any gaps | 128 | In review (implemented, not merged) |
+| 130 | Web: `BlockDialog` with confirmation on profiles; navigate away afterwards | 128 | In review (implemented, not merged) |
+| 131 | Automated tests (key cases): each block side effect | 128 | In review (implemented, not merged) |
 
 **Completion criteria:** every FR55–FR57 effect holds, and the blocked student is never told.
 

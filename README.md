@@ -32,10 +32,11 @@ Chi Huynh (Vincent), Harley Huynh, Harmilap Kasel, Thi Phuc Thinh Huynh.
 | [Milestone 9 – Student discovery & connections](docs/roadmap.md#m9--student-discovery--connections) | **Implemented, awaiting review.** Meet Spartans who share interests (FR43–FR44), connection requests with the FR45 rules, accept/decline (FR46), Connect on profiles, using the working assumptions for [Q1](docs/open-questions.md#q1-what-discover-means) and [Q17](docs/open-questions.md#q17-links-for-notifications-that-are-not-about-an-activity) |
 | [Milestone 10 – Direct messages](docs/roadmap.md#m10--direct-messages) | **Implemented, awaiting review.** One-to-one messages between connected students with 5-second polling (FR47–FR48), recipient notified with a link and conversations ordered by most recent (FR49), Message button on connected profiles |
 | [Milestone 11 – Reporting & administrator review](docs/roadmap.md#m11--reporting--administrator-review) | **Implemented, awaiting review.** Report students and activities with a required reason (FR50–FR52), administrators review reports and mark them Reviewed (FR53), using the working assumption for [Q14](docs/open-questions.md#q14-administrator-accounts) |
-| Other product features | **Not started.** Blocking is next |
-| Next step | [Milestone 12 – Blocking](docs/roadmap.md#m12--blocking) |
+| [Milestone 12 – Blocking](docs/roadmap.md#m12--blocking) | **Implemented, awaiting review.** Block a student from their profile (FR54): ends the connection and requests, removes them from the blocker's upcoming activities, hides their chat messages, and hides each from the other (FR55–FR57), using the working assumptions for [Q11](docs/open-questions.md#q11-no-unblock-and-no-disconnect) and [Q12](docs/open-questions.md#q12-reason-shown-when-a-block-prevents-joining) |
+| Other product features | **Not started.** Account removal is next |
+| Next step | [Milestone 13 – Account removal](docs/roadmap.md#m13--account-removal) |
 
-The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, finding them (Recommended and search), joining, leaving and removing participants, cancelling, notifications, the activity group chat, student discovery and connections, direct messages, and reporting exist so far; the rest is **planned**.
+The setup commands and scripts below work today. Of the "Main features", registration, email verification, login/logout, profiles, creating, viewing and editing activities, finding them (Recommended and search), joining, leaving and removing participants, cancelling, notifications, the activity group chat, student discovery and connections, direct messages, reporting, and blocking exist so far; the rest is **planned**.
 
 ---
 
