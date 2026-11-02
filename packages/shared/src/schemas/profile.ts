@@ -14,3 +14,9 @@ export const profileUpdateSchema = z
   .partial()
   .refine((update) => Object.keys(update).length > 0, 'Change at least one field.');
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+
+/** DELETE /users/me (FR07): the student's password confirms the permanent removal. */
+export const deleteAccountSchema = z.object({
+  password: z.string({ error: 'Enter your password.' }).min(1, 'Enter your password.'),
+});
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;

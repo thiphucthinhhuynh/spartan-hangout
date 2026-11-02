@@ -137,7 +137,7 @@ flowchart LR
 
 - One module uses another only by calling that module's **service**. It never imports another module's repository or controller.
 - `notifications` and `common/*` depend on no feature module.
-- `users → activities/connections` exists only for account deletion (FR08). `moderation → activities` also checks that a reported activity is visible and not the reporter's own (FR50); otherwise `moderation → activities/connections` exists only for blocking (FR55–FR56).
+- `users → activities` exists only for account deletion (FR08); connections go through the foreign keys. `moderation → activities` also checks that a reported activity is visible and not the reporter's own (FR50); otherwise `moderation → activities/connections` exists only for blocking (FR55–FR56).
 
 ### 4.4 Backend folder layout
 
@@ -445,9 +445,9 @@ Ongoing effects are applied at read time through `common/relationships`: DMs and
 `users.service.deleteAccount(actor, password)` runs one transaction:
 
 1. Verify the password (FR07).
-2. Cancel each **upcoming** activity the student organizes through `activity.service.cancel`, which notifies participants (FR08c).
-3. Remove the student from each activity they joined through `participation.service.leave`, which updates count and status (FR08b).
-4. Delete the `user` row. Foreign keys **cascade** to profile data, availability, connections, requests, blocks, notifications, sessions, tokens and participation (FR08a). They **set null** on chat and DM `sender_id`, which the UI displays as "Deleted Student" (FR08d), and on `activity.organizer_id` for past activities.
+2. Cancel each **upcoming** activity the student organizes through `activity.service.cancelUpcomingOrganized`, which notifies participants (FR08c).
+3. Give back the student's spots through `participation.service.releaseForAccountRemoval`. Organizers of upcoming joined activities are notified, and every activity's count goes down by one, past ones included, because their participation rows are about to go too (FR08b).
+4. Clear notification bodies that name the student, then delete the `user` row. Foreign keys **cascade** to profile data, availability, connections, requests, blocks, notifications, sessions, tokens and participation (FR08a). They **set null** on chat and DM `sender_id`, which the UI displays as "Deleted Student" (FR08d), and on `activity.organizer_id` for past activities.
 5. Clear the cookie. The session rows are already gone through the cascade (FR08e). The email can register again.
 
 Open details are in [Q13](open-questions.md#q13-account-removal-side-effects).

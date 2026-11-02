@@ -166,6 +166,33 @@ export function createParticipationService(
     },
 
     /**
+     * FR08b, FR41 (open question Q13): inside the account removal's transaction, tells organizers
+     * of upcoming activities the student is gone and gives back every spot they held. The name
+     * isn't kept in the notification, because the account is about to be deleted.
+     */
+    async releaseForAccountRemoval(client: DbClient, userId: string) {
+      const now = clock.now();
+      const joined = await repo.findUpcomingJoined(client, userId, now);
+      await createNotifications(
+        client,
+        joined.flatMap((activity) =>
+          activity.organizerId
+            ? [
+                {
+                  recipientId: activity.organizerId,
+                  type: NotificationType.PARTICIPANT_LEFT,
+                  activityId: activity.id,
+                  activityTitle: activity.title,
+                  body: `${MESSAGES.deletedStudent} left.`,
+                },
+              ]
+            : [],
+        ),
+      );
+      await repo.releaseSpotsOfDeparting(client, userId, now);
+    },
+
+    /**
      * FR56: when an organizer blocks a student, removes them from the organizer's upcoming
      * activities, inside the blocker's transaction. It looks like an ordinary removal with no
      * reason, so the notification says only that they were removed.

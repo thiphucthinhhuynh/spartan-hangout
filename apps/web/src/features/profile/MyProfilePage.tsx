@@ -9,10 +9,11 @@ import { formatDateTime } from '../../lib/format.js';
 import { useLogout } from '../auth/api.js';
 import { useMyProfile } from './api.js';
 import { AvailabilityList } from './AvailabilityList.js';
+import { DeleteAccountAction } from './DeleteAccountDialog.js';
 import { InterestTags } from './InterestTags.js';
 import styles from './profile.module.css';
 
-/** The student's own profile (FR12). Removing the account arrives in Milestone 13. */
+/** The student's own profile (FR12), with Log out and Remove account (FR07). */
 export function MyProfilePage() {
   const profile = useMyProfile();
   const logout = useLogout();
@@ -63,6 +64,7 @@ export function MyProfilePage() {
             >
               {logout.isPending ? 'Logging out…' : 'Log out'}
             </Button>
+            <DeleteAccountAction />
           </div>
         </Card>
 

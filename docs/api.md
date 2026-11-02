@@ -73,7 +73,7 @@
 |---|---|---|---|---|---|
 | `GET /users/me` | View own profile (FR12) | Student | – | `200 OwnProfileDto { id, email, displayName, interests, availability, updatedAt }` | – |
 | `PATCH /users/me` | Edit display name, interests, availability (FR05–FR06). Email can't be edited: an `email` key is ignored | Student | `profileUpdateSchema`: one or more of `{ displayName, interests, availability }`, same rules as registration; `availability` replaces all slots | `200 OwnProfileDto` (`updatedAt` = time of this edit) | `422 VALIDATION_FAILED` (each invalid field; nothing is saved) |
-| `DELETE /users/me` | Permanently remove the account (FR07–FR08) | Student | `{ password }` | `204` (clears cookie) | `401 INVALID_CREDENTIALS` (wrong password) |
+| `DELETE /users/me` | Permanently remove the account (FR07–FR08). Upcoming organized activities are cancelled and their participants notified; organizers of upcoming joined activities get `PARTICIPANT_LEFT` | Student | `deleteAccountSchema`: `{ password }` | `204` (clears cookie) | `401 INVALID_CREDENTIALS` (wrong password, also in `fields.password`) |
 | `GET /users/:id` | View another student's profile (FR13) | Student | – | `200 PublicProfileDto { id, displayName, interests: { type, shared }[], availability, connectionState }`. **No email.** `connectionState` is `none` or `connected` until connection requests arrive (M9) | `404 NOT_FOUND`, the same body whether the student is missing, unverified, blocked in either direction (FR57), or the id is malformed |
 
 ## Activities module: activities (FR14–FR18, FR20, FR26–FR32)

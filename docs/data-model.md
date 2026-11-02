@@ -239,8 +239,11 @@ An index on `(status, created_at DESC)` serves the administrators' list.
 |---|---|
 | availability, tokens, sessions, connections, requests, blocks, notifications, participation, removals | **CASCADE** (deleted) |
 | `activity_message.sender_id`, `direct_message.sender_id` | **SET NULL** → shown as "Deleted Student" |
+| `conversation.user_a_id` / `user_b_id` | **CASCADE**: the conversation, its messages and its notifications are deleted for both students, so the `direct_message.sender_id` rule above is only a backstop ([Q13](open-questions.md#q13-account-removal-side-effects)) |
 | `activity.organizer_id` (past activities; upcoming ones are cancelled first) | **SET NULL** |
 | `report.reporter_id` / `target_user_id` / `reviewed_by_id` | **SET NULL** (so the report history survives) |
+
+Foreign keys can't update `activity.participant_count`, so the removal lowers it first for every activity the student is in, past ones included, keeping it equal to the participation row count. It also clears notification bodies that name the student ("Sammy Spartan joined.").
 
 ## Important indexes
 

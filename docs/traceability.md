@@ -15,8 +15,8 @@ Abbreviations: **Unit-S** = shared Zod schema unit tests · **Unit-Svc** = servi
 | FR04 | Create an active profile after verification; email not shown to others | auth, users | `POST /auth/verify-email`, `GET /users/:id` | M1 (M3 for the public view) | Int | Implemented (M1–M3, in review) |
 | FR05 | Edit display name, interests, availability; email not editable | users | `PATCH /users/me` | M3 | Int, Manual | Implemented (M3, in review) |
 | FR06 | Validate edits like registration; update in place; record last-updated; save nothing if invalid | users | `PATCH /users/me` | M3 | Unit-S, Int | Implemented (M3, in review) |
-| FR07 | Remove account from the profile page with a permanent-removal warning and password | users | `DELETE /users/me` | M13 | Int, Manual | Planned |
-| FR08 | Removal effects (a)–(e); email reusable afterwards | users (+ activities, connections, messages via services) | `DELETE /users/me` | M13 | Int | Planned |
+| FR07 | Remove account from the profile page with a permanent-removal warning and password | users | `DELETE /users/me` | M13 | Int, Manual | Implemented (M13, in review) |
+| FR08 | Removal effects (a)–(e); email reusable afterwards | users (+ activities, connections, messages via services) | `DELETE /users/me` | M13 | Int | Implemented (M13, in review) |
 | FR09 | Authenticate verified email + password; generic error; no login if unverified | auth | `POST /auth/login` | M2 | Unit-Svc, Int | Implemented (M2, in review) |
 | FR10 | Session lasts until Log Out or 30 minutes idle; then login is required | auth (common/auth) | `POST /auth/logout`, `GET /auth/me`, all protected routes | M2 | Unit-Svc, Int | Implemented (M2, in review) |
 | FR11 | 15-minute lock after 5 failures in 15 minutes; reset on success or expiry | auth | `POST /auth/login` | M2 | Unit-Svc, Int | Implemented (M2, in review) |

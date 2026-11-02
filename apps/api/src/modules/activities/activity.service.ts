@@ -73,6 +73,31 @@ function toFormValues(activity: repo.ActivityValues): ActivityCreateInput {
   };
 }
 
+/** FR08c: shown to participants when the organizer's account removal cancels an activity. */
+const ORGANIZER_LEFT_REASON = 'The organizer removed their account.';
+
+/** FR32, FR40b: every participant except the organizer, with the reason if there is one. */
+async function notifyCancelled(
+  client: DbClient,
+  activityId: string,
+  activityTitle: string,
+  organizerId: string,
+  reason: string | undefined,
+) {
+  const recipients = await repo.participantIds(client, activityId, organizerId);
+  await createNotifications(
+    client,
+    recipients.map((recipientId) => ({
+      recipientId,
+      type: NotificationType.ACTIVITY_CANCELLED,
+      activityId,
+      activityTitle,
+      actorId: organizerId,
+      ...(reason ? { body: reason } : {}),
+    })),
+  );
+}
+
 export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock'>) {
   async function loadForViewer(activityId: string, viewerId: string) {
     const activity = await repo.findActivityForViewer(db, activityId, viewerId);
@@ -193,20 +218,29 @@ export function createActivityService({ db, clock }: Pick<AppDeps, 'db' | 'clock
             late?.message ?? 'This activity can’t be cancelled.',
           );
         }
-        const recipients = await repo.participantIds(tx, activityId, viewerId);
-        await createNotifications(
-          tx,
-          recipients.map((recipientId) => ({
-            recipientId,
-            type: NotificationType.ACTIVITY_CANCELLED,
-            activityId,
-            activityTitle: activity.title,
-            actorId: viewerId,
-            ...(reason ? { body: reason } : {}),
-          })),
-        );
+        await notifyCancelled(tx, activityId, activity.title, viewerId, reason);
       });
       return getDetail(viewerId, activityId);
+    },
+
+    /**
+     * FR08c: inside the account removal's transaction, cancels the student's upcoming organized
+     * activities and notifies their participants, as a normal cancellation would.
+     */
+    async cancelUpcomingOrganized(client: DbClient, organizerId: string) {
+      const now = clock.now();
+      const upcoming = await repo.findUpcomingOrganized(client, organizerId, now);
+      for (const activity of upcoming) {
+        if (await repo.cancelActivityGuarded(client, activity.id, ORGANIZER_LEFT_REASON, now)) {
+          await notifyCancelled(
+            client,
+            activity.id,
+            activity.title,
+            organizerId,
+            ORGANIZER_LEFT_REASON,
+          );
+        }
+      }
     },
 
     /**

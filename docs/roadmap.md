@@ -398,15 +398,15 @@ M9–M11 depend only on what their arrows show. With four people, M9/M10 and M11
 **Objective:** students can permanently remove their account, and every dependent record is handled.
 **Features included:** FR07–FR08.
 **Dependencies:** M6, M7, M8, M10, M12. Decision Q13.
-**Expected files/modules:** `users.service.deleteAccount`; possibly a migration adjusting FK `ON DELETE` rules; `apps/web/src/features/profile/DeleteAccountDialog.tsx`.
+**Expected files/modules:** `users.service.deleteAccount`; `activity.service.cancelUpcomingOrganized`; `participation.service.releaseForAccountRemoval`; `apps/api/test/accountRemoval.test.ts`; `apps/web/src/features/profile/DeleteAccountDialog.tsx`.
 
 | # | Task Name | Depends on | Status |
 |---|---|---|---|
-| 132 | Team decision Q13: account-removal side effects | 2 | Not started |
-| 133 | Check every FK `ON DELETE` rule against the delete summary in data-model.md; add a migration if any differ | 111, 117 | Not started |
-| 134 | `users.service.deleteAccount`: verify password; cancel upcoming organized activities; leave joined ones; delete the user; end the session; `DELETE /users/me` (FR07–FR08) | 89, 80, 133 | Not started |
-| 135 | Web: `DeleteAccountDialog` (permanent warning + password) and the Delete action on `MyProfilePage` (FR07, FR12) | 134 | Not started |
-| 136 | Automated tests (key cases): cascades, "Deleted Student" in chat, the same email can register again | 134 | Not started |
+| 132 | Team decision Q13: account-removal side effects | 2 | Not started (M13 is built on the Q13 working assumption until the team decides) |
+| 133 | Check every FK `ON DELETE` rule against the delete summary in data-model.md; add a migration if any differ | 111, 117 | In review (checked: every rule matches, so no migration was needed) |
+| 134 | `users.service.deleteAccount`: verify password; cancel upcoming organized activities; leave joined ones; delete the user; end the session; `DELETE /users/me` (FR07–FR08) | 89, 80, 133 | In review (implemented, not merged) |
+| 135 | Web: `DeleteAccountDialog` (permanent warning + password) and the Delete action on `MyProfilePage` (FR07, FR12) | 134 | In review (implemented, not merged) |
+| 136 | Automated tests (key cases): cascades, "Deleted Student" in chat, the same email can register again | 134 | In review (implemented, not merged) |
 
 **Completion criteria:** after removal, the student's data is gone or anonymized exactly as FR08 requires, their upcoming organized activities are cancelled with notifications, and the email can register again.
 

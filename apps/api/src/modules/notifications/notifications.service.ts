@@ -1,4 +1,9 @@
-import type { NotificationDto, NotificationType, Paged, PaginationInput } from '@sh/shared';
+import {
+  NotificationType,
+  type NotificationDto,
+  type Paged,
+  type PaginationInput,
+} from '@sh/shared';
 import { NotFoundError } from '../../common/errors.js';
 import type { DbClient } from '../../db.js';
 import type { AppDeps } from '../../deps.js';
@@ -22,6 +27,28 @@ export interface NewNotification {
 export async function createNotifications(client: DbClient, notifications: NewNotification[]) {
   if (notifications.length === 0) return;
   await client.notification.createMany({ data: notifications });
+}
+
+/**
+ * FR08: these bodies name the student who caused them ("Sammy Spartan joined."). Clears them so a
+ * removed student's name doesn't stay in other students' notifications; the list has wording for
+ * a missing body. Call this before deleting the user, while actor_id is still set.
+ */
+export async function forgetActorNames(client: DbClient, actorId: string) {
+  await client.notification.updateMany({
+    where: {
+      actorId,
+      type: {
+        in: [
+          NotificationType.PARTICIPANT_JOINED,
+          NotificationType.PARTICIPANT_LEFT,
+          NotificationType.CONNECTION_REQUEST,
+          NotificationType.CONNECTION_ACCEPTED,
+        ],
+      },
+    },
+    data: { body: null },
+  });
 }
 
 interface NotificationRow {

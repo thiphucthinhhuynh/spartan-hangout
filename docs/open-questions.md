@@ -137,6 +137,7 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
   - Reports filed *by* or *about* the deleted student: keep them for admins?
   - Conversations: should the other student still see the history with "Deleted Student"? FR48 would block access, since the connection is gone.
 - **Working assumption:** organizers are notified; past activities are kept with the organizer shown as "Deleted Student"; reports are kept with null references; DM history becomes inaccessible because the connection no longer exists.
+- **Built so far (M13, 2026-11-01):** implemented with this assumption. DM history is deleted rather than only made inaccessible, because `conversation` cascades with either student. The organizer's notification reads "Deleted Student left." The status stays Open until the team decides.
 
 ### Q14. Administrator accounts
 
@@ -230,5 +231,5 @@ These appear in the mockups but have no FR. They are **not planned** unless the 
 
 - **Source:** user request (2026-10-28): a yellow "Continue as Demo User" button under "Continue with SJSU email" on the login page, so a guest can explore the app in one click. No FR covers it.
 - **Decision (2026-10-28):** the button logs in to the seeded `sammy.spartan@sjsu.edu` account through the normal `POST /auth/login` (no new endpoint). The demo credentials are public on purpose. The button uses the logo's SJSU gold (`--color-accent`) with dark text for contrast. If the account doesn't exist (database not seeded), the page says the demo account isn't set up.
-- **Known limits:** everyone shares one account, so a guest's changes are seen by the next guest, and five wrong passwords for that email lock it for everyone (FR11).
+- **Known limits:** everyone shares one account, so a guest's changes are seen by the next guest, and five wrong passwords for that email lock it for everyone (FR11). Since M13 a guest can also remove the account, because its password is public; the demo button then fails until `npm run db:seed` runs again.
 - **Still open (by M14):** the seed refuses to run in production, so the deployed app has no demo account. Decide whether production gets one (and is reset periodically) or the button is hidden there.

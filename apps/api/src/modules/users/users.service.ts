@@ -1,8 +1,12 @@
-import { timeToMinutes, type ProfileUpdateInput } from '@sh/shared';
-import { NotFoundError } from '../../common/errors.js';
+import { ErrorCode, timeToMinutes, type ProfileUpdateInput } from '@sh/shared';
+import { AppError, NotFoundError } from '../../common/errors.js';
+import { verifyPassword } from '../../common/password.js';
 import { connectionStateBetween, isBlockedEitherWay } from '../../common/relationships.js';
 import type { AppDeps } from '../../deps.js';
 import { UserStatus } from '../../generated/prisma/client.js';
+import type { ActivityService } from '../activities/activity.service.js';
+import type { ParticipationService } from '../activities/participation.service.js';
+import { forgetActorNames } from '../notifications/notifications.service.js';
 import { toOwnProfileDto, toPublicProfileDto } from './users.mappers.js';
 
 const profileSelect = {
@@ -16,8 +20,37 @@ const profileSelect = {
 
 const STUDENT_NOT_FOUND = 'We couldn’t find that student.';
 
-export function createUsersService({ db, clock }: Pick<AppDeps, 'db' | 'clock'>) {
+export function createUsersService(
+  { db, clock }: Pick<AppDeps, 'db' | 'clock'>,
+  activities: ActivityService,
+  participation: ParticipationService,
+) {
   return {
+    /**
+     * FR07–FR08, architecture §11.5: after checking the password, in one transaction: cancel the
+     * student's upcoming organized activities, give back their spots, and delete the account.
+     * Foreign keys do the rest (the delete summary in docs/data-model.md). The email can register
+     * again.
+     */
+    async deleteAccount(userId: string, password: string): Promise<void> {
+      const user = await db.user.findUnique({
+        where: { id: userId },
+        select: { passwordHash: true },
+      });
+      if (!user) throw new NotFoundError();
+      if (!(await verifyPassword(user.passwordHash, password))) {
+        const message = 'That password isn’t right.';
+        throw new AppError(401, ErrorCode.INVALID_CREDENTIALS, message, { password: message });
+      }
+
+      await db.$transaction(async (tx) => {
+        await activities.cancelUpcomingOrganized(tx, userId);
+        await participation.releaseForAccountRemoval(tx, userId);
+        await forgetActorNames(tx, userId);
+        await tx.user.delete({ where: { id: userId } });
+      });
+    },
+
     /** FR12: the logged-in student's own profile, including their SJSU email. */
     async getOwnProfile(userId: string) {
       const user = await db.user.findUnique({ where: { id: userId }, select: profileSelect });

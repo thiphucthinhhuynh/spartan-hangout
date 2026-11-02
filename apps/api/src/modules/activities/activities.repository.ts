@@ -370,3 +370,45 @@ export function findUpcomingActivitiesWith(
     select: { id: true, title: true },
   });
 }
+
+// ─── Account removal (FR08) ─────────────────────────────────────────────────
+
+/** FR08c: the student's organized activities that are Open or Full and haven't started. */
+export function findUpcomingOrganized(client: DbClient, organizerId: string, now: Date) {
+  return client.activity.findMany({
+    where: {
+      organizerId,
+      status: { in: [ActivityStatus.OPEN, ActivityStatus.FULL] },
+      startAt: { gt: now },
+    },
+    select: { id: true, title: true },
+  });
+}
+
+/** FR08b: the activities the student joined that are Open or Full and haven't started. */
+export function findUpcomingJoined(client: DbClient, userId: string, now: Date) {
+  return client.activity.findMany({
+    where: {
+      status: { in: [ActivityStatus.OPEN, ActivityStatus.FULL] },
+      startAt: { gt: now },
+      participations: { some: { userId, isOrganizer: false } },
+    },
+    select: { id: true, title: true, organizerId: true },
+  });
+}
+
+/**
+ * FR08b: deleting the student also deletes all their participation rows, past ones too, so every
+ * one of those activities loses one from its count (ADR-0010). Only an activity that hasn't
+ * started reopens. Call this before deleting the user.
+ */
+export async function releaseSpotsOfDeparting(client: DbClient, userId: string, now: Date) {
+  await client.$executeRaw`
+    UPDATE "activity" SET
+      participant_count = participant_count - 1,
+      status = CASE
+        WHEN status = 'FULL' AND start_at > ${now} THEN 'OPEN'::"ActivityStatus"
+        ELSE status
+      END
+    WHERE id IN (SELECT activity_id FROM "participation" WHERE user_id = ${userId}::uuid)`;
+}
